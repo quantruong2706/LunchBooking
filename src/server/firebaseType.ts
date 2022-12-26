@@ -1,10 +1,13 @@
 export type User = {
-  address: string
-  age: string
-  bankAccount: string
-  name: string
-  password: string
-  phone: string
+  address?: string
+  age?: string
+  bankAccount?: string
+  name?: string
+  password?: string
+  phone?: string
+  email?: string | null
+  lastSeen?: string | null
+  uid?: string | null
 }
 
 export type PayHistory = {}

@@ -1,4 +1,5 @@
-import { initializeApp } from 'firebase/app'
+import { getApp, getApps, initializeApp } from 'firebase/app'
+import { getAuth, GoogleAuthProvider } from 'firebase/auth'
 import { initializeFirestore } from 'firebase/firestore'
 
 const { VITE_BASE_API_KEY } = import.meta.env
@@ -13,9 +14,12 @@ const firebaseConfig = {
   measurementId: 'G-FD0279B6RW',
 }
 
-const app = initializeApp(firebaseConfig)
+const app = getApps().length ? getApp() : initializeApp(firebaseConfig)
+
 const db = initializeFirestore(app, {
   experimentalForceLongPolling: true,
 })
+const auth = getAuth(app)
+const googleAuthProvider = new GoogleAuthProvider()
 
-export default db
+export { auth, db, googleAuthProvider }
