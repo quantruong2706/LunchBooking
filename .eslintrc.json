@@ -25,16 +25,16 @@
     "node": true
   },
   "extends": [
+    "prettier",
     "eslint:recommended",
     "plugin:react/recommended",
     "plugin:jsx-a11y/recommended",
     "plugin:prettier/recommended",
-    "plugin:react-hooks/recommended"
+    "plugin:react-hooks/recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended"
   ],
-  "plugins": [
-    "simple-import-sort",
-    "prettier"
-  ],
+  "plugins": ["react", "simple-import-sort", "prettier"],
   "rules": {
     "prettier/prettier": [
       "error",
@@ -60,6 +60,8 @@
     //   }
     // ],
     "react/prop-types": "off",
+    "@typescript-eslint/no-explicit-any": ["off"],
+    "@typescript-eslint/no-non-null-assertion": "off",
     "@typescript-eslint/explicit-function-return-type": "off",
     "simple-import-sort/imports": 1,
     "simple-import-sort/exports": 1,
@@ -70,7 +72,7 @@
       {
         "components": ["Link"],
         "specialLink": ["hrefLeft", "hrefRight"],
-        "aspects": [ "invalidHref", "preferButton"]
+        "aspects": ["invalidHref", "preferButton"]
       }
     ]
   }
