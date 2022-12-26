@@ -1,6 +1,6 @@
-import * as React from 'react'
-
-export interface IHomePageProps {}
+export interface IHomePageProps {
+  ahihi: string
+}
 
 export default function HomePage(props: IHomePageProps) {
   return (

@@ -3,8 +3,10 @@ import { RootState } from '@app/stores'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 export const namespace = 'USER'
 const initialState: IUser = {
+  uid: '',
   email: '',
-  name: '',
+  displayName: '',
+  photoURL: '',
 }
 
 const slice = createSlice({
@@ -17,5 +19,5 @@ const slice = createSlice({
 })
 
 export const { setUser, clearUser } = slice.actions
-export const userState = (state: RootState) => state[namespace]
+export const userStore = (state: RootState) => state[namespace]
 export const reducer = slice.reducer
