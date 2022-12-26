@@ -20,7 +20,7 @@ export default function Login() {
   }, [user, navigate])
   return (
     <>
-      <div className="flex min-h-full items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-tr from-primary-color to-green-500 h-screen">
+      <div className="flex min-h-full items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-tr from-secondary-color to-light-color h-screen">
         <div className="w-full max-w-sm space-y-8">
           <div>
             <img className="mx-auto h-12 w-auto" src="/login-logo.png" alt="Your Company" />

@@ -4,7 +4,8 @@ import { useAuthState } from 'react-firebase-hooks/auth'
 import { RouterProvider } from 'react-router-dom'
 
 import Router from './router/Router'
-import { auth, db } from './server/firebase'
+import { auth } from './server/firebase'
+import { usersColection } from './server/useDB'
 import { useAppDispatch } from './stores/hook'
 import { setUser } from './stores/user'
 
@@ -15,12 +16,12 @@ function App() {
     const setUserInDb = async () => {
       try {
         await setDoc(
-          doc(db, 'Users', loggedInUser?.email as string),
+          doc(usersColection, loggedInUser?.email as string),
           {
             email: loggedInUser?.email,
             lastSeen: serverTimestamp(),
             uid: loggedInUser?.uid,
-            // photoURL: loggedInUser?.photoURL,
+            // photoURL: loggedInUser?.photoURL
           },
           { merge: true }
         )
