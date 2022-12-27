@@ -8,6 +8,7 @@ import { auth } from './server/firebase'
 import { usersColection } from './server/useDB'
 import { useAppDispatch } from './stores/hook'
 import { setUser } from './stores/user'
+import { LoadingScreen } from '@app/components/Suspense'
 
 function App() {
   const [loggedInUser, loading] = useAuthState(auth)
@@ -23,7 +24,7 @@ function App() {
             uid: loggedInUser?.uid,
             // photoURL: loggedInUser?.photoURL
           },
-          { merge: true }
+          { merge: true },
         )
       } catch (error) {
         console.log('ERROR SETTING USER INFO IN DB', error)
@@ -38,7 +39,7 @@ function App() {
           displayName: displayName || 'unknown',
           email: email || 'undefined',
           photoURL: photoURL || '',
-        })
+        }),
       )
       setUserInDb()
     }
@@ -46,7 +47,7 @@ function App() {
   if (loading) {
     return (
       <div>
-        <span>Loading...</span>
+        <LoadingScreen />
       </div>
     )
   }

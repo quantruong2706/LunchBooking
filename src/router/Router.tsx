@@ -9,12 +9,16 @@ interface PrivateRouteProps {
   Comp: () => JSX.Element
   role?: string
 }
+
 const PrivateRoute = (props: PrivateRouteProps) => {
   const user = useAppSelector(userStore)
   const navigate = useNavigate()
   useEffect(() => {
     if (!user.uid) {
       navigate('/login')
+    }
+    if (!user.bankAccount && user.uid) {
+      navigate('/profile')
     }
   }, [navigate, user])
   return _c(props.Comp)
@@ -32,6 +36,10 @@ export default createBrowserRouter([
       {
         path: 'home',
         element: _c(AppSuspense, null, _c(lazy(() => import('@app/page/Home')))),
+      },
+      {
+        path: 'profile',
+        element: _c(AppSuspense, null, _c(lazy(() => import('@app/page/Profile')))),
       },
     ],
   },

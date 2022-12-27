@@ -4,10 +4,10 @@ import { userStore } from '@app/stores/user'
 import { useEffect } from 'react'
 import { useSignInWithGoogle } from 'react-firebase-hooks/auth'
 import { useNavigate } from 'react-router-dom'
+import { FcGoogle } from 'react-icons/all'
 
 export default function Login() {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [signInWithGoogle, _user, loading, error] = useSignInWithGoogle(auth)
+  const [signInWithGoogle, _user, loading] = useSignInWithGoogle(auth)
   const navigate = useNavigate()
   const user = useAppSelector(userStore)
   const signIn = () => {
@@ -20,18 +20,24 @@ export default function Login() {
   }, [user, navigate])
   return (
     <>
-      <div className="flex min-h-full items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-tr from-secondary-color to-light-color h-screen">
-        <div className="w-full max-w-sm space-y-8">
+      <div
+        className='flex min-h-full items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-tr from-secondary-color to-light-color h-screen'>
+        <div className='w-full max-w-xs space-y-8'>
           <div>
-            <img className="mx-auto h-12 w-auto" src="/login-logo.png" alt="Your Company" />
+            <img className='mx-auto h-56' src='/login-logo.png' alt='Your Company' />
           </div>
-          <div className="mt-8 space-y-6">
+          <div className='text-center'>
+            <span className='text-white text-3xl'>Happy Lunch</span>
+          </div>
+          <div>
             <button
-              className="focus:outline-none focus:ring-offset-1 focus:ring-gray-700 py-3.5 px-4 rounded-full w-full mt-10 bg-white text-primary-color"
+              className='focus:outline-none focus:ring-offset-1 focus:ring-gray-700 py-3.5 px-4 rounded-full w-full mt-10 bg-white text-primary-color'
               onClick={signIn}
+              disabled={loading}
             >
-              <span className="text-xl">
-                <i className="fa-brands fa-google"></i> Continue with Google
+              <span className='text-xl flex items-center justify-center gap-4'>
+                <FcGoogle size={36} />
+                Sign in with Google
               </span>
             </button>
           </div>
