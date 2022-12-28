@@ -21,10 +21,10 @@ const Login = () => {
   return (
     <>
       <div
-        className='flex min-h-full items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-tr from-secondary-color to-light-color h-screen'>
+        className='flex min-h-full items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-[#439D0D] h-screen'>
         <div className='w-full max-w-xs space-y-8'>
-          <div>
-            <img className='mx-auto h-56' src='/login-logo.png' alt='Your Company' />
+          <div className='flex items-center justify-center'>
+            <img src='/login-logo.png' alt='Your Company' className='h-56 w-56' />
           </div>
           <div className='text-center'>
             <span className='text-white text-3xl'>Happy Lunch</span>

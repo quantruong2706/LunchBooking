@@ -21,42 +21,43 @@ const Profile = () => {
   return (
     <div className='bg-white'>
       {/*Header section*/}
-      <div className='bg-green-300 h-72 rounded-b-2xl flex flex-col items-center justify-center'>
+      <div
+        className='bg-gradient-to-b from-[#CAF5B1] to-[#8AD769] to-green-300 h-72 rounded-b-2xl flex flex-col items-center justify-center'>
         <button className='self-start px-4' onClick={logout}><TiArrowBack size={32} /></button>
         <img src={user.photoURL} alt='' referrerPolicy='no-referrer' className='rounded-full w-28' />
         <span className='py-2 text-xl'>{user.displayName}</span>
         <span className='text-md'>randomemail@cmcglobal.vn</span>
         <span className='pt-4 text-md'>
-          <span className='font-bold'>Chủ trì</span>: 4 lần |
+          <span className='font-bold'>Chủ chi</span>: 4 lần |
           <span className='font-bold'> Tham gia</span>: 4 lần
         </span>
       </div>
       {/*Details section*/}
       <div className='px-6 py-4'>
         <div className='flex flex-col pb-4'>
-          <label htmlFor='' className='pb-1'>LDAP:</label>
+          <label htmlFor='' className='pb-1 font-bold text-gray-500'>LDAP</label>
           <input type='text' placeholder='Example: ntphuc1' className='border-b-2' />
         </div>
         <div className='flex flex-col pb-4'>
-          <label htmlFor='' className='pb-1'>Mobile number:</label>
+          <label htmlFor='' className='pb-1 font-bold text-gray-500'>Mobile</label>
           <input type='number' placeholder='' className='border-b-2' />
         </div>
         <div className='flex flex-col pb-4'>
-          <label htmlFor='' className='pb-1'>Address:</label>
+          <label htmlFor='' className='pb-1 font-bold text-gray-500'>Address</label>
           <input type='text' placeholder='Example: Cau Giay, Ha Noi' className='border-b-2' />
         </div>
         <div className='flex flex-col pb-4'>
-          <label htmlFor='' className='pb-1'>Bank:</label>
+          <label htmlFor='' className='pb-1 font-bold text-gray-500'>Bank</label>
           <input type='text' placeholder='' className='border-b-2' />
         </div>
         <div className='flex flex-col pb-4'>
-          <label htmlFor='' className='pb-1'>Account number:</label>
+          <label htmlFor='' className='pb-1 font-bold text-gray-500'>Account</label>
           <input type='text' placeholder='' className='border-b-2' />
         </div>
         <div className='flex flex-col items-center '>
-          <label htmlFor='' className='pb-1 self-start'>Account QR image:</label>
+          <label htmlFor='' className='pb-1 self-start font-bold text-gray-500'>Account QR</label>
           <img src='src/assets/profile-picture.png' alt='QR code image'
-               className='w-48 h-48' />
+               className='h-60 h-60' />
         </div>
       </div>
     </div>
