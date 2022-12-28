@@ -19,7 +19,7 @@ const Profile = () => {
   }
 
   return (
-    <div className='bg-white h-screen'>
+    <div className='bg-white'>
       {/*Header section*/}
       <div className='bg-green-300 h-72 rounded-b-2xl flex flex-col items-center justify-center'>
         <button className='self-start px-4' onClick={logout}><TiArrowBack size={32} /></button>
@@ -53,8 +53,10 @@ const Profile = () => {
           <label htmlFor='' className='pb-1'>Account number:</label>
           <input type='text' placeholder='' className='border-b-2' />
         </div>
-        <div className='flex flex-col pb-4'>
-          <label htmlFor='' className='pb-1'>Account QR image:</label>
+        <div className='flex flex-col items-center '>
+          <label htmlFor='' className='pb-1 self-start'>Account QR image:</label>
+          <img src='src/assets/profile-picture.png' alt='QR code image'
+               className='w-48 h-48' />
         </div>
       </div>
     </div>
