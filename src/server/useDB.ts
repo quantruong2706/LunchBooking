@@ -1,6 +1,7 @@
+import { collection, CollectionReference, DocumentData } from 'firebase/firestore'
+
 import { db } from './firebase'
-import { CollectionReference, collection, DocumentData } from 'firebase/firestore'
-import { User, Event } from './firebaseType'
+import { Event, User } from './firebaseType'
 
 const createCollection = <T = DocumentData>(collectionName: string) => {
   return collection(db, collectionName) as CollectionReference<T>

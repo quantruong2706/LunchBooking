@@ -1,11 +1,13 @@
 import { configureStore } from '@reduxjs/toolkit'
 
+import * as eventStore from './events'
 import * as userStore from './user'
 // ...
 
 export const store = configureStore({
   reducer: {
     [userStore.namespace]: userStore.reducer,
+    [eventStore.namespace]: eventStore.reducer,
   },
 })
 

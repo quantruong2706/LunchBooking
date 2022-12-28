@@ -2,7 +2,7 @@ export type User = {
   address?: string
   age?: string
   bankAccount?: string
-  name?: string
+  name?: string | null
   password?: string
   phone?: string
   email?: string | null
@@ -10,7 +10,7 @@ export type User = {
   uid?: string | null
 }
 
-export type PayHistory = {}
+// export type PayHistory = {}
 
 export type Event = {
   address: string

@@ -1,3 +1,8 @@
+import { LoadingScreen } from '@app/components/Suspense'
+import theme from '@app/style/theme'
+import { ThemeProvider } from '@mui/material'
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { doc, serverTimestamp, setDoc } from 'firebase/firestore'
 import { useEffect } from 'react'
 import { useAuthState } from 'react-firebase-hooks/auth'
@@ -8,7 +13,6 @@ import { auth } from './server/firebase'
 import { usersColection } from './server/useDB'
 import { useAppDispatch } from './stores/hook'
 import { setUser } from './stores/user'
-import { LoadingScreen } from '@app/components/Suspense'
 
 function App() {
   const [loggedInUser, loading] = useAuthState(auth)
@@ -22,9 +26,14 @@ function App() {
             email: loggedInUser?.email,
             lastSeen: serverTimestamp(),
             uid: loggedInUser?.uid,
+            address: '',
+            age: '',
+            bankAccount: '',
+            name: loggedInUser?.displayName,
+            phone: '',
             // photoURL: loggedInUser?.photoURL
           },
-          { merge: true },
+          { merge: true }
         )
       } catch (error) {
         console.log('ERROR SETTING USER INFO IN DB', error)
@@ -39,7 +48,7 @@ function App() {
           displayName: displayName || 'unknown',
           email: email || 'undefined',
           photoURL: photoURL || '',
-        }),
+        })
       )
       setUserInDb()
     }
@@ -51,7 +60,13 @@ function App() {
       </div>
     )
   }
-  return <RouterProvider router={Router} />
+  return (
+    <ThemeProvider theme={theme}>
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <RouterProvider router={Router} />
+      </LocalizationProvider>
+    </ThemeProvider>
+  )
 }
 
 export default App
