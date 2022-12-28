@@ -27,7 +27,7 @@ const Login = () => {
             <img src='/login-logo.png' alt='Your Company' className='h-56 w-56' />
           </div>
           <div className='text-center'>
-            <span className='text-white text-3xl'>Happy Lunch</span>
+            <span className='text-white text-4xl font-bellota'>Happy Lunch</span>
           </div>
           <div>
             <button

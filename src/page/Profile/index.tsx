@@ -24,7 +24,7 @@ const Profile = () => {
       <div
         className='bg-gradient-to-b from-[#CAF5B1] to-[#8AD769] to-green-300 h-72 rounded-b-2xl flex flex-col items-center justify-center'>
         <button className='self-start px-4' onClick={logout}><ReplyIcon fontSize={'large'} /></button>
-        <img src={user.photoURL} alt='' referrerPolicy='no-referrer' className='rounded-full w-28' />
+        <img src='/src/assets/profile-picture.png' alt='' referrerPolicy='no-referrer' className='rounded-full w-28' />
         <span className='py-2 text-xl'>{user.displayName}</span>
         <span className='text-md'>randomemail@cmcglobal.vn</span>
         <span className='pt-4 text-md'>
