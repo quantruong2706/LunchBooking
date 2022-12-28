@@ -13,6 +13,7 @@ export type User = {
 export type PayHistory = {}
 
 export type Event = {
+  id: string
   address: string
   date: string
   name: string
