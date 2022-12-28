@@ -4,7 +4,7 @@ import { userStore } from '@app/stores/user'
 import { useEffect } from 'react'
 import { useSignInWithGoogle } from 'react-firebase-hooks/auth'
 import { useNavigate } from 'react-router-dom'
-import { FcGoogle } from 'react-icons/all'
+import GoogleIcon from '@mui/icons-material/Google'
 
 const Login = () => {
   const [signInWithGoogle, _user, loading] = useSignInWithGoogle(auth)
@@ -36,7 +36,7 @@ const Login = () => {
               disabled={loading}
             >
               <span className='text-xl flex items-center justify-center gap-4'>
-                <FcGoogle size={36} />
+                <GoogleIcon fontSize={'large'} />
                 Sign in with Google
               </span>
             </button>
