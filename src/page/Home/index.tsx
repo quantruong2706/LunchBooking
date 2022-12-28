@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 
-export default function HomePage() {
+const HomePage = () => {
   return (
     <div>
       <h1 className='text-3xl font-bold'>Home Page</h1>
@@ -9,3 +9,5 @@ export default function HomePage() {
     </div>
   )
 }
+
+export default HomePage

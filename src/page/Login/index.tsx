@@ -6,7 +6,7 @@ import { useSignInWithGoogle } from 'react-firebase-hooks/auth'
 import { useNavigate } from 'react-router-dom'
 import { FcGoogle } from 'react-icons/all'
 
-export default function Login() {
+const Login = () => {
   const [signInWithGoogle, _user, loading] = useSignInWithGoogle(auth)
   const navigate = useNavigate()
   const user = useAppSelector(userStore)
@@ -46,3 +46,5 @@ export default function Login() {
     </>
   )
 }
+
+export default Login

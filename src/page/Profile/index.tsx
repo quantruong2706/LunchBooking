@@ -1,9 +1,62 @@
 import React from 'react'
+import { useAppSelector } from '@app/stores/hook'
+import { clearUser, userStore } from '@app/stores/user'
+import { TiArrowBack } from 'react-icons/all'
+import { signOut } from 'firebase/auth'
+import { auth } from '@app/server/firebase'
+import { store } from '@app/stores'
 
 const Profile = () => {
+  const user = useAppSelector(userStore)
+  const logout = async () => {
+    try {
+      await signOut(auth).then(() => {
+        store.dispatch(clearUser())
+      })
+    } catch (error) {
+      console.log('ERROR LOGGING OUT', error)
+    }
+  }
+
   return (
-    <div className='bg-white h-screen rounded-t-2xl p-3'>
-      <h2 className='font-bold text-2xl text-center'>Profile page</h2>
+    <div className='bg-white h-screen'>
+      {/*Header section*/}
+      <div className='bg-green-300 h-72 rounded-b-2xl flex flex-col items-center justify-center'>
+        <button className='self-start px-4' onClick={logout}><TiArrowBack size={32} /></button>
+        <img src={user.photoURL} alt='' referrerPolicy='no-referrer' className='rounded-full w-28' />
+        <span className='py-2 text-xl'>{user.displayName}</span>
+        <span className='text-md'>randomemail@cmcglobal.vn</span>
+        <span className='pt-4 text-md'>
+          <span className='font-bold'>Chủ trì</span>: 4 lần |
+          <span className='font-bold'> Tham gia</span>: 4 lần
+        </span>
+      </div>
+      {/*Details section*/}
+      <div className='px-6 py-4'>
+        <div className='flex flex-col pb-4'>
+          <label htmlFor='' className='pb-1'>LDAP:</label>
+          <input type='text' placeholder='Example: ntphuc1' className='border-b-2' />
+        </div>
+        <div className='flex flex-col pb-4'>
+          <label htmlFor='' className='pb-1'>Mobile number:</label>
+          <input type='number' placeholder='' className='border-b-2' />
+        </div>
+        <div className='flex flex-col pb-4'>
+          <label htmlFor='' className='pb-1'>Address:</label>
+          <input type='text' placeholder='Example: Cau Giay, Ha Noi' className='border-b-2' />
+        </div>
+        <div className='flex flex-col pb-4'>
+          <label htmlFor='' className='pb-1'>Bank:</label>
+          <input type='text' placeholder='' className='border-b-2' />
+        </div>
+        <div className='flex flex-col pb-4'>
+          <label htmlFor='' className='pb-1'>Account number:</label>
+          <input type='text' placeholder='' className='border-b-2' />
+        </div>
+        <div className='flex flex-col pb-4'>
+          <label htmlFor='' className='pb-1'>Account QR image:</label>
+        </div>
+      </div>
     </div>
   )
 }
