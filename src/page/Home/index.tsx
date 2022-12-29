@@ -9,6 +9,50 @@ export interface IHomePageProps {
 
 export default function HomePage(props: IHomePageProps) {
   const user = useAppSelector(userStore)
+  const dataEvents = [
+      {
+        id: 1,
+        name: "Gà Mạnh Hoạch",
+        type: 'admin',
+        total: 1200000,
+        cost: 100000
+      },
+      {
+        id: 2,
+        name: "Phật Nhảy Tường",
+        type: 'admin',
+        total: 1200000,
+        cost: 100000
+      },
+      {
+        id: 3,
+        name: "1900s",
+        type: 'member',
+        total: 1200000,
+        cost: 100000
+      },
+      {
+        id: 4,
+        name: "Bia Tạ Hiện",
+        type: 'member',
+        total: 1200000,
+        cost: 100000
+      },
+      {
+        id: 5,
+        name: "Trà Sữa sương sương",
+        type: 'member',
+        total: 1200000,
+        cost: 80000
+      },
+      {
+        id: 6,
+        name: "Bánh Mì Hội An",
+        type: 'member',
+        total: 1200000,
+        cost: 50000
+      },
+  ];
   const css = `
     html {
       width: 100vw;
@@ -92,7 +136,7 @@ export default function HomePage(props: IHomePageProps) {
           <p id="username">{user.displayName}</p>
         </Grid>
         <Grid item xs={2}>
-          <img id="userImg" src={user.photoURL} alt="user_photo"/>
+          <a href="/my-profile"><img id="userImg" src={user.photoURL} alt="user_photo"/></a>
         </Grid>
       </Grid>
       <Grid id="dashboard" container direction="row" alignItems="center" justifyContent="center" spacing={3} sx={{marginLeft: { xs: '-12px', sm: '0'} }}>
@@ -106,68 +150,48 @@ export default function HomePage(props: IHomePageProps) {
         </Grid>
         <Grid className="item box" item sm={3} sx={{ display: { xs: 'none', sm: 'block' }, maxWidth: { sm: '20vw', lg: '14vw'} }}>
           <p className="itemHeader">Cần trả</p>
-          <p className="itemDetail">400.000</p>
+          <p className="itemDetail">{dataEvents.filter(x => x.type == "member").reduce((total, data) => total += data.cost, 0)}</p>
         </Grid>
         <Grid className="item box" item sm={3} sx={{ display: { xs: 'none', sm: 'block' }, maxWidth: { sm: '20vw', lg: '14vw'} }}>
           <p className="itemHeader">Cần đòi</p>
-          <p className="itemDetail">1.920.000</p>
+          <p className="itemDetail">{dataEvents.filter(x => x.type == "admin").reduce((total, data) => total += data.total, 0)}</p>
         </Grid>
         </Grid>
         <Grid id="list" container direction="row" alignItems="center" justifyContent="center" spacing={3} sx={{marginLeft: { xs: '-12px', sm: '0'} }}>
           <Grid className="item box" item xs={12} sm={6} sx={{maxWidth: { sm: '43vw', lg: '29vw'} }}>
             <div>
               <span className="text-bold">Số bữa chưa trả</span>
-              <span className="text-right">4 bữa</span>
+              <span className="text-right">{dataEvents.filter(x => x.type == "member").length} bữa</span>
             </div>
             <hr className="divider"/>
-            <div>
-              <a href="/" className="text-link">Gà Mạch Hoạch</a>
-              <span className="text-right">100.000</span>
-            </div>
-            <div>
-              <a href="/" className="text-link">Gà Mạch Hoạch</a>
-              <span className="text-right">100.000</span>
-            </div>
-            <div>
-              <a href="/" className="text-link">Gà Mạch Hoạch</a>
-              <span className="text-right">100.000</span>
-            </div>
-            <div>
-              <a href="/" className="text-link">Gà Mạch Hoạch</a>
-              <span className="text-right">100.000</span>
-            </div>
+            {dataEvents.filter(x => x.type == "member").map(data => 
+              <div>
+                <a href={'/events/' + data.id} className="text-link">{data.name}</a>
+                <span className="text-right">{data.cost}</span>
+              </div>
+             )}
             <hr className="divider"/>
             <div>
               <span className="text-bold">Total</span>
-              <span className="text-right">400.000</span>
+              <span className="text-right">{dataEvents.filter(x => x.type == "member").reduce((total, data) => total += data.cost, 0)}</span>
             </div>
           </Grid>
           <Grid className="item box" item xs={12} sm={6} sx={{maxWidth: { sm: '43vw', lg: '29vw'} }}>
           <div>
-              <span className="text-bold">Số bữa chưa trả</span>
-              <span className="text-right">4 bữa</span>
+              <span className="text-bold">Số bữa cần đòi</span>
+              <span className="text-right">{dataEvents.filter(x => x.type == "admin").length} bữa</span>
             </div>
             <hr className="divider"/>
-            <div>
-              <a href="/" className="text-link">Gà Mạch Hoạch</a>
-              <span className="text-right">100.000</span>
-            </div>
-            <div>
-              <a href="/" className="text-link">Gà Mạch Hoạch</a>
-              <span className="text-right">100.000</span>
-            </div>
-            <div>
-              <a href="/" className="text-link">Gà Mạch Hoạch</a>
-              <span className="text-right">100.000</span>
-            </div>
-            <div>
-              <a href="/" className="text-link">Gà Mạch Hoạch</a>
-              <span className="text-right">100.000</span>
-            </div>
+            {dataEvents.filter(x => x.type == "admin").map(data => 
+              <div>
+                <a href={'/events/' + data.id} className="text-link">{data.name}</a>
+                <span className="text-right">{data.total}</span>
+              </div>
+             )}
             <hr className="divider"/>
             <div>
               <span className="text-bold">Total</span>
-              <span className="text-right">400.000</span>
+              <span className="text-right">{dataEvents.filter(x => x.type == "admin").reduce((total, data) => total += data.total, 0)}</span>
             </div>
           </Grid>
         </Grid>
