@@ -1,4 +1,4 @@
-import { PAGES } from '@app/contants'
+import { PAGES, PAGE_ROUTES } from '@app/contants'
 import { currentPageStore, setCurrentPage } from '@app/stores/footer'
 import { useAppDispatch } from '@app/stores/hook'
 import AddCircleIcon from '@mui/icons-material/AddCircle'
@@ -7,13 +7,17 @@ import ListAltIcon from '@mui/icons-material/ListAlt'
 import NotificationsIcon from '@mui/icons-material/Notifications'
 import PeopleIcon from '@mui/icons-material/People'
 import { useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 
 const Footer = () => {
   const dispatch = useAppDispatch()
+
+  const navigateTo = useNavigate()
   const currentPage = useSelector(currentPageStore)
 
   const onClickFooterIcon = (page: string) => {
     dispatch(setCurrentPage(page))
+    navigateTo(PAGE_ROUTES[page])
   }
 
   return (
