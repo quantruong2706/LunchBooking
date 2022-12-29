@@ -3,7 +3,7 @@ import AppSuspense from '@app/components/Suspense'
 import { useAppSelector } from '@app/stores/hook'
 import { userStore } from '@app/stores/user'
 import { lazy, useEffect } from 'react'
-import { createBrowserRouter, Navigate, useNavigate } from 'react-router-dom'
+import { createBrowserRouter, Navigate, Outlet, useNavigate } from 'react-router-dom'
 
 interface PrivateRouteProps {
   Comp: () => JSX.Element
@@ -18,13 +18,16 @@ const PrivateRoute = ({ Comp }: PrivateRouteProps) => {
       if (!user.uid) {
         navigate('/login', { state: window.location.pathname })
       }
-      if (!user.bankAccount && user.uid) {
-        navigate('/profile')
-      }
+      // if (!user.bankAccount && user.uid) {
+      //   navigate('/profile')
+      // }
     }, 0)
     return () => {
       clearTimeout(checkRouteTimeOut)
     }
+    // if (!user.bankAccount && user.uid) {
+    //   navigate('/profile')
+    // }
   }, [navigate, user])
   return <Comp />
 }
@@ -46,12 +49,31 @@ export default createBrowserRouter([
         path: 'profile',
         element: <AppSuspense comp={lazy(() => import('@app/page/Profile'))} />,
       },
+      {
+        path: 'events',
+        element: <Outlet />,
+        children: [
+          {
+            path: '',
+            element: <AppSuspense comp={lazy(() => import('@app/page/Events/List'))} />,
+          },
+          {
+            path: 'add',
+            element: <AppSuspense comp={lazy(() => import('@app/page/Events/Add'))} />,
+          },
+          {
+            path: ':id',
+            element: <AppSuspense comp={lazy(() => import('@app/page/Events/LunchDetail'))} />,
+          },
+        ],
+      },
     ],
   },
   {
     path: 'login',
     element: <AppSuspense comp={lazy(() => import('@app/page/Login'))} />,
   },
+
   {
     path: '*',
     element: <AppSuspense comp={lazy(() => import('@app/page/notfound'))} />,

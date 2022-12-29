@@ -11,6 +11,9 @@ module.exports = {
         'grey-1': '#A0A0A0',
         'grey-2': '#D9D9D9',
       },
+ fontFamily: {
+        bellota: ['"Bellota"', 'cursive'],
+      },
     },
   },
   plugins: [],
