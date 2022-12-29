@@ -12,5 +12,7 @@ const createDocumentReference = <T = DocumentData>(collectionName: string, id: s
 
 // export all your collections
 export const usersColection = createCollection<User>('Users')
+export const userId = createCollection<User>('UserID')
 export const EventColection = createCollection<Event>('Events')
 export const EventDetail = (id: string) => createDocumentReference<Event>('Events', id)
+export const UserDetail = (id: string) => createDocumentReference<User>('Users', id)

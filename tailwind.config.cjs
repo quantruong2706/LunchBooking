@@ -8,6 +8,9 @@ module.exports = {
         'secondary-color': '#5BD76F',
         'light-color': '#CAF5B1',
       },
+      fontFamily: {
+        'bellota': ['"Bellota"', 'cursive'],
+      },
     },
   },
   plugins: [],

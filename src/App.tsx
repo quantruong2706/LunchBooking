@@ -10,7 +10,7 @@ import { RouterProvider } from 'react-router-dom'
 
 import Router from './router/Router'
 import { auth } from './server/firebase'
-import { usersColection } from './server/useDB'
+import { userId } from './server/useDB'
 import { useAppDispatch } from './stores/hook'
 import { setUser } from './stores/user'
 
@@ -21,7 +21,7 @@ function App() {
     const setUserInDb = async () => {
       try {
         await setDoc(
-          doc(usersColection, loggedInUser?.uid as string),
+          doc(userId, loggedInUser?.uid as string),
           {
             email: loggedInUser?.email,
             lastSeen: serverTimestamp(),

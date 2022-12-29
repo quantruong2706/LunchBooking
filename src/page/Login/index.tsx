@@ -1,12 +1,12 @@
 import { auth } from '@app/server/firebase'
 import { useAppSelector } from '@app/stores/hook'
 import { userStore } from '@app/stores/user'
+import GoogleIcon from '@mui/icons-material/Google'
 import { useEffect } from 'react'
 import { useSignInWithGoogle } from 'react-firebase-hooks/auth'
-import { FcGoogle } from 'react-icons/all'
 import { useLocation, useNavigate } from 'react-router-dom'
 
-export default function Login() {
+const Login = () => {
   const [signInWithGoogle, _user, loading] = useSignInWithGoogle(auth)
   const navigate = useNavigate()
   const location = useLocation()
@@ -22,13 +22,13 @@ export default function Login() {
   }, [user, navigate, location])
   return (
     <>
-      <div className="flex min-h-full items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-tr from-secondary-color to-light-color h-screen">
+      <div className="flex min-h-full items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-[#439D0D] h-screen">
         <div className="w-full max-w-xs space-y-8">
-          <div>
-            <img className="mx-auto h-56" src="/login-logo.png" alt="Your Company" />
+          <div className="flex items-center justify-center">
+            <img src="/login-logo.png" alt="Your Company" className="h-56 w-56" />
           </div>
           <div className="text-center">
-            <span className="text-white text-3xl">Happy Lunch</span>
+            <span className="text-white text-4xl font-bellota">Happy Lunch</span>
           </div>
           <div>
             <button
@@ -37,7 +37,7 @@ export default function Login() {
               disabled={loading}
             >
               <span className="text-xl flex items-center justify-center gap-4">
-                <FcGoogle size={36} />
+                <GoogleIcon fontSize={'large'} />
                 Sign in with Google
               </span>
             </button>
@@ -47,3 +47,5 @@ export default function Login() {
     </>
   )
 }
+
+export default Login
