@@ -2,7 +2,8 @@ import React, { Suspense } from 'react'
 import { CircularProgress } from '@mui/material'
 
 interface AppSuspenseProps {
-  children: React.ReactElement
+  children?: React.ReactElement
+  comp?: React.LazyExoticComponent<() => JSX.Element>
 }
 
 export const LoadingScreen = () => {
@@ -13,9 +14,8 @@ export const LoadingScreen = () => {
   )
 }
 
-
-const AppSuspense: React.FC<AppSuspenseProps> = ({ children }) => {
-  return <Suspense fallback={<LoadingScreen />}>{children}</Suspense>
+const AppSuspense: React.FC<AppSuspenseProps> = ({ children, comp: Comp }) => {
+  return <Suspense fallback={<LoadingScreen />}>{Comp ? <Comp /> : children}</Suspense>
 }
 
 export default AppSuspense

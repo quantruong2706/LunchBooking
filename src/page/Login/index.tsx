@@ -4,20 +4,21 @@ import { userStore } from '@app/stores/user'
 import GoogleIcon from '@mui/icons-material/Google'
 import { useEffect } from 'react'
 import { useSignInWithGoogle } from 'react-firebase-hooks/auth'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 const Login = () => {
   const [signInWithGoogle, _user, loading] = useSignInWithGoogle(auth)
   const navigate = useNavigate()
+  const location = useLocation()
   const user = useAppSelector(userStore)
   const signIn = () => {
     signInWithGoogle()
   }
   useEffect(() => {
     if (user.uid) {
-      navigate('/')
+      navigate(location.state || '/')
     }
-  }, [user, navigate])
+  }, [user, navigate, location])
   return (
     <>
       <div className="flex min-h-full items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-[#439D0D] h-screen">
