@@ -4,10 +4,10 @@ import { formatMoney } from '@app/libs/functions'
 import { Event } from '@app/server/firebaseType'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-
 const List = () => {
   const [test, _] = useState(false)
   const [listEvent, setListEvent] = useState<Event[]>([])
+
   useEffect(() => {
     getListEvent().then((e) => {
       setListEvent(e)
@@ -57,7 +57,7 @@ const List = () => {
                     </span>
                     <br />
                     <span>
-                      Số tiền chưa đòi: <b>{formatMoney(item.total)}</b>
+                      Số tiền chưa đòi: <b>{formatMoney(item.billAmount)}</b>
                     </span>
                   </div>
                   <span

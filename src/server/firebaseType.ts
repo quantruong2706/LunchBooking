@@ -17,6 +17,7 @@ export type User = {
 // export type PayHistory = {}
 
 export interface Event {
+  id: string
   address?: string
   date?: string
   name?: string
