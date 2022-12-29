@@ -1,9 +1,7 @@
 import { useAppSelector } from "@app/stores/hook"
 import { userStore } from "@app/stores/user"
 import { Grid } from "@mui/material"
-import Paper from "@mui/material/Paper"
 import { Container } from "@mui/system"
-import style from './style.css'
 
 export interface IHomePageProps {
   ahihi: string
@@ -12,6 +10,10 @@ export interface IHomePageProps {
 export default function HomePage(props: IHomePageProps) {
   const user = useAppSelector(userStore)
   const css = `
+    html {
+      width: 100vw;
+      height: 100vh;
+    }
     #header, #dashboard, #list {
       margin-top: 20px;
       margin-bottom: 20px;
@@ -37,8 +39,9 @@ export default function HomePage(props: IHomePageProps) {
     }
     #userImg {
       width: 64px;
-      height: 64px;
+      height: auto;
       border-radius: 32px;
+      float: right;
 
       filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25));
     }
@@ -92,26 +95,26 @@ export default function HomePage(props: IHomePageProps) {
           <img id="userImg" src={user.photoURL} alt="user_photo"/>
         </Grid>
       </Grid>
-      <Grid id="dashboard" container direction="row" alignItems="center" justifyContent="center" spacing={3}>
-        <Grid className="item box" item xs={6} sm={3} sx={{maxWidth: { xs: '40vw', sm: '14vw'} }}>
-          <p className="itemHeader">Số bữa đã tham gia</p>
+      <Grid id="dashboard" container direction="row" alignItems="center" justifyContent="center" spacing={3} sx={{marginLeft: { xs: '-12px', sm: '0'} }}>
+        <Grid className="item box" item xs={6} sm={3} sx={{maxWidth: { xs: '43vw', sm: '20vw', lg: '14vw'} }}>
+          <p className="itemHeader">Tham gia</p>
           <p className="itemDetail">12</p>
         </Grid>
-        <Grid className="item box" item xs={6} sm={3} sx={{maxWidth: { xs: '40vw', sm: '14vw'} }}>
-          <p className="itemHeader">Số lần chủ chi</p>
+        <Grid className="item box" item xs={6} sm={3} sx={{maxWidth: { xs: '43vw', sm: '20vw', lg: '14vw'} }}>
+          <p className="itemHeader">Chủ chi</p>
           <p className="itemDetail">12</p>
         </Grid>
-        <Grid className="item box" item sm={3} sx={{ display: { xs: 'none', sm: 'block' }, maxWidth: { sm: '14vw'} }}>
-          <p className="itemHeader">Số tiền chưa trả</p>
+        <Grid className="item box" item sm={3} sx={{ display: { xs: 'none', sm: 'block' }, maxWidth: { sm: '20vw', lg: '14vw'} }}>
+          <p className="itemHeader">Cần trả</p>
           <p className="itemDetail">400.000</p>
         </Grid>
-        <Grid className="item box" item sm={3} sx={{ display: { xs: 'none', sm: 'block' }, maxWidth: { sm: '14vw'} }}>
-          <p className="itemHeader">Số tiền chưa đòi</p>
+        <Grid className="item box" item sm={3} sx={{ display: { xs: 'none', sm: 'block' }, maxWidth: { sm: '20vw', lg: '14vw'} }}>
+          <p className="itemHeader">Cần đòi</p>
           <p className="itemDetail">1.920.000</p>
         </Grid>
         </Grid>
         <Grid id="list" container direction="row" alignItems="center" justifyContent="center" spacing={3} sx={{marginLeft: { xs: '-12px', sm: '0'} }}>
-          <Grid className="item box" item xs={12} sm={6} sx={{maxWidth: { sm: '29vw'} }}>
+          <Grid className="item box" item xs={12} sm={6} sx={{maxWidth: { sm: '43vw', lg: '29vw'} }}>
             <div>
               <span className="text-bold">Số bữa chưa trả</span>
               <span className="text-right">4 bữa</span>
@@ -139,7 +142,7 @@ export default function HomePage(props: IHomePageProps) {
               <span className="text-right">400.000</span>
             </div>
           </Grid>
-          <Grid className="item box" item xs={12} sm={6} sx={{maxWidth: { sm: '29vw'} }}>
+          <Grid className="item box" item xs={12} sm={6} sx={{maxWidth: { sm: '43vw', lg: '29vw'} }}>
           <div>
               <span className="text-bold">Số bữa chưa trả</span>
               <span className="text-right">4 bữa</span>
