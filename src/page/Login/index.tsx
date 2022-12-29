@@ -21,7 +21,7 @@ export default function Login() {
   }, [user, navigate, location])
   return (
     <>
-      <div className="flex min-h-full items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-tr from-secondary-color to-light-color h-screen">
+      <div className="flex min-h-full items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-tr from-light-green-1 to-dark-green-1 h-screen">
         <div className="w-full max-w-xs space-y-8">
           <div>
             <img className="mx-auto h-56" src="/login-logo.png" alt="Your Company" />
@@ -31,7 +31,7 @@ export default function Login() {
           </div>
           <div>
             <button
-              className="focus:outline-none focus:ring-offset-1 focus:ring-gray-700 py-3.5 px-4 rounded-full w-full mt-10 bg-white text-primary-color"
+              className="focus:outline-none focus:ring-offset-1 focus:ring-gray-700 py-3.5 px-4 rounded-full w-full mt-10 bg-white text-dard-green-1"
               onClick={signIn}
               disabled={loading}
             >
