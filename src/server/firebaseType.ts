@@ -1,4 +1,6 @@
 export type User = {
+  bankName?: string
+  ldapAcc?: string
   address?: string
   age?: string
   bankAccount?: string

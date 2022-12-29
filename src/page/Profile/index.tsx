@@ -1,16 +1,28 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import { auth } from '@app/server/firebase'
+import { User } from '@app/server/firebaseType'
+import { UserDetail } from '@app/server/useDB'
 import { store } from '@app/stores'
 import { useAppSelector } from '@app/stores/hook'
 import { clearUser, userStore } from '@app/stores/user'
 import LogoutIcon from '@mui/icons-material/Logout'
 import ReplyIcon from '@mui/icons-material/Reply'
 import { signOut } from 'firebase/auth'
+import { getDoc } from 'firebase/firestore'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 
 const Profile = () => {
   const user = useAppSelector(userStore)
-  console.log(user)
+
+  const [userData, setUserData] = useState<User>({})
+
+  useEffect(() => {
+    getDoc(UserDetail(user.uid)).then((res) => {
+      setUserData(res.data()!)
+    })
+  }, [user.uid])
+
   const logout = async () => {
     try {
       await signOut(auth).then(() => {
@@ -36,8 +48,8 @@ const Profile = () => {
           </button>
         </div>
         <img src="/src/assets/profile-picture.png" alt="" referrerPolicy="no-referrer" className="rounded-full w-28" />
-        <span className="py-2 text-xl">{user.displayName}</span>
-        <span className="text-md">{user.email}</span>
+        <span className="py-2 text-xl">{userData.name}</span>
+        <span className="text-md">{userData.email}</span>
         <span className="pt-4 text-md">
           <span className="font-bold">Chủ chi</span>: 4 lần |<span className="font-bold"> Tham gia</span>: 4 lần
         </span>
@@ -48,31 +60,31 @@ const Profile = () => {
           <label htmlFor="" className="pb-1 font-bold text-gray-500">
             LDAP
           </label>
-          <input type="text" placeholder="Example: ntphuc1" className="border-b-2" />
+          <input type="text" placeholder="Example: ntphuc1" className="border-b-2" value={userData.ldapAcc} />
         </div>
         <div className="flex flex-col pb-4">
           <label htmlFor="" className="pb-1 font-bold text-gray-500">
             Mobile
           </label>
-          <input type="number" placeholder="" className="border-b-2" />
+          <input type="number" placeholder="" className="border-b-2" value={userData.phone} />
         </div>
         <div className="flex flex-col pb-4">
           <label htmlFor="" className="pb-1 font-bold text-gray-500">
             Address
           </label>
-          <input type="text" placeholder="Example: Cau Giay, Ha Noi" className="border-b-2" value={user.address} />
+          <input type="text" placeholder="Example: Cau Giay, Ha Noi" className="border-b-2" value={userData.address} />
         </div>
         <div className="flex flex-col pb-4">
           <label htmlFor="" className="pb-1 font-bold text-gray-500">
             Bank
           </label>
-          <input type="text" placeholder="" className="border-b-2" />
+          <input type="text" placeholder="" className="border-b-2" value={userData.bankName} />
         </div>
         <div className="flex flex-col pb-4">
           <label htmlFor="" className="pb-1 font-bold text-gray-500">
             Account
           </label>
-          <input type="text" placeholder="" className="border-b-2" />
+          <input type="text" placeholder="" className="border-b-2" value={userData.bankAccount} />
         </div>
         <div className="flex flex-col items-center ">
           <label htmlFor="" className="pb-1 self-start font-bold text-gray-500">

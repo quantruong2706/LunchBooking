@@ -1,3 +1,4 @@
+import { LoadingScreen } from '@app/components/Suspense'
 import { doc, serverTimestamp, setDoc } from 'firebase/firestore'
 import { useEffect } from 'react'
 import { useAuthState } from 'react-firebase-hooks/auth'
@@ -5,10 +6,9 @@ import { RouterProvider } from 'react-router-dom'
 
 import Router from './router/Router'
 import { auth } from './server/firebase'
-import { usersColection } from './server/useDB'
+import { userId } from './server/useDB'
 import { useAppDispatch } from './stores/hook'
 import { setUser } from './stores/user'
-import { LoadingScreen } from '@app/components/Suspense'
 
 function App() {
   const [loggedInUser, loading] = useAuthState(auth)
@@ -17,14 +17,14 @@ function App() {
     const setUserInDb = async () => {
       try {
         await setDoc(
-          doc(usersColection, loggedInUser?.email as string),
+          doc(userId, loggedInUser?.uid as string),
           {
             email: loggedInUser?.email,
             lastSeen: serverTimestamp(),
             uid: loggedInUser?.uid,
             // photoURL: loggedInUser?.photoURL
           },
-          { merge: true },
+          { merge: true }
         )
       } catch (error) {
         console.log('ERROR SETTING USER INFO IN DB', error)
@@ -39,7 +39,7 @@ function App() {
           displayName: displayName || 'unknown',
           email: email || 'undefined',
           photoURL: photoURL || '',
-        }),
+        })
       )
       setUserInDb()
     }
