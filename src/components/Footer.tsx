@@ -1,22 +1,19 @@
+import { PAGES } from '@app/contants'
+import { currentPageStore, setCurrentPage } from '@app/stores/footer'
+import { useAppDispatch } from '@app/stores/hook'
 import AddCircleIcon from '@mui/icons-material/AddCircle'
 import HomeIcon from '@mui/icons-material/Home'
 import ListAltIcon from '@mui/icons-material/ListAlt'
 import NotificationsIcon from '@mui/icons-material/Notifications'
 import PeopleIcon from '@mui/icons-material/People'
-import { useState } from 'react'
-
-const PAGES = {
-  HOME: 'home',
-  HISTORY: 'history',
-  ADD_BILL: 'addBill',
-  NOTIFICATIONS: 'notifications',
-  MEMEBERS: 'memebers',
-}
+import { useSelector } from 'react-redux'
 
 const Footer = () => {
-  const [currentPage, setCurrentPage] = useState<string>('')
+  const dispatch = useAppDispatch()
+  const currentPage = useSelector(currentPageStore)
+
   const onClickFooterIcon = (page: string) => {
-    setCurrentPage(page)
+    dispatch(setCurrentPage(page))
   }
 
   return (

@@ -1,11 +1,12 @@
 import { configureStore } from '@reduxjs/toolkit'
-
+import footerReducer from '../stores/footer'
 import * as userStore from './user'
 // ...
 
 export const store = configureStore({
   reducer: {
     [userStore.namespace]: userStore.reducer,
+    footer: footerReducer,
   },
 })
 
