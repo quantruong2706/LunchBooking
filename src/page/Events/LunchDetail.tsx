@@ -2,8 +2,9 @@ import { getDetailEvent } from '@app/libs/api/events'
 import { TEXT__HOST, TEXT__MEMBER, TEXT__PAYMENT_REMIND } from '@app/libs/constant'
 import { formatMoney } from '@app/libs/functions'
 import { Event } from '@app/server/firebaseType'
+import BorderColorIcon from '@mui/icons-material/BorderColor'
+import ReplyIcon from '@mui/icons-material/Reply'
 import { useEffect, useState } from 'react'
-import { BiEdit, MdOutlineReply } from 'react-icons/all'
 import { useParams } from 'react-router-dom'
 const LunchDetail = () => {
   const [test, setTest] = useState<boolean>(false)
@@ -11,6 +12,7 @@ const LunchDetail = () => {
   const params = useParams<{ id: string }>()
   useEffect(() => {
     getDetailEvent(params.id!).then((e) => {
+      console.log(e)
       setDetailData(e)
     })
   }, [params])
@@ -25,13 +27,14 @@ const LunchDetail = () => {
         </button> */}
       <div className="bg-gradient-to-t from-green-300 to-light-color rounded-b-3xl">
         <div className="flex justify-between p-3">
-          <MdOutlineReply
-            size={36}
-            className="cursor-pointer"
+          <button
+            className="h-[36px]"
             onClick={() => {
               history.back()
             }}
-          />
+          >
+            <ReplyIcon fontSize={'large'} />
+          </button>
           <div className="flex flex-col text-center">
             <div className={'mx-auto relative mb-5 rounded-full border-4 p-1 ' + (test ? 'border-red-500' : 'border-green-500')}>
               <img src="https://picsum.photos/200/300?grayscale" className="w-24 h-24 rounded-full" alt="" />
@@ -56,14 +59,22 @@ const LunchDetail = () => {
               </span>
             </p>
           </div>
-          <div>{test ? <BiEdit className="cursor-pointer" size={36} /> : <div className="h-[36px] w-[36px]"></div>}</div>
+          <div>
+            {test ? (
+              <button className="h-[36px]">
+                <BorderColorIcon fontSize={'large'} />
+              </button>
+            ) : (
+              <div className="h-[36px] w-[36px]"></div>
+            )}
+          </div>
         </div>
       </div>
       <div className="py-3 px-5">
         <div className="mb-3">
           <span className="text-gray-400 font-bold block mb-3">Tổng tiền</span>
           <p className="block text-end">
-            <span className="text-black">{formatMoney(detailData?.total)}</span>
+            <span className="text-black">{formatMoney(detailData?.billAmount)}</span>
           </p>
         </div>
         <div className="border-y-[1px] border-gray-400">

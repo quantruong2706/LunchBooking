@@ -9,7 +9,6 @@ import { useLocation, useNavigate } from 'react-router-dom'
 const Login = () => {
   const [signInWithGoogle, _user, loading] = useSignInWithGoogle(auth)
   const navigate = useNavigate()
-  const location = useLocation()
   const user = useAppSelector(userStore)
   const location = useLocation()
   const signIn = () => {
@@ -22,7 +21,7 @@ const Login = () => {
   }, [user, navigate, location])
   return (
     <>
-      <div className="flex min-h-full items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-[#439D0D] h-screen">
+      <div className="flex min-h-full items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-tr from-light-green-1 to-dark-green-1 h-screen">
         <div className="w-full max-w-xs space-y-8">
           <div className="flex items-center justify-center">
             <img src="/login-logo.png" alt="Your Company" className="h-56 w-56" />
@@ -32,7 +31,7 @@ const Login = () => {
           </div>
           <div>
             <button
-              className="focus:outline-none focus:ring-offset-1 focus:ring-gray-700 py-3.5 px-4 rounded-full w-full mt-10 bg-white text-primary-color"
+              className="focus:outline-none focus:ring-offset-1 focus:ring-gray-700 py-3.5 px-4 rounded-full w-full mt-10 bg-white text-dard-green-1"
               onClick={signIn}
               disabled={loading}
             >

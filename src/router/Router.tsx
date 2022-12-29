@@ -1,4 +1,4 @@
-import Layout from '@app/components/Layout'
+import LayoutWithFooter from '@app/components/LayoutWithFooter'
 import AppSuspense from '@app/components/Suspense'
 import { useAppSelector } from '@app/stores/hook'
 import { userStore } from '@app/stores/user'
@@ -35,7 +35,7 @@ const PrivateRoute = ({ Comp }: PrivateRouteProps) => {
 export default createBrowserRouter([
   {
     path: '/',
-    element: <PrivateRoute Comp={Layout} />,
+    element: <PrivateRoute Comp={LayoutWithFooter} />,
     children: [
       {
         path: '',
