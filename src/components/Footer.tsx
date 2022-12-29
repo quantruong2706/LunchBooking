@@ -22,31 +22,31 @@ const Footer = () => {
         <div>
           <HomeIcon sx={{ color: currentPage === PAGES.HOME ? '#439D0D' : '#A0A0A0' }} />
         </div>
-        <div className={`text-[12px] ${currentPage === PAGES.HOME ? 'text-[#439D0D]' : 'text-[#A0A0A0]'}`}>Home</div>
+        <div className={`text-[12px] ${currentPage === PAGES.HOME ? 'text-dark-green-1' : 'text-grey-1'}`}>Home</div>
       </button>
       <button className="flex-1" onClick={() => onClickFooterIcon(PAGES.HISTORY)}>
         <div>
           <ListAltIcon sx={{ color: currentPage === PAGES.HISTORY ? '#439D0D' : '#A0A0A0' }} />
         </div>
-        <div className={`text-[12px] ${currentPage === PAGES.HISTORY ? 'text-[#439D0D]' : 'text-[#A0A0A0]'}`}>History</div>
+        <div className={`text-[12px] ${currentPage === PAGES.HISTORY ? 'text-dark-green-1' : 'text-grey-1'}`}>History</div>
       </button>
       <button className="flex flex-col items-center flex-1" onClick={() => onClickFooterIcon(PAGES.ADD_BILL)}>
-        <div className="flex text-center items-center mt-[-24px] rounded-[50%] bg-[#d9d9d9] w-[55px] h-[55px] justify-center">
+        <div className="flex text-center items-center mt-[-24px] rounded-[50%] bg-grey-2 w-[55px] h-[55px] justify-center">
           <AddCircleIcon sx={{ width: '45px', height: '45px', justifyContent: 'center', color: currentPage === PAGES.ADD_BILL ? '#439D0D' : '#B91D37' }} />
         </div>
-        <div className={`text-[12px] mt-[-6px] ${currentPage === PAGES.ADD_BILL ? 'text-[#439D0D]' : 'text-[#A0A0A0]'}`}>Add Bill</div>
+        <div className={`text-[12px] mt-[-6px] ${currentPage === PAGES.ADD_BILL ? 'text-dark-green-1' : 'text-grey-1'}`}>Add Bill</div>
       </button>
       <button className="flex-1" onClick={() => onClickFooterIcon(PAGES.NOTIFICATIONS)}>
         <div>
           <NotificationsIcon sx={{ color: currentPage === PAGES.NOTIFICATIONS ? '#439D0D' : '#A0A0A0' }} />
         </div>
-        <div className={`text-[12px] ${currentPage === PAGES.NOTIFICATIONS ? 'text-[#439D0D]' : 'text-[#A0A0A0]'}`}>Notifications</div>
+        <div className={`text-[12px] ${currentPage === PAGES.NOTIFICATIONS ? 'text-dark-green-1' : 'text-grey-1'}`}>Notifications</div>
       </button>
       <button className="flex-1" onClick={() => onClickFooterIcon(PAGES.MEMEBERS)}>
         <div>
           <PeopleIcon sx={{ color: currentPage === PAGES.MEMEBERS ? '#439D0D' : '#A0A0A0' }} />
         </div>
-        <div className={`text-[12px] mt-[-6px] ${currentPage === PAGES.MEMEBERS ? 'text-[#439D0D]' : 'text-[#A0A0A0]'}`}>Members</div>
+        <div className={`text-[12px] mt-[-6px] ${currentPage === PAGES.MEMEBERS ? 'text-dark-green-1' : 'text-grey-1'}`}>Members</div>
       </button>
     </div>
   )

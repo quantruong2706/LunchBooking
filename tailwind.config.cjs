@@ -8,6 +8,8 @@ module.exports = {
         'light-green-1': '#9DDC4C',
         'light-green-2': '#8AD769',
         'light-green-3': '#CAF5B1',
+        'grey-1': '#A0A0A0',
+        'grey-2': '#D9D9D9',
       },
     },
   },
