@@ -1,6 +1,6 @@
 import { getListUser } from '@app/libs/api/EventApi'
 import { User } from '@app/server/firebaseType'
-import { selectedListMemberStore, setListUser } from '@app/stores/events'
+import { selectedListMemberStore, setSelectedListMember } from '@app/stores/events'
 import { useAppDispatch, useAppSelector } from '@app/stores/hook'
 import { Box, Button, Modal, Typography } from '@mui/material'
 import { useEffect, useState } from 'react'
@@ -20,10 +20,11 @@ const style = {
   p: 4,
 }
 function PeopleModal({ open, setOpen }: PropsType) {
-  const [userData, setUserData] = useState<User[]>([])
+  const [allMembers, setAllMembers] = useState<User[]>([])
   const { selectedListMember } = useAppSelector(selectedListMemberStore)
   const [selectingMembers, setSelectingMembers] = useState<User[]>([...selectedListMember])
   const dispatch = useAppDispatch()
+
   const handleClickRow = (user: User) => {
     const tempMembers = [...selectingMembers]
     const index = tempMembers.findIndex((u) => u.uid === user.uid)
@@ -35,13 +36,21 @@ function PeopleModal({ open, setOpen }: PropsType) {
     setSelectingMembers(tempMembers)
   }
   const handleAdd = () => {
-    dispatch(setListUser(selectingMembers))
+    dispatch(setSelectedListMember(selectingMembers))
     setSelectingMembers([])
     setOpen(false)
   }
 
+  const removeDuplicateMembers = (allMembers) => {
+    const uniqueListMembers = allMembers.filter((item, index, list) => index === list.findIndex((member) => member.uid === item.uid))
+    return uniqueListMembers
+  }
+
   useEffect(() => {
-    getListUser().then((data) => setUserData(data))
+    getListUser().then((allMembers) => {
+      const uniqueListMembers = removeDuplicateMembers(allMembers)
+      setAllMembers(uniqueListMembers)
+    })
   }, [])
 
   useEffect(() => {
@@ -57,9 +66,9 @@ function PeopleModal({ open, setOpen }: PropsType) {
     <Modal open={open} onClose={handleOnClose} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
       <Box sx={style}>
         <Typography variant="h5">Chọn người đi ăn</Typography>
-        {userData?.map((item: User) => (
+        {allMembers?.map((item: User) => (
           <Box
-            key={Number(item.uid)}
+            key={item.uid}
             className={`hover:cursor-pointer ${selectingMembers.find((user) => item.uid === user.uid) ? 'bg-green-300' : ''} p-3 rounded-md mb-2`}
             onClick={() => handleClickRow(item)}
           >
@@ -67,7 +76,7 @@ function PeopleModal({ open, setOpen }: PropsType) {
           </Box>
         ))}
         <Button onClick={handleAdd} variant="contained">
-          Add People
+          Save
         </Button>
       </Box>
     </Modal>

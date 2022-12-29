@@ -1,8 +1,8 @@
 // import { ReactComponent as DishImg } from '@app/assets/react.svg'
 import PeopleModal from '@app/components/Modal/PeopleModal'
-import { getListUser, setEvent, updateMemberInfo } from '@app/libs/api/EventApi'
+import { setEvent, updateMemberInfo } from '@app/libs/api/EventApi'
 import { Event, User } from '@app/server/firebaseType'
-import { selectedListMemberStore, setListUser } from '@app/stores/events'
+import { selectedListMemberStore, setSelectedListMember } from '@app/stores/events'
 import { useAppDispatch, useAppSelector } from '@app/stores/hook'
 import AddIcon from '@mui/icons-material/Add'
 import DeleteIcon from '@mui/icons-material/Delete'
@@ -58,8 +58,14 @@ function Add() {
   const [eventState, setEventState] = useState<Partial<Event>>(initEventValue)
   const { selectedListMember } = useAppSelector(selectedListMemberStore)
   const [openModalSuccess, setOpenModalSuccess] = useState<boolean>(false)
-  const [listAllMember, setListAllMember] = useState<User[]>([])
+  const [listBillOwner, setListBillOwner] = useState<User>([])
+
   const dispatch = useAppDispatch()
+
+  useEffect(() => {
+    setListBillOwner([...selectedListMember])
+  }, [selectedListMember])
+
   const handleToggle = (memberId: string) => {
     const tempMembers = _.cloneDeep(selectedListMember)
     const index = tempMembers.findIndex((u) => u.uid === memberId)
@@ -67,36 +73,43 @@ function Add() {
       const isPaid = tempMembers[index].isPaid
       tempMembers[index].isPaid = !isPaid
     }
-    dispatch(setListUser(tempMembers))
+    dispatch(setSelectedListMember(tempMembers))
   }
+
   const handleChangeAmount = (memberId: string | null | undefined, value: number) => {
     const tempMembers = _.cloneDeep(selectedListMember)
     const index = tempMembers.findIndex((u) => u.uid === memberId)
     if (index > -1) {
       tempMembers[index].amount = value
     }
-    dispatch(setListUser(tempMembers))
+    dispatch(setSelectedListMember(tempMembers))
   }
+
   const [open, setOpen] = useState(false)
+
   const handleDelete = (member: User) => {
     const newSelectedMember = [...selectedListMember]
     const index = newSelectedMember.findIndex((u) => u.uid === member.uid)
     if (index > -1) {
       newSelectedMember.splice(index, 1)
     }
-    dispatch(setListUser(newSelectedMember))
+    dispatch(setSelectedListMember(newSelectedMember))
   }
+
   const handleChangeTextField = (field: string, value: string | number) => {
     setEventState({ ...eventState, [field]: value })
   }
+
   const handleChangeBill = (value: number) => {
     const total = eventState.tip ? eventState.tip + value : value
     setEventState({ ...eventState, billAmount: value, totalAmount: total })
   }
+
   const handleChangeTip = (value: number) => {
     const total = eventState.billAmount ? eventState.billAmount + value : value
     setEventState({ ...eventState, tip: value, totalAmount: total })
   }
+
   const handleCreateEvent = async () => {
     const newEventData = { ...eventState, members: selectedListMember }
     const isSuccess = await setEvent(newEventData)
@@ -105,29 +118,32 @@ function Add() {
       setOpenModalSuccess(true)
     }
   }
+
   const handleShareBill = () => {
-    const tempMembers = _.cloneDeep(selectedListMember)
-    const numberOfMember = tempMembers.length
+    const selectedListMembersWithMoney = _.cloneDeep(selectedListMember)
+    const numberOfMember = selectedListMembersWithMoney.length
     if (numberOfMember > 0) {
-      const amount = eventState.totalAmount! / numberOfMember
-      tempMembers.map((item) => (item.amount = amount))
+      const amount = Math.round(eventState.totalAmount! / numberOfMember)
+      selectedListMembersWithMoney.map((item) => (item.amount = amount))
     }
-    dispatch(setListUser(tempMembers))
+    dispatch(setSelectedListMember(selectedListMembersWithMoney))
   }
-  const handleGenarate = () => {
-    const tempListAllMemberSort = _.cloneDeep(listAllMember)
-    const listAllMemberSort = tempListAllMemberSort.sort((a, b) => (a.count || 0) - (b.count || 0))
-    const memberToPay = listAllMemberSort.pop()
-    setListAllMember(listAllMemberSort)
+
+  const handleGenerate = () => {
+    const sortListBillOwner = listBillOwner.sort((a, b) => (a.count || 0) - (b.count || 0))
+    const memberToPay = sortListBillOwner.pop()
+    setListBillOwner(sortListBillOwner)
     if (memberToPay && memberToPay.uid) {
-      setEventState({ ...eventState, userPayId: memberToPay.uid, userPayName: memberToPay.name || '' })
+      setEventState({ ...eventState, userPayId: memberToPay.uid, userPayName: memberToPay.name || memberToPay.email })
     }
   }
-  useEffect(() => {
-    getListUser().then((e) => {
-      setListAllMember(e)
-    })
-  }, [])
+
+  // useEffect(() => {
+  //   getListUser().then((e) => {
+  //     setListAllMember(e)
+  //   })
+  // }, [])
+
   return (
     <>
       <CardStyled variant="outlined" className="max-w-[500px]">
@@ -244,8 +260,8 @@ function Add() {
           <Box sx={{ flexGrow: 1 }} className="mt-2">
             <Grid container spacing={2}>
               <Grid item xs={4}>
-                <ButtonStyled variant="contained" onClick={handleGenarate}>
-                  <Typography>Genarate</Typography>
+                <ButtonStyled variant="contained" onClick={handleGenerate} disabled={!listBillOwner.length}>
+                  <Typography>Generate</Typography>
                 </ButtonStyled>
               </Grid>
               <Grid item xs={8}>

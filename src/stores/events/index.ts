@@ -10,12 +10,12 @@ const slice = createSlice({
   name: namespace,
   initialState,
   reducers: {
-    setListUser: (state, action: PayloadAction<User[]>) => {
+    setSelectedListMember: (state, action: PayloadAction<User[]>) => {
       state.selectedListMember = action.payload
     },
   },
 })
 
-export const { setListUser } = slice.actions
+export const { setSelectedListMember } = slice.actions
 export const selectedListMemberStore = (state: RootState) => state[namespace]
 export const reducer = slice.reducer
