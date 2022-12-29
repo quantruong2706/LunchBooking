@@ -1,0 +1,17 @@
+#hello {
+    position: absolute;
+    width: 73px;
+    height: 23px;
+    left: 20px;
+    top: 30px;
+
+    font-family: 'Bellota';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 18px;
+    line-height: 23px;
+    /* identical to box height */
+
+
+    color: #000000;
+}

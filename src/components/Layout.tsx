@@ -2,6 +2,7 @@ import { auth } from '@app/server/firebase'
 import { store } from '@app/stores'
 import { useAppSelector } from '@app/stores/hook'
 import { clearUser, userStore } from '@app/stores/user'
+import { Container } from '@mui/system'
 import { signOut } from 'firebase/auth'
 import { Link, Outlet } from 'react-router-dom'
 
@@ -18,7 +19,7 @@ export default function Layout() {
   }
   return (
     <div>
-      <ul>
+      {/* <ul>
         <li>
           <Link to="/home">Public Page</Link>
         </li>
@@ -31,7 +32,7 @@ export default function Layout() {
         <li>
           <img src={user.photoURL} alt="" referrerPolicy="no-referrer" />
         </li>
-      </ul>
+      </ul> */}
 
       <Outlet />
     </div>
