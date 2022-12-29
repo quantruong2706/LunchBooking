@@ -4,8 +4,6 @@ import { useAppSelector } from '@app/stores/hook'
 import { clearUser, userStore } from '@app/stores/user'
 import { signOut } from 'firebase/auth'
 import { Outlet } from 'react-router-dom'
-import Footer from './Footer'
-
 
 export default function Layout() {
   const user = useAppSelector(userStore)
@@ -19,10 +17,18 @@ export default function Layout() {
     }
   }
   return (
-    <div className="flex flex-col justify-between bg-light-green-2 h-screen">
-      <Outlet />
+    <div className="flex flex-col justify-between bg-gradient-to-b from-light-green-2 to-light-green-3 h-screen">
+      <div className="flex flex-wrap justify-start gap-4 items-center p-3">
+        <img src={user.photoURL} alt="" referrerPolicy="no-referrer" className="rounded-xl w-16" />
+        <div>
+          <p className="text-black">Hello, {user.displayName}!</p>
+          <button onClick={logout} className="hover:font-bold">
+            Logout
+          </button>
+        </div>
+      </div>
 
-      <Footer />
+      <Outlet />
     </div>
   )
 }
