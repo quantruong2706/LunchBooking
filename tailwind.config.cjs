@@ -4,9 +4,12 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        'primary-color': '#2DA027',
+        'primary-color': '#8AD769',
         'secondary-color': '#5BD76F',
-        'light-color': '#BDF7A5',
+        'light-color': '#CAF5B1',
+      },
+      fontFamily: {
+        bellota: ['"Bellota"', 'cursive'],
       },
     },
   },
