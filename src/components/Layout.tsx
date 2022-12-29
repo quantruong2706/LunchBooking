@@ -18,7 +18,7 @@ const Layout = () => {
   //   }
   // }
   return (
-    <div className='flex flex-col justify-between bg-green-400 h-screen'>
+    <div className="flex flex-col justify-between bg-green-400 h-screen">
       {/*<div className='flex flex-wrap justify-start gap-4 items-center p-4'>*/}
       {/*  <img src={user.photoURL} alt='' referrerPolicy='no-referrer' className='rounded-xl w-16' />*/}
       {/*  <div>*/}
@@ -29,10 +29,7 @@ const Layout = () => {
 
       <Outlet />
 
-      <div
-        className='flex bg-white h-24 px-3 py-2 items-center justify-around sm:justify-center sm:gap-12'>
-        Footer here
-      </div>
+      <div className="flex bg-white h-16 px-3 py-2 items-center justify-around sm:justify-center sm:gap-12">Footer here</div>
     </div>
   )
 }
