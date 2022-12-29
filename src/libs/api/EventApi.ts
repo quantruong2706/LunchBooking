@@ -1,6 +1,6 @@
 import { Event, User } from '@app/server/firebaseType'
-import { EventColection, usersColection } from '@app/server/useDB'
-import { doc, getDocs, setDoc } from 'firebase/firestore'
+import { EventColection, UserDetail, usersColection } from '@app/server/useDB'
+import { doc, getDocs, setDoc, updateDoc } from 'firebase/firestore'
 
 export const getListUser = async () => {
   const userDocs = await getDocs(usersColection)
@@ -13,5 +13,13 @@ export const getListUser = async () => {
 }
 export const setEvent = async (data: Event) => {
   const userRef = doc(EventColection, 'user_12345')
-  await setDoc(userRef, data)
+  let isSuccess = false
+  await setDoc(userRef, data).then(() => {
+    isSuccess = true
+  })
+  return isSuccess
+}
+
+export const updateMemberInfo = async (member_id: string, data: User) => {
+  updateDoc(UserDetail(member_id), data)
 }

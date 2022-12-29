@@ -1,12 +1,12 @@
 // import { ReactComponent as DishImg } from '@app/assets/react.svg'
 import PeopleModal from '@app/components/Modal/PeopleModal'
-import { setEvent } from '@app/libs/api/EventApi'
+import { getListUser, setEvent, updateMemberInfo } from '@app/libs/api/EventApi'
 import { Event, User } from '@app/server/firebaseType'
 import { selectedListMemberStore, setListUser } from '@app/stores/events'
 import { useAppDispatch, useAppSelector } from '@app/stores/hook'
 import AddIcon from '@mui/icons-material/Add'
 import DeleteIcon from '@mui/icons-material/Delete'
-import { Box, CardContent, TextField, Typography } from '@mui/material'
+import { Box, CardContent, Modal, TextField, Typography } from '@mui/material'
 import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import Checkbox from '@mui/material/Checkbox'
@@ -18,7 +18,7 @@ import { styled } from '@mui/material/styles'
 import { DatePicker } from '@mui/x-date-pickers/DatePicker'
 import * as dayjs from 'dayjs'
 import _ from 'lodash'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 const TextFieldStyled = styled(TextField)(({ theme }) => ({
   '& .MuiFormLabel-root': {
     ...theme.typography.subtitle1,
@@ -34,7 +34,17 @@ const CardStyled = styled(Card)(() => ({
     borderRadius: '15px',
   },
 }))
-
+const style = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 400,
+  bgcolor: 'background.paper',
+  border: '2px solid #000',
+  boxShadow: 24,
+  p: 4,
+}
 function Add() {
   const initEventValue = {
     address: '',
@@ -45,9 +55,10 @@ function Add() {
     tip: 0,
     billAmount: 0,
   }
-
-  const [eventState, setEventState] = useState<Event>(initEventValue)
+  const [eventState, setEventState] = useState<Partial<Event>>(initEventValue)
   const { selectedListMember } = useAppSelector(selectedListMemberStore)
+  const [openModalSuccess, setOpenModalSuccess] = useState<boolean>(false)
+  const [listAllMember, setListAllMember] = useState<User[]>([])
   const dispatch = useAppDispatch()
   const handleToggle = (memberId: string) => {
     const tempMembers = _.cloneDeep(selectedListMember)
@@ -79,7 +90,7 @@ function Add() {
     setEventState({ ...eventState, [field]: value })
   }
   const handleChangeBill = (value: number) => {
-    const total = eventState.tip + value
+    const total = eventState.tip ? eventState.tip + value : value
     setEventState({ ...eventState, billAmount: value, totalAmount: total })
   }
   const handleChangeTip = (value: number) => {
@@ -88,8 +99,35 @@ function Add() {
   }
   const handleCreateEvent = async () => {
     const newEventData = { ...eventState, members: selectedListMember }
-    await setEvent(newEventData)
+    const isSuccess = await setEvent(newEventData)
+    updateMemberInfo(selectedListMember[0].uid!, { ...selectedListMember[0], count: 10 })
+    if (isSuccess) {
+      setOpenModalSuccess(true)
+    }
   }
+  const handleShareBill = () => {
+    const tempMembers = _.cloneDeep(selectedListMember)
+    const numberOfMember = tempMembers.length
+    if (numberOfMember > 0) {
+      const amount = eventState.totalAmount! / numberOfMember
+      tempMembers.map((item) => (item.amount = amount))
+    }
+    dispatch(setListUser(tempMembers))
+  }
+  const handleGenarate = () => {
+    const tempListAllMemberSort = _.cloneDeep(listAllMember)
+    const listAllMemberSort = tempListAllMemberSort.sort((a, b) => (a.count || 0) - (b.count || 0))
+    const memberToPay = listAllMemberSort.pop()
+    setListAllMember(listAllMemberSort)
+    if (memberToPay && memberToPay.uid) {
+      setEventState({ ...eventState, userPayId: memberToPay.uid, userPayName: memberToPay.name || '' })
+    }
+  }
+  useEffect(() => {
+    getListUser().then((e) => {
+      setListAllMember(e)
+    })
+  }, [])
   return (
     <>
       <CardStyled variant="outlined" className="max-w-[500px]">
@@ -101,7 +139,7 @@ function Add() {
               fullWidth
               id="filled-required"
               label="Tên"
-              value={eventState?.name}
+              value={eventState?.eventName}
               onChange={(e) => handleChangeTextField('name', e.target.value)}
               variant="standard"
               InputLabelProps={{
@@ -139,75 +177,82 @@ function Add() {
               />
             </ButtonStyled>
           </Box>
-          <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
-            <ListItem disablePadding>
-              <Typography className="min-w-[50px]" variant="subtitle2">
-                Đã trả
-              </Typography>
-              <Box className="ml-5">
-                <Typography className="min-w-[150px]" variant="subtitle2">
-                  Tên
-                </Typography>
-              </Box>
-              <Box className="ml-5">
-                <Typography className="min-w-[150px]" variant="subtitle2">
-                  Tiền
-                </Typography>
-              </Box>
-            </ListItem>
-            {selectedListMember.map((member) => {
-              const labelId = `checkbox-list-label-${member.uid}`
-
-              return (
-                <ListItem key={member.uid} disablePadding>
-                  <ListItemIcon onClick={() => (member.uid ? handleToggle(member.uid) : undefined)}>
-                    <Checkbox
-                      edge="start"
-                      // checked={checked.includes(member.uid) !== -1}
-                      tabIndex={-1}
-                      disableRipple
-                      inputProps={{ 'aria-labelledby': labelId }}
-                    />
-                  </ListItemIcon>
-                  <Box className="ml-5 min-w-[150px]">
-                    <Typography noWrap>{member.name || member.email}</Typography>
+          {selectedListMember.length > 0 ? (
+            <>
+              <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
+                <ListItem disablePadding>
+                  <Typography className="min-w-[50px]" variant="subtitle2">
+                    Đã trả
+                  </Typography>
+                  <Box className="ml-5">
+                    <Typography className="min-w-[150px]" variant="subtitle2">
+                      Tên
+                    </Typography>
                   </Box>
-                  <Box className="ml-5 min-w-[150px]">
-                    <TextFieldStyled
-                      fullWidth
-                      type="number"
-                      id="filled-required"
-                      variant="standard"
-                      value={member.amount}
-                      onChange={(e) => handleChangeAmount(member.uid, Number(e.target.value))}
-                      InputLabelProps={{
-                        shrink: true,
-                      }}
-                    />
+                  <Box className="ml-5">
+                    <Typography className="min-w-[150px]" variant="subtitle2">
+                      Tiền
+                    </Typography>
                   </Box>
-                  <ButtonStyled onClick={() => handleDelete(member)}>
-                    <DeleteIcon />
-                  </ButtonStyled>
                 </ListItem>
-              )
-            })}
-          </List>
-          <Box className="w-full flex justify-end mt-3">
-            <ButtonStyled variant="contained" className="mt-6">
-              <Typography>Chia đều</Typography>
-            </ButtonStyled>
-          </Box>
+                {selectedListMember.map((member) => {
+                  const labelId = `checkbox-list-label-${member.uid}`
+
+                  return (
+                    <ListItem key={member.uid} disablePadding>
+                      <ListItemIcon onClick={() => (member.uid ? handleToggle(member.uid) : undefined)}>
+                        <Checkbox
+                          edge="start"
+                          // checked={checked.includes(member.uid) !== -1}
+                          tabIndex={-1}
+                          disableRipple
+                          inputProps={{ 'aria-labelledby': labelId }}
+                        />
+                      </ListItemIcon>
+                      <Box className="ml-5 min-w-[150px]">
+                        <Typography noWrap>{member.name || member.email}</Typography>
+                      </Box>
+                      <Box className="ml-5 min-w-[150px]">
+                        <TextFieldStyled
+                          fullWidth
+                          type="number"
+                          id="filled-required"
+                          variant="standard"
+                          value={member.amount}
+                          onChange={(e) => handleChangeAmount(member.uid, Number(e.target.value))}
+                          InputLabelProps={{
+                            shrink: true,
+                          }}
+                        />
+                      </Box>
+                      <ButtonStyled onClick={() => handleDelete(member)}>
+                        <DeleteIcon />
+                      </ButtonStyled>
+                    </ListItem>
+                  )
+                })}
+              </List>
+              <Box className="w-full flex justify-end mt-3">
+                <ButtonStyled variant="contained" className="mt-6" onClick={handleShareBill}>
+                  <Typography>Chia đều</Typography>
+                </ButtonStyled>
+              </Box>
+            </>
+          ) : null}
+
           <Typography variant="subtitle2">Người trả bill</Typography>
           <Box sx={{ flexGrow: 1 }} className="mt-2">
             <Grid container spacing={2}>
               <Grid item xs={4}>
-                <ButtonStyled variant="contained">
+                <ButtonStyled variant="contained" onClick={handleGenarate}>
                   <Typography>Genarate</Typography>
                 </ButtonStyled>
               </Grid>
               <Grid item xs={8}>
                 <TextFieldStyled
                   fullWidth
+                  disabled
+                  value={eventState.userPayName || eventState.userPayId}
                   id="filled-required"
                   variant="standard"
                   InputLabelProps={{
@@ -266,6 +311,11 @@ function Add() {
         </CardContent>
       </CardStyled>
       <PeopleModal open={open} setOpen={setOpen} />
+      <Modal open={openModalSuccess} onClose={() => setOpenModalSuccess(false)} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
+        <Box sx={style}>
+          <Typography variant="h5">thành công</Typography>
+        </Box>
+      </Modal>
     </>
   )
 }
