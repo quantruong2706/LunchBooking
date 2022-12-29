@@ -9,7 +9,7 @@ module.exports = {
         'light-color': '#CAF5B1',
       },
       fontFamily: {
-        'bellota': ['"Bellota"', 'cursive'],
+        bellota: ['"Bellota"', 'cursive'],
       },
     },
   },

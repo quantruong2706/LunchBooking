@@ -18,15 +18,19 @@ const Profile = () => {
   const [userData, setUserData] = useState<User>({})
 
   useEffect(() => {
-    getDoc(UserDetail(user.uid)).then((res) => {
-      setUserData(res.data()!)
-    })
+    if (user.uid) {
+      getDoc(UserDetail(user.uid)).then((res) => {
+        setUserData(res.data()!)
+      })
+    }
   }, [user.uid])
 
   const logout = async () => {
+    console.log('aaa')
     try {
       await signOut(auth).then(() => {
         store.dispatch(clearUser())
+        console.log('vvbbb')
       })
     } catch (error) {
       console.log('ERROR LOGGING OUT', error)

@@ -20,7 +20,7 @@ export interface Event {
   address?: string
   date?: string
   name?: string
-  billAmount?: number
+  billAmount?: string
   userPayId?: string
   members?: User[]
   tip: number
