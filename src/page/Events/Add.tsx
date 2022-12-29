@@ -1,9 +1,11 @@
 // import { ReactComponent as DishImg } from '@app/assets/react.svg'
 import PeopleModal from '@app/components/Modal/PeopleModal'
-import { User } from '@app/server/firebaseType'
-import { selectedListMemberStore } from '@app/stores/events'
-import { useAppSelector } from '@app/stores/hook'
+import { setEvent } from '@app/libs/api/EventApi'
+import { Event, User } from '@app/server/firebaseType'
+import { selectedListMemberStore, setListUser } from '@app/stores/events'
+import { useAppDispatch, useAppSelector } from '@app/stores/hook'
 import AddIcon from '@mui/icons-material/Add'
+import DeleteIcon from '@mui/icons-material/Delete'
 import { Box, CardContent, TextField, Typography } from '@mui/material'
 import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
@@ -12,127 +14,199 @@ import Grid from '@mui/material/Grid'
 import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
 import ListItemIcon from '@mui/material/ListItemIcon'
-import ListItemText from '@mui/material/ListItemText'
+import { styled } from '@mui/material/styles'
 import { DatePicker } from '@mui/x-date-pickers/DatePicker'
-import { Dayjs } from 'dayjs'
+import * as dayjs from 'dayjs'
+import _ from 'lodash'
 import { useState } from 'react'
+const TextFieldStyled = styled(TextField)(({ theme }) => ({
+  '& .MuiFormLabel-root': {
+    ...theme.typography.subtitle1,
+  },
+}))
+const ButtonStyled = styled(Button)(() => ({
+  '&.MuiButton-root': {
+    borderRadius: '10px',
+  },
+}))
+const CardStyled = styled(Card)(() => ({
+  '&.MuiPaper-root': {
+    borderRadius: '15px',
+  },
+}))
 
 function Add() {
-  const [date, setDate] = useState<Dayjs | null>(null)
-  const [checked, setChecked] = useState([0])
+  const initEventValue = {
+    address: '',
+    date: dayjs(new Date()).format('MM/DD/YYYY'),
+    name: '',
+    totalAmount: 0,
+    userId: '',
+    tip: 0,
+    billAmount: 0,
+  }
+
+  const [eventState, setEventState] = useState<Event>(initEventValue)
   const { selectedListMember } = useAppSelector(selectedListMemberStore)
-  const handleToggle = (value: string) => () => {
-    const currentIndex = checked.findIndex(())
-    const newChecked = [...checked]
-
-    if (currentIndex === -1) {
-      newChecked.push(value)
-    } else {
-      newChecked.splice(currentIndex, 1)
+  const dispatch = useAppDispatch()
+  const handleToggle = (memberId: string) => {
+    const tempMembers = _.cloneDeep(selectedListMember)
+    const index = tempMembers.findIndex((u) => u.uid === memberId)
+    if (index > -1) {
+      const isPaid = tempMembers[index].isPaid
+      tempMembers[index].isPaid = !isPaid
     }
-
-    setChecked(newChecked)
+    dispatch(setListUser(tempMembers))
+  }
+  const handleChangeAmount = (memberId: string | null | undefined, value: number) => {
+    const tempMembers = _.cloneDeep(selectedListMember)
+    const index = tempMembers.findIndex((u) => u.uid === memberId)
+    if (index > -1) {
+      tempMembers[index].amount = value
+    }
+    dispatch(setListUser(tempMembers))
   }
   const [open, setOpen] = useState(false)
-
+  const handleDelete = (member: User) => {
+    const newSelectedMember = [...selectedListMember]
+    const index = newSelectedMember.findIndex((u) => u.uid === member.uid)
+    if (index > -1) {
+      newSelectedMember.splice(index, 1)
+    }
+    dispatch(setListUser(newSelectedMember))
+  }
+  const handleChangeTextField = (field: string, value: string | number) => {
+    setEventState({ ...eventState, [field]: value })
+  }
+  const handleChangeBill = (value: number) => {
+    const total = eventState.tip + value
+    setEventState({ ...eventState, billAmount: value, totalAmount: total })
+  }
+  const handleChangeTip = (value: number) => {
+    const total = eventState.billAmount ? eventState.billAmount + value : value
+    setEventState({ ...eventState, tip: value, totalAmount: total })
+  }
+  const handleCreateEvent = async () => {
+    const newEventData = { ...eventState, members: selectedListMember }
+    await setEvent(newEventData)
+  }
   return (
     <>
-      <Card variant="outlined" className="max-w-[500px]">
+      <CardStyled variant="outlined" className="max-w-[500px]">
         <CardContent>
           <img src="/vite.svg" alt="" />
-          <TextField
-            fullWidth
-            id="filled-required"
-            label="Tên"
-            variant="standard"
-            InputLabelProps={{
-              shrink: true,
-            }}
-          />
-          <DatePicker
-            className="w-full "
-            label="Thời gian"
-            value={date}
-            onChange={(newValue) => {
-              setDate(newValue)
-            }}
-            renderInput={(params) => (
-              <TextField
-                variant="standard"
-                InputLabelProps={{
-                  shrink: true,
-                }}
-                {...params}
-              />
-            )}
-          />
-          <Box className="flex items-center">
-            <Typography>Thành viên</Typography>
-            <Button>
+          <Box className="mt-6">
+            <TextFieldStyled
+              required
+              fullWidth
+              id="filled-required"
+              label="Tên"
+              value={eventState?.name}
+              onChange={(e) => handleChangeTextField('name', e.target.value)}
+              variant="standard"
+              InputLabelProps={{
+                shrink: true,
+              }}
+            />
+          </Box>
+          <Box className="mt-6">
+            <DatePicker
+              className="w-full "
+              label="Thời gian"
+              value={dayjs(eventState?.date)}
+              onChange={(newValue) => {
+                handleChangeTextField('date', dayjs(newValue).format('MM/DD/YYYY'))
+              }}
+              renderInput={(params) => (
+                <TextFieldStyled
+                  variant="standard"
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  {...params}
+                />
+              )}
+            />
+          </Box>
+          <Box className="flex items-center mt-3">
+            <Typography variant="subtitle2">Thành viên</Typography>
+            <ButtonStyled>
               <AddIcon
                 color="success"
                 onClick={() => {
                   setOpen(true)
                 }}
               />
-            </Button>
+            </ButtonStyled>
           </Box>
           <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
-            <ListItem>
-              <ListItemText>Đã trả</ListItemText>
-              <ListItemText>Tên</ListItemText>
-              <ListItemText>Tiền</ListItemText>
+            <ListItem disablePadding>
+              <Typography className="min-w-[50px]" variant="subtitle2">
+                Đã trả
+              </Typography>
+              <Box className="ml-5">
+                <Typography className="min-w-[150px]" variant="subtitle2">
+                  Tên
+                </Typography>
+              </Box>
+              <Box className="ml-5">
+                <Typography className="min-w-[150px]" variant="subtitle2">
+                  Tiền
+                </Typography>
+              </Box>
             </ListItem>
             {selectedListMember.map((member) => {
               const labelId = `checkbox-list-label-${member.uid}`
 
               return (
                 <ListItem key={member.uid} disablePadding>
-                  <ListItemIcon onClick={handleToggle(member.)}>
+                  <ListItemIcon onClick={() => (member.uid ? handleToggle(member.uid) : undefined)}>
                     <Checkbox
                       edge="start"
-                      checked={checked.indexOf(member.uid) !== -1}
+                      // checked={checked.includes(member.uid) !== -1}
                       tabIndex={-1}
                       disableRipple
                       inputProps={{ 'aria-labelledby': labelId }}
                     />
                   </ListItemIcon>
-                  <TextField
-                    fullWidth
-                    id="filled-required"
-                    label="Tên"
-                    value={member.name || member.email}
-                    variant="standard"
-                    InputLabelProps={{
-                      shrink: true,
-                    }}
-                  />
-                  <TextField
-                    fullWidth
-                    id="filled-required"
-                    variant="standard"
-                    InputLabelProps={{
-                      shrink: true,
-                    }}
-                  />
+                  <Box className="ml-5 min-w-[150px]">
+                    <Typography noWrap>{member.name || member.email}</Typography>
+                  </Box>
+                  <Box className="ml-5 min-w-[150px]">
+                    <TextFieldStyled
+                      fullWidth
+                      type="number"
+                      id="filled-required"
+                      variant="standard"
+                      value={member.amount}
+                      onChange={(e) => handleChangeAmount(member.uid, Number(e.target.value))}
+                      InputLabelProps={{
+                        shrink: true,
+                      }}
+                    />
+                  </Box>
+                  <ButtonStyled onClick={() => handleDelete(member)}>
+                    <DeleteIcon />
+                  </ButtonStyled>
                 </ListItem>
               )
             })}
           </List>
-          <Button variant="contained">
-            <Typography>Chia đều</Typography>
-          </Button>
-          <Typography>Người trả bill</Typography>
-          <Box sx={{ flexGrow: 1 }}>
+          <Box className="w-full flex justify-end mt-3">
+            <ButtonStyled variant="contained" className="mt-6">
+              <Typography>Chia đều</Typography>
+            </ButtonStyled>
+          </Box>
+          <Typography variant="subtitle2">Người trả bill</Typography>
+          <Box sx={{ flexGrow: 1 }} className="mt-2">
             <Grid container spacing={2}>
               <Grid item xs={4}>
-                <Button variant="contained">
-                  {' '}
+                <ButtonStyled variant="contained">
                   <Typography>Genarate</Typography>
-                </Button>
+                </ButtonStyled>
               </Grid>
               <Grid item xs={8}>
-                <TextField
+                <TextFieldStyled
                   fullWidth
                   id="filled-required"
                   variant="standard"
@@ -143,30 +217,55 @@ function Add() {
               </Grid>
             </Grid>
           </Box>
-          <TextField
-            fullWidth
-            id="filled-required"
-            variant="standard"
-            label="Tổng bill"
-            InputLabelProps={{
-              shrink: true,
-            }}
-          />
-          <TextField
-            fullWidth
-            id="filled-required"
-            label="Hoa hồng"
-            variant="standard"
-            InputLabelProps={{
-              shrink: true,
-            }}
-          />
-          <Button variant="contained">
-            <Typography>Tạo hóa đơn</Typography>
-          </Button>
+          <Box className="mt-5">
+            <TextFieldStyled
+              fullWidth
+              type="number"
+              id="filled-required"
+              variant="standard"
+              label="Tổng bill"
+              value={eventState?.billAmount}
+              onChange={(e) => handleChangeBill(Number(e.target.value))}
+              InputLabelProps={{
+                shrink: true,
+              }}
+            />
+          </Box>
+          <Box className="mt-5">
+            <TextFieldStyled
+              fullWidth
+              type="number"
+              id="filled-required"
+              label="Hoa hồng"
+              value={eventState?.tip}
+              onChange={(e) => handleChangeTip(Number(e.target.value))}
+              variant="standard"
+              InputLabelProps={{
+                shrink: true,
+              }}
+            />
+          </Box>
+          <Box className="mt-5">
+            <TextFieldStyled
+              fullWidth
+              id="filled-required"
+              label="Tổng tiền"
+              value={eventState?.totalAmount}
+              variant="standard"
+              disabled
+              InputLabelProps={{
+                shrink: true,
+              }}
+            />
+          </Box>
+          <Box className="flex justify-center my-7">
+            <ButtonStyled variant="contained" onClick={handleCreateEvent}>
+              <Typography>Tạo hóa đơn</Typography>
+            </ButtonStyled>
+          </Box>
         </CardContent>
-      </Card>
-      <PeopleModal open={open} setOpen={setOpen} setPeople={(data: User) => console.log(data)} />
+      </CardStyled>
+      <PeopleModal open={open} setOpen={setOpen} />
     </>
   )
 }

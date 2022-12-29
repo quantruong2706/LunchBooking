@@ -219,12 +219,12 @@ const theme = createTheme({
     MuiCheckbox: {
       styleOverrides: {
         root: {
-          color: customPalette.secondary.main,
+          color: customPalette.primary.main,
           '&.Mui-checked': {
-            color: customPalette.secondary.main,
+            color: customPalette.primary.main,
           },
           '&.MuiCheckbox-indeterminate': {
-            color: customPalette.secondary.main,
+            color: customPalette.primary.main,
           },
           '&.Mui-disabled': {
             color: customPalette.checkbox.disabled,
@@ -286,23 +286,27 @@ const theme = createTheme({
       fontSize: 20,
       fontWeight: 700,
       lineHeight: '30px',
+      color: '#9C9C9C',
     },
     subtitle1: {
       fontFamily: 'Inter',
       fontSize: 18,
-      fontWeight: 700,
+      fontWeight: 'bold',
+      color: '#9C9C9C',
       lineHeight: '27px',
     },
     subtitle2: {
       fontFamily: 'Inter',
       fontSize: 16,
-      fontWeight: 700,
+      fontWeight: 'bold',
+      color: '#9C9C9C',
       lineHeight: '24px',
     },
     subtitle3: {
       fontFamily: 'Inter',
       fontSize: 14,
-      fontWeight: 700,
+      fontWeight: 'bold',
+      color: '#9C9C9C',
       lineHeight: '21px',
     },
     body1: {

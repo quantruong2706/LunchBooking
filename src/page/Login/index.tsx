@@ -9,6 +9,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 export default function Login() {
   const [signInWithGoogle, _user, loading] = useSignInWithGoogle(auth)
   const navigate = useNavigate()
+  const location = useLocation()
   const user = useAppSelector(userStore)
   const location = useLocation()
   const signIn = () => {

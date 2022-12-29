@@ -6,7 +6,6 @@ import { Box, Button, Modal, Typography } from '@mui/material'
 import { useEffect, useState } from 'react'
 type PropsType = {
   open: boolean
-  setPeople: any
   setOpen: any
 }
 const style = {
@@ -60,7 +59,7 @@ function PeopleModal({ open, setOpen }: PropsType) {
         <Typography variant="h5">Chọn người đi ăn</Typography>
         {userData?.map((item: User) => (
           <Box
-            key={item.uid}
+            key={Number(item.uid)}
             className={`hover:cursor-pointer ${selectingMembers.find((user) => item.uid === user.uid) ? 'bg-green-300' : ''} p-3 rounded-md mb-2`}
             onClick={() => handleClickRow(item)}
           >

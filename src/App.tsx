@@ -21,7 +21,7 @@ function App() {
     const setUserInDb = async () => {
       try {
         await setDoc(
-          doc(usersColection, loggedInUser?.email as string),
+          doc(usersColection, loggedInUser?.uid as string),
           {
             email: loggedInUser?.email,
             lastSeen: serverTimestamp(),

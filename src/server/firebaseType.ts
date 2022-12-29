@@ -1,4 +1,4 @@
-export type User = {
+export interface User {
   address?: string
   age?: string
   bankAccount?: string
@@ -8,14 +8,19 @@ export type User = {
   email?: string | null
   lastSeen?: string | null
   uid?: string | null
+  isPaid?: boolean
+  amount?: number
 }
 
 // export type PayHistory = {}
 
-export type Event = {
-  address: string
-  date: string
-  name: string
-  total: number
-  userId: string
+export interface Event {
+  address?: string
+  date?: string
+  name?: string
+  billAmount?: number
+  userPayId?: string
+  members?: User[]
+  tip: number
+  totalAmount: number
 }
