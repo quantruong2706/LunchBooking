@@ -1,7 +1,7 @@
 // import { ReactComponent as DishImg } from '@app/assets/react.svg'
 import PeopleModal from '@app/components/Modal/PeopleModal'
 import { setEvent, updateMemberInfo } from '@app/libs/api/EventApi'
-import { Event, User } from '@app/server/firebaseType'
+import { IEvent, User } from '@app/server/firebaseType'
 import { billStore, setSelectedListMember } from '@app/stores/events'
 import { useAppDispatch, useAppSelector } from '@app/stores/hook'
 import AddIcon from '@mui/icons-material/Add'
@@ -68,9 +68,9 @@ const initEventValue = {
 
 function Add() {
   const { selectedListMember, billDetail, isEditBill } = useAppSelector(billStore)
-  const [eventState, setEventState] = useState<Event>(isEditBill ? billDetail : initEventValue)
+  const [eventState, setEventState] = useState<IEvent>(isEditBill ? billDetail : initEventValue)
   const [openModalSuccess, setOpenModalSuccess] = useState<boolean>(false)
-  const [listBillOwner, setListBillOwner] = useState<User>([])
+  const [listBillOwner, setListBillOwner] = useState<User[]>([])
 
   const dispatch = useAppDispatch()
 
@@ -146,15 +146,9 @@ function Add() {
     const memberToPay = sortListBillOwner.pop()
     setListBillOwner(sortListBillOwner)
     if (memberToPay && memberToPay.uid) {
-      setEventState({ ...eventState, userPayId: memberToPay.uid, userPayName: memberToPay.name || memberToPay.email })
+      setEventState({ ...eventState, userPayId: memberToPay.uid, userPayName: memberToPay.name ? memberToPay.name : 'no name' })
     }
   }
-
-  // useEffect(() => {
-  //   getListUser().then((e) => {
-  //     setListAllMember(e)
-  //   })
-  // }, [])
 
   return (
     <>

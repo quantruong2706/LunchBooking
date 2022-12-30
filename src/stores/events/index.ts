@@ -1,4 +1,4 @@
-import { User } from '@app/server/firebaseType'
+import { IEvent, User } from '@app/server/firebaseType'
 import { RootState } from '@app/stores'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import dayjs from 'dayjs'
@@ -17,10 +17,10 @@ const mockBillDetail = {
   userPayName: 'Phuc',
 }
 
-const initialState: { selectedListMember: User[] } = {
+const initialState: { selectedListMember: User[]; isEditBill: boolean; billDetail: IEvent } = {
   selectedListMember: [],
+  isEditBill: false,
   billDetail: mockBillDetail,
-  isEditBill: true,
 }
 
 const slice = createSlice({

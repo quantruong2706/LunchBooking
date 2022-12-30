@@ -1,5 +1,5 @@
 import { getListUser } from '@app/libs/api/EventApi'
-import { User } from '@app/server/firebaseType'
+import { IEvent, User } from '@app/server/firebaseType'
 import { billStore, setSelectedListMember } from '@app/stores/events'
 import { useAppDispatch, useAppSelector } from '@app/stores/hook'
 import { Box, Button, Modal, Typography } from '@mui/material'
@@ -41,7 +41,7 @@ function PeopleModal({ open, setOpen }: PropsType) {
     setOpen(false)
   }
 
-  const removeDuplicateMembers = (allMembers) => {
+  const removeDuplicateMembers = (allMembers: User[]) => {
     const uniqueListMembers = allMembers.filter((item, index, list) => index === list.findIndex((member) => member.uid === item.uid))
     return uniqueListMembers
   }
