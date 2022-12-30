@@ -8,7 +8,7 @@ const NotfoundPage = () => {
           </h2>
           <p className="text-2xl font-semibold md:text-3xl">Sorry, we couldn&apos;t find this page.</p>
           <p className="mt-4 mb-8 ">But dont worry, you can find plenty of other things on our homepage.</p>
-          <a rel="noopener noreferrer" href="/" className="px-8 py-3 font-semibold bg-primary-color rounded text-white">
+          <a rel="noopener noreferrer" href="/" className="px-8 py-3 font-semibold bg-dark-green-1 rounded text-white">
             Back to home
           </a>
         </div>

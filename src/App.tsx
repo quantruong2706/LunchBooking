@@ -1,12 +1,16 @@
 import { LoadingScreen } from '@app/components/Suspense'
-import { doc, serverTimestamp, setDoc } from 'firebase/firestore'
+import theme from '@app/style/theme'
+import { ThemeProvider } from '@mui/material'
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
+import { doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore'
 import { useEffect } from 'react'
 import { useAuthState } from 'react-firebase-hooks/auth'
 import { RouterProvider } from 'react-router-dom'
 
 import Router from './router/Router'
 import { auth } from './server/firebase'
-import { userId } from './server/useDB'
+import { UserDetail, usersColection } from './server/useDB'
 import { useAppDispatch } from './stores/hook'
 import { setUser } from './stores/user'
 
@@ -17,11 +21,16 @@ function App() {
     const setUserInDb = async () => {
       try {
         await setDoc(
-          doc(userId, loggedInUser?.uid as string),
+          doc(usersColection, loggedInUser?.uid as string),
           {
             email: loggedInUser?.email,
             lastSeen: serverTimestamp(),
             uid: loggedInUser?.uid,
+            address: '',
+            age: '',
+            bankAccount: '',
+            name: loggedInUser?.displayName,
+            phone: '',
             // photoURL: loggedInUser?.photoURL
           },
           { merge: true }
@@ -33,6 +42,11 @@ function App() {
 
     if (loggedInUser) {
       const { uid, displayName, email, photoURL } = loggedInUser
+      getDoc(UserDetail(uid)).then((res) => {
+        if (!res.id) {
+          setUserInDb()
+        }
+      })
       dispatch(
         setUser({
           uid,
@@ -41,7 +55,6 @@ function App() {
           photoURL: photoURL || '',
         })
       )
-      setUserInDb()
     }
   }, [loggedInUser, dispatch])
   if (loading) {
@@ -51,7 +64,13 @@ function App() {
       </div>
     )
   }
-  return <RouterProvider router={Router} />
+  return (
+    <ThemeProvider theme={theme}>
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <RouterProvider router={Router} />
+      </LocalizationProvider>
+    </ThemeProvider>
+  )
 }
 
 export default App

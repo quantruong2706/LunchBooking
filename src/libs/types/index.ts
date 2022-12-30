@@ -10,3 +10,8 @@ export interface IUser {
   password?: string
   phone?: number
 }
+
+export interface IFooter {
+  currentPage: string
+}
+
