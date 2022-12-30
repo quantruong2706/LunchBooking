@@ -12,18 +12,20 @@ export type User = {
   uid?: string | null
   isPaid?: boolean
   amount?: number
+  count?: number
 }
 
 // export type PayHistory = {}
 
-export interface Event {
-  id: string
+export interface IEvent {
+  id?: string | null
   address?: string
   date?: string
-  name?: string
-  billAmount?: string
+  eventName?: string
+  billAmount?: number
   userPayId?: string
+  userPayName?: string
   members?: User[]
-  tip: number
-  totalAmount: number
+  tip?: number
+  totalAmount?: number
 }

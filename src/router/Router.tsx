@@ -1,3 +1,4 @@
+import Layout from '@app/components/Layout'
 import LayoutWithFooter from '@app/components/LayoutWithFooter'
 import AppSuspense from '@app/components/Suspense'
 import { useAppSelector } from '@app/stores/hook'
@@ -35,7 +36,7 @@ const PrivateRoute = ({ Comp }: PrivateRouteProps) => {
 export default createBrowserRouter([
   {
     path: '/',
-    element: <PrivateRoute Comp={LayoutWithFooter} />,
+    element: <PrivateRoute Comp={Layout} />,
     children: [
       {
         path: '',
@@ -43,7 +44,11 @@ export default createBrowserRouter([
       },
       {
         path: 'home',
-        element: <AppSuspense comp={lazy(() => import('@app/page/Home'))} />,
+        element: (
+          <LayoutWithFooter>
+            <AppSuspense comp={lazy(() => import('@app/page/Home'))} />
+          </LayoutWithFooter>
+        ),
       },
       {
         path: 'profile',
