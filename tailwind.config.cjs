@@ -11,21 +11,21 @@ module.exports = {
         'grey-1': '#A0A0A0',
         'grey-2': '#D9D9D9',
       },
- fontFamily: {
+      fontFamily: {
         bellota: ['"Bellota"', 'cursive'],
       },
     },
   },
   plugins: [],
-  safelist: [
-    {
-      pattern: /(bg|text|border|from)-green-1/,
-    },
-    {
-      pattern: /(bg|text|border|from)-secondary-color/,
-    },
-    {
-      pattern: /(bg|text|border|to)-light-color/,
-    },
-  ],
+  // safelist: [
+  //   {
+  //     pattern: /(bg|text|border|from)-green-1/,
+  //   },
+  //   {
+  //     pattern: /(bg|text|border|from)-secondary-color/,
+  //   },
+  //   {
+  //     pattern: /(bg|text|border|to)-light-color/,
+  //   },
+  // ],
 }

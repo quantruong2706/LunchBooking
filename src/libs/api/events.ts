@@ -1,10 +1,10 @@
-import { Event } from '@app/server/firebaseType'
+import { IEvent } from '@app/server/firebaseType'
 import { EventColection, EventDetail } from '@app/server/useDB'
 import { getDoc, getDocs } from 'firebase/firestore'
 
-export const getListEvent = async (): Promise<Event[]> => {
+export const getListEvent = async (): Promise<IEvent[]> => {
   const eventDocs = await getDocs(EventColection)
-  const listEvent: Event[] = []
+  const listEvent: IEvent[] = []
 
   eventDocs.docs.forEach((eventDoc) => {
     const event = eventDoc.data()
@@ -16,7 +16,7 @@ export const getListEvent = async (): Promise<Event[]> => {
 }
 export const getDetailEvent = async (id: string) => {
   const eventDocs = await getDoc(EventDetail(id))
-  const EventData: Event = eventDocs.data()!
+  const EventData: IEvent = eventDocs.data()!
   EventData.id = eventDocs.id
   return EventData
 }

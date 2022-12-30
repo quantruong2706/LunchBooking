@@ -4,6 +4,7 @@ export type User = {
   address?: string
   age?: string
   bankAccount?: string
+  bankAccountName?: string
   name?: string | null
   password?: string
   phone?: string
