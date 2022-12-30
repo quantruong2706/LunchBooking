@@ -1,5 +1,5 @@
-import React, { Suspense } from 'react'
 import { CircularProgress } from '@mui/material'
+import React, { Suspense } from 'react'
 
 interface AppSuspenseProps {
   children?: React.ReactElement
@@ -8,8 +8,8 @@ interface AppSuspenseProps {
 
 export const LoadingScreen = () => {
   return (
-    <div className='text-center h-screen flex justify-center items-center'>
-      <CircularProgress color='success' />
+    <div className="text-center h-screen flex justify-center items-center">
+      <CircularProgress color="success" />
     </div>
   )
 }

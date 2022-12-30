@@ -3,7 +3,6 @@ import { IFooter } from '@app/libs/types'
 import { createSlice } from '@reduxjs/toolkit'
 import { RootState } from '..'
 
-
 const initialState: IFooter = {
   currentPage: PAGES.HOME,
 }
