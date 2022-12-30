@@ -43,7 +43,7 @@ function App() {
     if (loggedInUser) {
       const { uid, displayName, email, photoURL } = loggedInUser
       getDoc(UserDetail(uid)).then((res) => {
-        if (!res.id) {
+        if (!res.data()?.uid) {
           setUserInDb()
         }
       })

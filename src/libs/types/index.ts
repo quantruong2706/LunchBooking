@@ -14,4 +14,3 @@ export interface IUser {
 export interface IFooter {
   currentPage: string
 }
-

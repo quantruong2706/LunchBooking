@@ -1,3 +1,4 @@
+import { LoadingScreen } from '@app/components/Suspense'
 import { getDetailEvent } from '@app/libs/api/events'
 import { TEXT__HOST, TEXT__MEMBER, TEXT__PAYMENT_PAID, TEXT__PAYMENT_REMIND } from '@app/libs/constant'
 import { formatMoney } from '@app/libs/functions'
@@ -16,6 +17,7 @@ const LunchDetail = () => {
   const { uid } = useAppSelector(userStore)
   const [detailData, setDetailData] = useState<IEvent>()
   const [host, setHostData] = useState<User>()
+  const [loading, setLoading] = useState<boolean>(true)
 
   const [openAlert, setOpenAlert] = useState(false)
 
@@ -31,17 +33,20 @@ const LunchDetail = () => {
 
   const params = useParams<{ id: string }>()
   useEffect(() => {
-    getDetailEvent(params.id!).then((e) => {
-      setDetailData(e)
-      getDoc(UserDetail(e.userPayId!)).then((res) => {
-        setHostData(res.data())
+    getDetailEvent(params.id!)
+      .then((e) => {
+        setDetailData(e)
+        getDoc(UserDetail(e.userPayId!)).then((res) => {
+          setHostData(res.data())
+        })
       })
-    })
+      .catch((e) => {
+        throw Error(e)
+      })
+      .finally(() => {
+        setLoading(false)
+      })
   }, [params])
-  // const funcCoppy = () => {
-  //   navigator.clipboard.writeText(`https://itap.minastik.com/${userName}`);
-  //   message.success("Đã copy");
-  // };
 
   const handleClick = () => {
     navigator.clipboard.writeText(host?.bankAccount || '')
@@ -56,11 +61,13 @@ const LunchDetail = () => {
     setOpenAlert(false)
   }
 
-  return (
+  return loading ? (
+    <LoadingScreen />
+  ) : (
     <div className="bg-white h-screen">
       <Snackbar open={openAlert} autoHideDuration={1500} onClose={handleClose}>
         <Alert onClose={handleClose} severity="success" sx={{ width: '100%', backgroundColor: '#baf7c2' }}>
-          This is a success message!
+          <span className="font-bold">copied!</span>
         </Alert>
       </Snackbar>
       <div className="bg-gradient-to-t from-green-300 to-light-color rounded-b-3xl">
@@ -137,11 +144,9 @@ const LunchDetail = () => {
             ))}
           </ul>
         </div>
-        <div className="my-3">
-          {isPaid ? (
-            <img className="w-96 h-auto mx-auto" src="/paid.png" alt="aaa" />
-          ) : (
-            <>
+        {!isPaid ? (
+          <>
+            <div className="my-3">
               <span className="text-gray-400 font-bold block mb-3">Bank Account</span>
               <p>
                 Chủ tài khoản: {host?.bankAccountName} <br />
@@ -152,23 +157,25 @@ const LunchDetail = () => {
                 </button>
                 <img className="w-96 h-auto mx-auto" src="https://kalite.vn/wp-content/uploads/2021/09/maqrkalite.jpg" alt="aaa" />
               </p>
-            </>
-          )}
-        </div>
-        {!isPaid && (
-          <div className="my-3">
-            <span className="text-gray-400 font-bold block mb-3">Action</span>
-            <div className="flex w-full">
-              <button
-                type="button"
-                className={
-                  'focus:outline-none text-white focus:ring-4 font-medium rounded-lg px-5 py-2.5 mx-auto ' +
-                  (isHost ? 'bg-green-600 hover:bg-green-700 focus:ring-green-400' : 'bg-[#B91D37]')
-                }
-              >
-                {isHost ? TEXT__PAYMENT_REMIND : TEXT__PAYMENT_PAID}
-              </button>
             </div>
+            <div className="my-3">
+              <span className="text-gray-400 font-bold block mb-3">Action</span>
+              <div className="flex w-full">
+                <button
+                  type="button"
+                  className={
+                    'focus:outline-none text-white focus:ring-4 font-medium rounded-lg px-5 py-2.5 mx-auto ' +
+                    (isHost ? 'bg-green-600 hover:bg-green-700 focus:ring-green-400' : 'bg-[#B91D37]')
+                  }
+                >
+                  {isHost ? TEXT__PAYMENT_REMIND : TEXT__PAYMENT_PAID}
+                </button>
+              </div>
+            </div>
+          </>
+        ) : (
+          <div className="my-3">
+            <img className="w-96 h-auto mx-auto" src="/paid.png" alt="aaa" />
           </div>
         )}
       </div>
