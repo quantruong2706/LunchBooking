@@ -164,12 +164,12 @@ export default function HomePage(props: IHomePageProps) {
               <span className="text-right">{dataEvents.filter(x => x.type == "member").length} bữa</span>
             </div>
             <hr className="divider"/>
-            {dataEvents.filter(x => x.type == "member").map(data => 
-              <div>
+            {dataEvents.filter(x => x.type == "member").length > 0 ? dataEvents.filter(x => x.type == "member").map(data =>
+              <div key={data.id}>
                 <a href={'/events/' + data.id} className="text-link">{data.name}</a>
                 <span className="text-right">{data.cost}</span>
               </div>
-             )}
+             ): <img src="/src/assets/paid_logo.webp" alt="paid"/>}
             <hr className="divider"/>
             <div>
               <span className="text-bold">Total</span>
@@ -182,12 +182,12 @@ export default function HomePage(props: IHomePageProps) {
               <span className="text-right">{dataEvents.filter(x => x.type == "admin").length} bữa</span>
             </div>
             <hr className="divider"/>
-            {dataEvents.filter(x => x.type == "admin").map(data => 
-              <div>
+            {dataEvents.filter(x => x.type == "admin").length > 0 ? dataEvents.filter(x => x.type == "admin").map(data =>
+              <div key={data.id}>
                 <a href={'/events/' + data.id} className="text-link">{data.name}</a>
                 <span className="text-right">{data.total}</span>
               </div>
-             )}
+             ): <img src="/src/assets/paid_logo.webp" alt="paid"/>}
             <hr className="divider"/>
             <div>
               <span className="text-bold">Total</span>
