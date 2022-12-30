@@ -26,11 +26,9 @@ const Profile = () => {
   }, [user.uid])
 
   const logout = async () => {
-    console.log('aaa')
     try {
       await signOut(auth).then(() => {
         store.dispatch(clearUser())
-        console.log('vvbbb')
       })
     } catch (error) {
       console.log('ERROR LOGGING OUT', error)
