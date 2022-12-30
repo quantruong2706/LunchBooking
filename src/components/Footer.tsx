@@ -21,14 +21,14 @@ const Footer = () => {
   }
 
   return (
-    <div className="text-center h-[60px] flex justify-around footer" style={{ backgroundColor: '#D9D9D9' }}>
+    <div className="fixed bottom-0 w-full text-center h-[60px] flex justify-around" style={{ backgroundColor: '#D9D9D9' }}>
       <button className="flex-1" onClick={() => onClickFooterIcon(PAGES.HOME)}>
         <div>
           <HomeIcon sx={{ color: currentPage === PAGES.HOME ? '#439D0D' : '#A0A0A0' }} />
         </div>
         <div className={`text-[12px] ${currentPage === PAGES.HOME ? 'text-dark-green-1' : 'text-grey-1'}`}>Home</div>
       </button>
-      <button className="flex-1" onClick={() => onClickFooterIcon(PAGES.HISTORY)}>
+      <button className="flex-1 cursor-not-allowed" disabled onClick={() => onClickFooterIcon(PAGES.HISTORY)}>
         <div>
           <ListAltIcon sx={{ color: currentPage === PAGES.HISTORY ? '#439D0D' : '#A0A0A0' }} />
         </div>
@@ -40,13 +40,13 @@ const Footer = () => {
         </div>
         <div className={`text-[12px] mt-[-6px] ${currentPage === PAGES.ADD_BILL ? 'text-dark-green-1' : 'text-grey-1'}`}>Add Bill</div>
       </button>
-      <button className="flex-1" onClick={() => onClickFooterIcon(PAGES.NOTIFICATIONS)}>
+      <button className="flex-1 cursor-not-allowed" disabled onClick={() => onClickFooterIcon(PAGES.NOTIFICATIONS)}>
         <div>
           <NotificationsIcon sx={{ color: currentPage === PAGES.NOTIFICATIONS ? '#439D0D' : '#A0A0A0' }} />
         </div>
         <div className={`text-[12px] ${currentPage === PAGES.NOTIFICATIONS ? 'text-dark-green-1' : 'text-grey-1'}`}>Notifications</div>
       </button>
-      <button className="flex-1" onClick={() => onClickFooterIcon(PAGES.MEMEBERS)}>
+      <button className="flex-1 cursor-not-allowed" disabled onClick={() => onClickFooterIcon(PAGES.MEMEBERS)}>
         <div>
           <PeopleIcon sx={{ color: currentPage === PAGES.MEMEBERS ? '#439D0D' : '#A0A0A0' }} />
         </div>
