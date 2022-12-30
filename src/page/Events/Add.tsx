@@ -60,14 +60,6 @@ const initEventValue = {
   userPayName: '',
 }
 
-/** TODO 
- EDIT 
- When click button "Edit":
-  setIsEditBill(true) 
-  setBillDetail(existData)
-  setSelectedListMember(existData) 
- */
-
 function Add() {
   const { selectedListMember, billDetail, isEditBill } = useAppSelector(billStore)
   const [eventState, setEventState] = useState<IEvent>(isEditBill ? billDetail : initEventValue)

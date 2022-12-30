@@ -1,8 +1,13 @@
+import { PAGES } from '@app/contants'
+import { setCurrentPage } from '@app/stores/footer'
+import { useAppSelector } from '@app/stores/hook'
+import { userStore } from '@app/stores/user'
+import { Grid } from '@mui/material'
+import { Container } from '@mui/system'
+import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { useAppSelector } from "@app/stores/hook"
-import { userStore } from "@app/stores/user"
-import { Grid } from "@mui/material"
-import { Container } from "@mui/system"
+import { useAppDispatch } from '../../stores/hook'
+
 
 export interface IHomePageProps {
   ahihi: string
@@ -10,50 +15,56 @@ export interface IHomePageProps {
 
 export default function HomePage(props: IHomePageProps) {
   const user = useAppSelector(userStore)
+  const dispatch = useAppDispatch()
+
+  useEffect(() => {
+    dispatch(setCurrentPage(PAGES.HOME))
+  }, [])
+
   const dataEvents = [
-      {
-        id: 1,
-        name: "Gà Mạnh Hoạch",
-        type: 'admin',
-        total: 1200000,
-        cost: 100000
-      },
-      {
-        id: 2,
-        name: "Phật Nhảy Tường",
-        type: 'admin',
-        total: 1200000,
-        cost: 100000
-      },
-      {
-        id: 3,
-        name: "1900s",
-        type: 'member',
-        total: 1200000,
-        cost: 100000
-      },
-      {
-        id: 4,
-        name: "Bia Tạ Hiện",
-        type: 'member',
-        total: 1200000,
-        cost: 100000
-      },
-      {
-        id: 5,
-        name: "Trà Sữa sương sương",
-        type: 'member',
-        total: 1200000,
-        cost: 80000
-      },
-      {
-        id: 6,
-        name: "Bánh Mì Hội An",
-        type: 'member',
-        total: 1200000,
-        cost: 50000
-      },
-  ];
+    {
+      id: 1,
+      name: 'Gà Mạnh Hoạch',
+      type: 'admin',
+      total: 1200000,
+      cost: 100000,
+    },
+    {
+      id: 2,
+      name: 'Phật Nhảy Tường',
+      type: 'admin',
+      total: 1200000,
+      cost: 100000,
+    },
+    {
+      id: 3,
+      name: '1900s',
+      type: 'member',
+      total: 1200000,
+      cost: 100000,
+    },
+    {
+      id: 4,
+      name: 'Bia Tạ Hiện',
+      type: 'member',
+      total: 1200000,
+      cost: 100000,
+    },
+    {
+      id: 5,
+      name: 'Trà Sữa sương sương',
+      type: 'member',
+      total: 1200000,
+      cost: 80000,
+    },
+    {
+      id: 6,
+      name: 'Bánh Mì Hội An',
+      type: 'member',
+      total: 1200000,
+      cost: 50000,
+    },
+  ]
   const css = `
     html {
       width: 100vw;
@@ -137,68 +148,84 @@ export default function HomePage(props: IHomePageProps) {
           <p id="username">{user.displayName}</p>
         </Grid>
         <Grid item xs={2}>
-          <Link to="/my-profile"><img id="userImg" src={user.photoURL} alt="user_photo"/></Link>
+          <Link to="/my-profile">
+            <img id="userImg" src={user.photoURL} alt="user_photo" />
+          </Link>
         </Grid>
       </Grid>
-      <Grid id="dashboard" container direction="row" alignItems="center" justifyContent="center" spacing={3} sx={{marginLeft: { xs: '-12px', sm: '0'} }}>
-        <Grid className="item box" item xs={6} sm={3} sx={{maxWidth: { xs: '43vw', sm: '20vw', lg: '14vw'} }}>
+      <Grid id="dashboard" container direction="row" alignItems="center" justifyContent="center" spacing={3} sx={{ marginLeft: { xs: '-12px', sm: '0' } }}>
+        <Grid className="item box" item xs={6} sm={3} sx={{ maxWidth: { xs: '43vw', sm: '20vw', lg: '14vw' } }}>
           <p className="itemHeader">Tham gia</p>
           <p className="itemDetail">12</p>
         </Grid>
-        <Grid className="item box" item xs={6} sm={3} sx={{maxWidth: { xs: '43vw', sm: '20vw', lg: '14vw'} }}>
+        <Grid className="item box" item xs={6} sm={3} sx={{ maxWidth: { xs: '43vw', sm: '20vw', lg: '14vw' } }}>
           <p className="itemHeader">Chủ chi</p>
           <p className="itemDetail">12</p>
         </Grid>
-        <Grid className="item box" item sm={3} sx={{ display: { xs: 'none', sm: 'block' }, maxWidth: { sm: '20vw', lg: '14vw'} }}>
+        <Grid className="item box" item sm={3} sx={{ display: { xs: 'none', sm: 'block' }, maxWidth: { sm: '20vw', lg: '14vw' } }}>
           <p className="itemHeader">Cần trả</p>
-          <p className="itemDetail">{dataEvents.filter(x => x.type == "member").reduce((total, data) => total += data.cost, 0)}</p>
+          <p className="itemDetail">{dataEvents.filter((x) => x.type == 'member').reduce((total, data) => (total += data.cost), 0)}</p>
         </Grid>
-        <Grid className="item box" item sm={3} sx={{ display: { xs: 'none', sm: 'block' }, maxWidth: { sm: '20vw', lg: '14vw'} }}>
+        <Grid className="item box" item sm={3} sx={{ display: { xs: 'none', sm: 'block' }, maxWidth: { sm: '20vw', lg: '14vw' } }}>
           <p className="itemHeader">Cần đòi</p>
-          <p className="itemDetail">{dataEvents.filter(x => x.type == "admin").reduce((total, data) => total += data.total, 0)}</p>
+          <p className="itemDetail">{dataEvents.filter((x) => x.type == 'admin').reduce((total, data) => (total += data.total), 0)}</p>
         </Grid>
-        </Grid>
-        <Grid id="list" container direction="row" alignItems="center" justifyContent="center" spacing={3} sx={{marginLeft: { xs: '-12px', sm: '0'} }}>
-          <Grid className="item box" item xs={12} sm={6} sx={{maxWidth: { sm: '43vw', lg: '29vw'} }}>
-            <div>
-              <span className="text-bold">Số bữa chưa trả</span>
-              <span className="text-right">{dataEvents.filter(x => x.type == "member").length} bữa</span>
-            </div>
-            <hr className="divider"/>
-            {dataEvents.filter(x => x.type == "member").length > 0 ? dataEvents.filter(x => x.type == "member").map(data =>
-              <div key={data.id}>
-                <Link to={'/events/' + data.id} className="text-link">{data.name}</Link>
-                <span className="text-right">{data.cost}</span>
-              </div>
-             ): <img src="/src/assets/paid_logo.webp" alt="paid"/>}
-            <hr className="divider"/>
-            <div>
-              <span className="text-bold">Total</span>
-              <span className="text-right">{dataEvents.filter(x => x.type == "member").reduce((total, data) => total += data.cost, 0)}</span>
-            </div>
-          </Grid>
-          <Grid className="item box" item xs={12} sm={6} sx={{maxWidth: { sm: '43vw', lg: '29vw'} }}>
+      </Grid>
+      <Grid id="list" container direction="row" alignItems="center" justifyContent="center" spacing={3} sx={{ marginLeft: { xs: '-12px', sm: '0' } }}>
+        <Grid className="item box" item xs={12} sm={6} sx={{ maxWidth: { sm: '43vw', lg: '29vw' } }}>
           <div>
-              <span className="text-bold">Số bữa cần đòi</span>
-              <span className="text-right">{dataEvents.filter(x => x.type == "admin").length} bữa</span>
-            </div>
-            <hr className="divider"/>
-            {dataEvents.filter(x => x.type == "admin").length > 0 ? dataEvents.filter(x => x.type == "admin").map(data =>
-              <div key={data.id}>
-                <Link to={'/events/' + data.id} className="text-link">{data.name}</Link>
-                <span className="text-right">{data.total}</span>
-              </div>
-             ): <img src="/src/assets/paid_logo.webp" alt="paid"/>}
-            <hr className="divider"/>
-            <div>
-              <span className="text-bold">Total</span>
-              <span className="text-right">{dataEvents.filter(x => x.type == "admin").reduce((total, data) => total += data.total, 0)}</span>
-            </div>
-          </Grid>
+            <span className="text-bold">Số bữa chưa trả</span>
+            <span className="text-right">{dataEvents.filter((x) => x.type == 'member').length} bữa</span>
+          </div>
+          <hr className="divider" />
+          {dataEvents.filter((x) => x.type == 'member').length > 0 ? (
+            dataEvents
+              .filter((x) => x.type == 'member')
+              .map((data) => (
+                <div key={data.id}>
+                  <Link to={'/events/' + data.id} className="text-link">
+                    {data.name}
+                  </Link>
+                  <span className="text-right">{data.cost}</span>
+                </div>
+              ))
+          ) : (
+            <img src="/src/assets/paid_logo.webp" alt="paid" />
+          )}
+          <hr className="divider" />
+          <div>
+            <span className="text-bold">Total</span>
+            <span className="text-right">{dataEvents.filter((x) => x.type == 'member').reduce((total, data) => (total += data.cost), 0)}</span>
+          </div>
         </Grid>
-      <div>
-        
-      </div>
+        <Grid className="item box" item xs={12} sm={6} sx={{ maxWidth: { sm: '43vw', lg: '29vw' } }}>
+          <div>
+            <span className="text-bold">Số bữa cần đòi</span>
+            <span className="text-right">{dataEvents.filter((x) => x.type == 'admin').length} bữa</span>
+          </div>
+          <hr className="divider" />
+          {dataEvents.filter((x) => x.type == 'admin').length > 0 ? (
+            dataEvents
+              .filter((x) => x.type == 'admin')
+              .map((data) => (
+                <div key={data.id}>
+                  <Link to={'/events/' + data.id} className="text-link">
+                    {data.name}
+                  </Link>
+                  <span className="text-right">{data.total}</span>
+                </div>
+              ))
+          ) : (
+            <img src="/src/assets/paid_logo.webp" alt="paid" />
+          )}
+          <hr className="divider" />
+          <div>
+            <span className="text-bold">Total</span>
+            <span className="text-right">{dataEvents.filter((x) => x.type == 'admin').reduce((total, data) => (total += data.total), 0)}</span>
+          </div>
+        </Grid>
+      </Grid>
+      <div></div>
     </Container>
   )
 }
