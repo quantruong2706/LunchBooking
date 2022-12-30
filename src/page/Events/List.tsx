@@ -21,13 +21,22 @@ const List = () => {
           <h2 className="text-2xl">Lịch sử đi ăn</h2>
         </div>
         <div className="inline-flex w-full" role="group">
-          <button className="min-w-[33%] py-4 px-4 text-gray-900 bg-white rounded-l-lg hover:bg-gray-100 hover:text-green-700 focus:z-10 focus:ring-2 focus:ring-green-700 focus:text-green-700">
+          <button
+            disabled
+            className="min-w-[33%] py-4 px-4 text-gray-900 bg-white rounded-l-lg hover:bg-gray-100 hover:text-green-700 focus:z-10 focus:ring-2 focus:ring-green-700 focus:text-green-700 cursor-not-allowed"
+          >
             Thời gian
           </button>
-          <button className="min-w-[33%] py-4 px-4 text-gray-900 bg-white border-x border-gray-200 hover:bg-gray-100 hover:text-green-700 focus:z-10 focus:ring-2 focus:ring-green-700 focus:text-green-700">
+          <button
+            disabled
+            className="min-w-[33%] py-4 px-4 text-gray-900 bg-white border-x border-gray-200 hover:bg-gray-100 hover:text-green-700 focus:z-10 focus:ring-2 focus:ring-green-700 focus:text-green-700 cursor-not-allowed"
+          >
             Thanh toán
           </button>
-          <button className="min-w-[33%] py-4 px-4 text-gray-900 bg-white rounded-r-lg hover:bg-gray-100 hover:text-green-700 focus:z-10 focus:ring-2 focus:ring-green-700 focus:text-green-700">
+          <button
+            disabled
+            className="min-w-[33%] py-4 px-4 text-gray-900 bg-white rounded-r-lg hover:bg-gray-100 hover:text-green-700 focus:z-10 focus:ring-2 focus:ring-green-700 focus:text-green-700 cursor-not-allowed"
+          >
             Hình thức
           </button>
         </div>
@@ -64,7 +73,8 @@ const List = () => {
                       </span>
                       <br />
                       <span>
-                        Số tiền chưa đòi: <b>{formatMoney(item.billAmount)}</b>
+                        {isHost ? 'Số tiền chưa đòi: ' : 'Số tiền chưa trả: '}
+                        <b>{formatMoney(isHost ? item.billAmount : item.members?.find((member) => member.uid === userData.uid)?.amount)}</b>
                       </span>
                     </div>
                     <span
