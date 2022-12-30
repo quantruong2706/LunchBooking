@@ -28,7 +28,7 @@ const Footer = () => {
         </div>
         <div className={`text-[12px] ${currentPage === PAGES.HOME ? 'text-dark-green-1' : 'text-grey-1'}`}>Home</div>
       </button>
-      <button className="flex-1 cursor-not-allowed" disabled onClick={() => onClickFooterIcon(PAGES.HISTORY)}>
+      <button className="flex-1" onClick={() => onClickFooterIcon(PAGES.HISTORY)}>
         <div>
           <ListAltIcon sx={{ color: currentPage === PAGES.HISTORY ? '#439D0D' : '#A0A0A0' }} />
         </div>

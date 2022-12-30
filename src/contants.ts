@@ -11,5 +11,5 @@ export const PAGE_ROUTES = {
   [PAGES.ADD_BILL]: '/events/add',
   [PAGES.NOTIFICATIONS]: '/notifications',
   [PAGES.MEMEBERS]: '/members',
-  [PAGES.HISTORY]: '/history',
+  [PAGES.HISTORY]: '/events',
 }
