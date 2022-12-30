@@ -6,6 +6,7 @@ import { billStore, setSelectedListMember } from '@app/stores/events'
 import { useAppDispatch, useAppSelector } from '@app/stores/hook'
 import AddIcon from '@mui/icons-material/Add'
 import DeleteIcon from '@mui/icons-material/Delete'
+import ReplyIcon from '@mui/icons-material/Reply'
 import { Box, CardContent, Modal, TextField, Typography } from '@mui/material'
 import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
@@ -19,6 +20,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker'
 import * as dayjs from 'dayjs'
 import _ from 'lodash'
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 const TextFieldStyled = styled(TextField)(({ theme }) => ({
   '& .MuiFormLabel-root': {
     ...theme.typography.subtitle1,
@@ -57,14 +59,6 @@ const initEventValue = {
   userPayId: '',
   userPayName: '',
 }
-
-/** TODO 
- EDIT 
- When click button "Edit":
-  setIsEditBill(true) 
-  setBillDetail(existData)
-  setSelectedListMember(existData) 
- */
 
 function Add() {
   const { selectedListMember, billDetail, isEditBill } = useAppSelector(billStore)
@@ -154,7 +148,11 @@ function Add() {
     <>
       <CardStyled variant="outlined" className="max-w-[500px]">
         <CardContent>
-          <img src="/vite.svg" alt="" />
+          <button className="px-4">
+            <Link to="/">
+              <ReplyIcon fontSize={'large'} />
+            </Link>
+          </button>{' '}
           <Box className="mt-6">
             <TextFieldStyled
               fullWidth
@@ -259,7 +257,6 @@ function Add() {
               </Box>
             </>
           ) : null}
-
           <Typography variant="subtitle2">Người trả bill</Typography>
           <Box sx={{ flexGrow: 1 }} className="mt-2">
             <Grid container spacing={2}>
