@@ -2,7 +2,7 @@
 import PeopleModal from '@app/components/Modal/PeopleModal'
 import { setEvent, updateMemberInfo } from '@app/libs/api/EventApi'
 import { Event, User } from '@app/server/firebaseType'
-import { selectedListMemberStore, setSelectedListMember } from '@app/stores/events'
+import { billStore, setSelectedListMember } from '@app/stores/events'
 import { useAppDispatch, useAppSelector } from '@app/stores/hook'
 import AddIcon from '@mui/icons-material/Add'
 import DeleteIcon from '@mui/icons-material/Delete'
@@ -45,18 +45,30 @@ const style = {
   boxShadow: 24,
   p: 4,
 }
+
+const initEventValue = {
+  address: '',
+  date: dayjs(new Date()).format('MM/DD/YYYY'),
+  eventName: '',
+  totalAmount: 0,
+  userId: '',
+  tip: 0,
+  billAmount: 0,
+  userPayId: '',
+  userPayName: '',
+}
+
+/** TODO 
+ EDIT 
+ When click button "Edit":
+  setIsEditBill(true) 
+  setBillDetail(existData)
+  setSelectedListMember(existData) 
+ */
+
 function Add() {
-  const initEventValue = {
-    address: '',
-    date: dayjs(new Date()).format('MM/DD/YYYY'),
-    name: '',
-    totalAmount: 0,
-    userId: '',
-    tip: 0,
-    billAmount: 0,
-  }
-  const [eventState, setEventState] = useState<Partial<Event>>(initEventValue)
-  const { selectedListMember } = useAppSelector(selectedListMemberStore)
+  const { selectedListMember, billDetail, isEditBill } = useAppSelector(billStore)
+  const [eventState, setEventState] = useState<Event>(isEditBill ? billDetail : initEventValue)
   const [openModalSuccess, setOpenModalSuccess] = useState<boolean>(false)
   const [listBillOwner, setListBillOwner] = useState<User>([])
 
@@ -151,12 +163,10 @@ function Add() {
           <img src="/vite.svg" alt="" />
           <Box className="mt-6">
             <TextFieldStyled
-              required
               fullWidth
-              id="filled-required"
               label="Tên"
               value={eventState?.eventName}
-              onChange={(e) => handleChangeTextField('name', e.target.value)}
+              onChange={(e) => handleChangeTextField('eventName', e.target.value)}
               variant="standard"
               InputLabelProps={{
                 shrink: true,

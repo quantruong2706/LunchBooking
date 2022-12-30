@@ -1,6 +1,6 @@
 import { getListUser } from '@app/libs/api/EventApi'
 import { User } from '@app/server/firebaseType'
-import { selectedListMemberStore, setSelectedListMember } from '@app/stores/events'
+import { billStore, setSelectedListMember } from '@app/stores/events'
 import { useAppDispatch, useAppSelector } from '@app/stores/hook'
 import { Box, Button, Modal, Typography } from '@mui/material'
 import { useEffect, useState } from 'react'
@@ -21,7 +21,7 @@ const style = {
 }
 function PeopleModal({ open, setOpen }: PropsType) {
   const [allMembers, setAllMembers] = useState<User[]>([])
-  const { selectedListMember } = useAppSelector(selectedListMemberStore)
+  const { selectedListMember } = useAppSelector(billStore)
   const [selectingMembers, setSelectingMembers] = useState<User[]>([...selectedListMember])
   const dispatch = useAppDispatch()
 
