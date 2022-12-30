@@ -2,6 +2,7 @@ import { auth } from '@app/server/firebase'
 import { store } from '@app/stores'
 import { useAppSelector } from '@app/stores/hook'
 import { clearUser, userStore } from '@app/stores/user'
+import { Container } from '@mui/system'
 import { signOut } from 'firebase/auth'
 import { Outlet } from 'react-router-dom'
 
