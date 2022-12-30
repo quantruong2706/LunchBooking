@@ -148,7 +148,7 @@ export default function HomePage(props: IHomePageProps) {
           <p id="username">{user.displayName}</p>
         </Grid>
         <Grid item xs={2}>
-          <Link to="/my-profile">
+          <Link to="/profile">
             <img id="userImg" src={user.photoURL} alt="user_photo" />
           </Link>
         </Grid>
