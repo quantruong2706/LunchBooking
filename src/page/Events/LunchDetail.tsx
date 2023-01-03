@@ -13,6 +13,7 @@ import Snackbar from '@mui/material/Snackbar'
 import { getDoc } from 'firebase/firestore'
 import { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
+
 const LunchDetail = () => {
   const { uid } = useAppSelector(userStore)
   const [detailData, setDetailData] = useState<IEvent>()
