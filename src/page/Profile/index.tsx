@@ -92,7 +92,7 @@ const Profile = () => {
           <label htmlFor="" className="pb-1 self-start font-bold text-gray-500">
             Account QR
           </label>
-          <img src="src/assets/profile-picture.png" alt="QR code" className="h-64 w-6h-64" />
+          <img src="src/assets/profile-picture.png" alt="QR code" className="h-64 w-64" />
         </div>
       </div>
     </div>
