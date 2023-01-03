@@ -1,4 +1,4 @@
-import { PAGES, PAGE_ROUTES } from '@app/contants'
+import { PAGE_ROUTES, PAGES } from '@app/contants'
 import { currentPageStore, setCurrentPage } from '@app/stores/footer'
 import { useAppDispatch } from '@app/stores/hook'
 import AddCircleIcon from '@mui/icons-material/AddCircle'
@@ -21,7 +21,7 @@ const Footer = () => {
   }
 
   return (
-    <div className="fixed bottom-0 w-full text-center h-[60px] flex justify-around" style={{ backgroundColor: '#D9D9D9' }}>
+    <div className="w-full text-center h-[60px] flex justify-around" style={{ backgroundColor: '#D9D9D9' }}>
       <button className="flex-1" onClick={() => onClickFooterIcon(PAGES.HOME)}>
         <div>
           <HomeIcon sx={{ color: currentPage === PAGES.HOME ? '#439D0D' : '#A0A0A0' }} />
