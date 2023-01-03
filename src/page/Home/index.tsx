@@ -26,7 +26,7 @@ export default function HomePage(props: IHomePageProps) {
   }, [])
 
   const [listEvent, setListEvent] = useState<Event[]>([])
-
+  console.log('listEvent',listEvent);
   useEffect(() => {
   }, [])
   const dataEvents = [
@@ -151,7 +151,8 @@ export default function HomePage(props: IHomePageProps) {
   `
 
   const getPaidEvent = () => {
-    return listEvent.filter(x => x.userPayId == user.uid);
+    let result = listEvent.filter(x => x.userPayId == user.uid);
+    return result;
   }
 
   const getTotalPaidEvent = () => {
@@ -160,7 +161,8 @@ export default function HomePage(props: IHomePageProps) {
   }
 
   const getNotPaidEvent = () => {
-    return listEvent.filter(x => x.members.filter(member => member.uid == user.uid));
+    let result = listEvent.filter(x => x.members.some(member => member.uid == user.uid));
+    return result;
   }
 
   const getTotalNotPaidAmount = () => {
