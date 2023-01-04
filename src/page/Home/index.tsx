@@ -9,6 +9,8 @@ import { Link } from 'react-router-dom'
 import { useAppDispatch } from '../../stores/hook'
 import { getListEvent } from '@app/libs/api/events'
 import { getToPathname } from '@remix-run/router'
+import { IEvent, User } from '@app/server/firebaseType'
+
 export interface IHomePageProps {
   ahihi: string
 }
@@ -25,54 +27,8 @@ export default function HomePage(props: IHomePageProps) {
     })
   }, [])
 
-  const [listEvent, setListEvent] = useState<Event[]>([])
-  console.log('listEvent',listEvent);
-  useEffect(() => {
-  }, [])
-  const dataEvents = [
-    {
-      id: 1,
-      name: 'Gà Mạnh Hoạch',
-      type: 'admin',
-      total: 1200000,
-      cost: 100000,
-    },
-    {
-      id: 2,
-      name: 'Phật Nhảy Tường',
-      type: 'admin',
-      total: 1200000,
-      cost: 100000,
-    },
-    {
-      id: 3,
-      name: '1900s',
-      type: 'member',
-      total: 1200000,
-      cost: 100000,
-    },
-    {
-      id: 4,
-      name: 'Bia Tạ Hiện',
-      type: 'member',
-      total: 1200000,
-      cost: 100000,
-    },
-    {
-      id: 5,
-      name: 'Trà Sữa sương sương',
-      type: 'member',
-      total: 1200000,
-      cost: 80000,
-    },
-    {
-      id: 6,
-      name: 'Bánh Mì Hội An',
-      type: 'member',
-      total: 1200000,
-      cost: 50000,
-    },
-  ]
+  const [listEvent, setListEvent] = useState<IEvent[]>([])
+  console.log(listEvent);
   const css = `
     html {
       width: 100vw;
@@ -149,6 +105,12 @@ export default function HomePage(props: IHomePageProps) {
       color: #0075FF;
     }
   `
+  const getJoinedEvent = () => {
+    let result = listEvent.filter(x => {
+      Object.values(x.members).some(member => member.uid == user.uid);
+    });
+    return result;
+  }
 
   const getPaidEvent = () => {
     let result = listEvent.filter(x => x.userPayId == user.uid);
@@ -161,7 +123,9 @@ export default function HomePage(props: IHomePageProps) {
   }
 
   const getNotPaidEvent = () => {
-    let result = listEvent.filter(x => x.members.some(member => member.uid == user.uid));
+    let result = listEvent.filter(x => {
+      Object.values(x.members).some(member => member.uid == user.uid && (member.isPaid !== undefined && member.isPaid !== true))
+    });
     return result;
   }
 
@@ -187,7 +151,7 @@ export default function HomePage(props: IHomePageProps) {
       <Grid id="dashboard" container direction="row" alignItems="center" justifyContent="center" spacing={3} sx={{ marginLeft: { xs: '-12px', sm: '0' } }}>
         <Grid className="item box" item xs={6} sm={3} sx={{ maxWidth: { xs: '43vw', sm: '20vw', lg: '14vw' } }}>
           <p className="itemHeader">Tham gia</p>
-          <p className="itemDetail">{getNotPaidEvent().length}</p>
+          <p className="itemDetail">{getJoinedEvent().length}</p>
         </Grid>
         <Grid className="item box" item xs={6} sm={3} sx={{ maxWidth: { xs: '43vw', sm: '20vw', lg: '14vw' } }}>
           <p className="itemHeader">Chủ chi</p>
@@ -217,7 +181,7 @@ export default function HomePage(props: IHomePageProps) {
              ): <img src="/src/assets/paid_logo.webp" alt="paid"/>}
             <hr className="divider"/>
             <div>
-              <span className="text-bold">Total</span>
+              <span className="text-bold">Tổng</span>
               <span className="text-right">{getTotalNotPaidAmount()}</span>
             </div>
           </Grid>
@@ -235,7 +199,7 @@ export default function HomePage(props: IHomePageProps) {
              ): <img src="/src/assets/paid_logo.webp" alt="paid"/>}
             <hr className="divider"/>
             <div>
-              <span className="text-bold">Total</span>
+              <span className="text-bold">Tổng</span>
               <span className="text-right">{getTotalPaidEvent()}</span>
             </div>
           </Grid>
