@@ -1,12 +1,12 @@
 import { getListUser } from '@app/libs/api/EventApi'
-import { IEvent, User } from '@app/server/firebaseType'
-import { billStore, setSelectedListMember } from '@app/stores/events'
-import { useAppDispatch, useAppSelector } from '@app/stores/hook'
+import { User } from '@app/server/firebaseType'
 import { Box, Button, Modal, Typography } from '@mui/material'
 import { useEffect, useState } from 'react'
 type PropsType = {
   open: boolean
   setOpen: any
+  handleSelectedMember: any
+  selectedListMember: User[]
 }
 const style = {
   position: 'absolute',
@@ -19,11 +19,11 @@ const style = {
   boxShadow: 24,
   p: 4,
 }
-function PeopleModal({ open, setOpen }: PropsType) {
+function PeopleModal({ open, setOpen, handleSelectedMember, selectedListMember }: PropsType) {
   const [allMembers, setAllMembers] = useState<User[]>([])
-  const { selectedListMember } = useAppSelector(billStore)
+  // const { selectedListMember } = useAppSelector(billStore)
   const [selectingMembers, setSelectingMembers] = useState<User[]>([...selectedListMember])
-  const dispatch = useAppDispatch()
+  // const dispatch = useAppDispatch()
 
   const handleClickRow = (user: User) => {
     const tempMembers = [...selectingMembers]
@@ -36,8 +36,18 @@ function PeopleModal({ open, setOpen }: PropsType) {
     setSelectingMembers(tempMembers)
   }
   const handleAdd = () => {
-    dispatch(setSelectedListMember(selectingMembers))
-    setSelectingMembers([])
+    const formatSelectingMembers: User[] = []
+
+    selectingMembers.map((member: User) =>
+      formatSelectingMembers.push({
+        uid: member.uid,
+        name: member.name,
+        email: member.email,
+      })
+    )
+    handleSelectedMember(formatSelectingMembers)
+    // dispatch(setSelectedListMember(formatSelectingMembers))
+    // setSelectingMembers([])
     setOpen(false)
   }
 
