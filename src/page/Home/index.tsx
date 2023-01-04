@@ -9,26 +9,25 @@ import { Link } from 'react-router-dom'
 import { useAppDispatch } from '../../stores/hook'
 import { getListEvent } from '@app/libs/api/events'
 import { getToPathname } from '@remix-run/router'
+import { IEvent } from '@app/server/firebaseType'
 export interface IHomePageProps {
   ahihi: string
 }
 
-export default function HomePage(props: IHomePageProps) {
+export default function HomePage() {
   const user = useAppSelector(userStore)
   const dispatch = useAppDispatch()
 
   useEffect(() => {
-    dispatch(setCurrentPage(PAGES.HOME));
-    
+    dispatch(setCurrentPage(PAGES.HOME))
+
     getListEvent().then((e) => {
       setListEvent(e)
     })
   }, [])
 
-  const [listEvent, setListEvent] = useState<Event[]>([])
+  const [listEvent, setListEvent] = useState<IEvent[]>([])
 
-  useEffect(() => {
-  }, [])
   const dataEvents = [
     {
       id: 1,
@@ -151,21 +150,24 @@ export default function HomePage(props: IHomePageProps) {
   `
 
   const getPaidEvent = () => {
-    return listEvent.filter(x => x.userPayId == user.uid);
+    return listEvent.filter((x) => x.userPayId == user.uid)
   }
 
   const getTotalPaidEvent = () => {
-    let result = listEvent.filter(x => x.userPayId == user.uid).reduce((total, data) => total += data.totalAmount, 0);
-    return Math.round(result);
+    const result = listEvent.filter((x) => x.userPayId == user.uid).reduce((total, data) => (total += data.totalAmount || 0), 0)
+    return Math.round(result)
   }
 
   const getNotPaidEvent = () => {
-    return listEvent.filter(x => x.members.filter(member => member.uid == user.uid));
+    return listEvent.filter((x) => x.members && x.members.filter((member) => member.uid == user.uid))
   }
 
   const getTotalNotPaidAmount = () => {
-    let result = getNotPaidEvent().reduce((total, data) => total += (data.totalAmount / data.members.length), 0);
-    return Math.round(result);
+    const result = getNotPaidEvent().reduce(
+      (total, data) => (data.members && data.members.length > 0 ? (total += (data.totalAmount || 0) / data.members.length) : 0),
+      0
+    )
+    return Math.round(result)
   }
 
   return (
@@ -178,7 +180,7 @@ export default function HomePage(props: IHomePageProps) {
         </Grid>
         <Grid item xs={2}>
           <Link to="/profile">
-            <img id="userImg" src={user.photoURL} alt="user_photo" />
+            <img id="userImg" src={user.photoURL} alt="user_photo" referrerPolicy="no-referrer" />
           </Link>
         </Grid>
       </Grid>
@@ -199,44 +201,58 @@ export default function HomePage(props: IHomePageProps) {
           <p className="itemHeader">Cần đòi</p>
           <p className="itemDetail">{getTotalPaidEvent()}</p>
         </Grid>
-        </Grid>
-        <Grid id="list" container direction="row" justifyContent="center" spacing={3} sx={{marginLeft: { xs: '-12px', sm: '0'} }}>
-          <Grid className="item box" item xs={12} sm={6} sx={{maxWidth: { sm: '43vw', lg: '29vw'} }}>
-            <div>
-              <span className="text-bold">Số bữa chưa trả</span>
-              <span className="text-right">{getNotPaidEvent().length} bữa</span>
-            </div>
-            <hr className="divider"/>
-            {getNotPaidEvent().length > 0 ? getNotPaidEvent().map(data =>
-              <div key={data.id}>
-                <Link to={'/events/' + data.id} className="text-link">{data.eventName}</Link>
-                <span className="text-right">{Math.round(data.totalAmount / data.members.length)}</span>
-              </div>
-             ): <img src="/src/assets/paid_logo.webp" alt="paid"/>}
-            <hr className="divider"/>
-            <div>
-              <span className="text-bold">Total</span>
-              <span className="text-right">{getTotalNotPaidAmount()}</span>
-            </div>
-          </Grid>
-          <Grid className="item box" item xs={12} sm={6} sx={{maxWidth: { sm: '43vw', lg: '29vw'} }}>
+      </Grid>
+      <Grid id="list" container direction="row" justifyContent="center" spacing={3} sx={{ marginLeft: { xs: '-12px', sm: '0' } }}>
+        <Grid className="item box" item xs={12} sm={6} sx={{ maxWidth: { sm: '43vw', lg: '29vw' } }}>
           <div>
-              <span className="text-bold">Số bữa cần đòi</span>
-              <span className="text-right">{listEvent.filter(x => x.userPayId == user.uid).length} bữa</span>
-            </div>
-            <hr className="divider"/>
-            {listEvent.filter(x => x.userPayId == user.uid).length > 0 ? listEvent.filter(x => x.userPayId == user.uid).map(data =>
+            <span className="text-bold">Số bữa chưa trả</span>
+            <span className="text-right">{getNotPaidEvent().length} bữa</span>
+          </div>
+          <hr className="divider" />
+          {getNotPaidEvent().length > 0 ? (
+            getNotPaidEvent().map((data) => (
               <div key={data.id}>
-                <Link to={'/events/' + data.id} className="text-link">{data.eventName}</Link>
-                <span className="text-right">{Math.round(data.totalAmount)}</span>
+                <Link to={'/events/' + data.id} className="text-link">
+                  {data.eventName}
+                </Link>
+                <span className="text-right">{data.members ? Math.round(data.totalAmount || 0 / data.members.length) : 0}</span>
               </div>
-             ): <img src="/src/assets/paid_logo.webp" alt="paid"/>}
-            <hr className="divider"/>
-            <div>
-              <span className="text-bold">Total</span>
-              <span className="text-right">{getTotalPaidEvent()}</span>
-            </div>
-          </Grid>
+            ))
+          ) : (
+            <img src="/src/assets/paid_logo.webp" alt="paid" />
+          )}
+          <hr className="divider" />
+          <div>
+            <span className="text-bold">Total</span>
+            <span className="text-right">{getTotalNotPaidAmount()}</span>
+          </div>
+        </Grid>
+        <Grid className="item box" item xs={12} sm={6} sx={{ maxWidth: { sm: '43vw', lg: '29vw' } }}>
+          <div>
+            <span className="text-bold">Số bữa cần đòi</span>
+            <span className="text-right">{listEvent.filter((x) => x.userPayId == user.uid).length} bữa</span>
+          </div>
+          <hr className="divider" />
+          {listEvent.filter((x) => x.userPayId == user.uid).length > 0 ? (
+            listEvent
+              .filter((x) => x.userPayId == user.uid)
+              .map((data) => (
+                <div key={data.id}>
+                  <Link to={'/events/' + data.id} className="text-link">
+                    {data.eventName}
+                  </Link>
+                  <span className="text-right">{data.totalAmount ? Math.round(data.totalAmount) : 0}</span>
+                </div>
+              ))
+          ) : (
+            <img src="/src/assets/paid_logo.webp" alt="paid" />
+          )}
+          <hr className="divider" />
+          <div>
+            <span className="text-bold">Total</span>
+            <span className="text-right">{getTotalPaidEvent()}</span>
+          </div>
+        </Grid>
       </Grid>
       <div></div>
     </Container>
