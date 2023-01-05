@@ -11,7 +11,7 @@ import ReplyIcon from '@mui/icons-material/Reply'
 import Alert from '@mui/material/Alert'
 import Snackbar from '@mui/material/Snackbar'
 import { useEffect, useMemo, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 const LunchDetail = () => {
   const params = useParams<{ id: string }>()
   const { uid } = useAppSelector(userStore)
@@ -26,6 +26,7 @@ const LunchDetail = () => {
 
   const isHost = useMemo(() => eventInfo?.userPayId === uid, [eventInfo?.userPayId, uid])
   const hostInfo = useMemo(() => listUser.find((user) => user.uid === eventInfo?.userPayId), [eventInfo?.userPayId, listUser])
+  const navigate = useNavigate()
   const isPaid = useMemo(() => {
     const member = userInEvent.find((member) => member.uid === uid)
     if (member && member.uid !== eventInfo?.userPayId) {
@@ -99,7 +100,7 @@ const LunchDetail = () => {
           </div>
           <div>
             {isHost ? (
-              <button className="h-[36px]">
+              <button className="h-[36px]" onClick={() => navigate(`/events/edit/${params.id}`)}>
                 <BorderColorIcon fontSize={'large'} />
               </button>
             ) : (
