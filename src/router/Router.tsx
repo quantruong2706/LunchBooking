@@ -71,6 +71,10 @@ export default createBrowserRouter([
             element: <AppSuspense comp={lazy(() => import('@app/page/Events/Add'))} />,
           },
           {
+            path: 'edit/:id',
+            element: <AppSuspense comp={lazy(() => import('@app/page/Events/Add'))} />,
+          },
+          {
             path: ':id',
             element: <AppSuspense comp={lazy(() => import('@app/page/Events/LunchDetail'))} />,
           },

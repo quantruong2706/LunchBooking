@@ -1,4 +1,6 @@
 import { PAGES } from '@app/contants'
+import { getListEvent } from '@app/libs/api/events'
+import { IEvent } from '@app/server/firebaseType'
 import { setCurrentPage } from '@app/stores/footer'
 import { useAppSelector } from '@app/stores/hook'
 import { userStore } from '@app/stores/user'
@@ -6,10 +8,8 @@ import { Grid } from '@mui/material'
 import { Container } from '@mui/system'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+
 import { useAppDispatch } from '../../stores/hook'
-import { getListEvent } from '@app/libs/api/events'
-import { getToPathname } from '@remix-run/router'
-import { IEvent } from '@app/server/firebaseType'
 export interface IHomePageProps {
   ahihi: string
 }
