@@ -1,19 +1,20 @@
-import { getListEvent } from '@app/libs/api/events'
 import { TEXT__HOST, TEXT__MEMBER, TEXT__PAID, TEXT__UNPAID } from '@app/libs/constant'
 import { formatMoney } from '@app/libs/functions'
-import { IEvent } from '@app/server/firebaseType'
 import { useAppSelector } from '@app/stores/hook'
+import { listEventStore } from '@app/stores/listEvent'
+import { listEventDetailStore } from '@app/stores/listEventDetail'
 import { userStore } from '@app/stores/user'
-import { useEffect, useState } from 'react'
+import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 const List = () => {
   const userData = useAppSelector(userStore)
-  const [listEvent, setListEvent] = useState<IEvent[]>([])
-  useEffect(() => {
-    getListEvent().then((e) => {
-      setListEvent(e)
-    })
-  }, [])
+  const listEvent = useAppSelector(listEventStore)
+  const listEventDetail = useAppSelector(listEventDetailStore)
+  const eventOfUser = useMemo(
+    () => listEventDetail.filter((event) => event.uid === userData.uid).map((event) => event.eventId),
+    [listEventDetail, userData.uid]
+  )
+  const listEventUser = useMemo(() => listEvent.filter((event) => eventOfUser.includes(event.id)), [eventOfUser, listEvent])
   return (
     <main className="flex">
       <div className="mx-auto w-11/12 max-w-md">
@@ -23,32 +24,25 @@ const List = () => {
         <div className="inline-flex w-full" role="group">
           <button
             disabled
-            className="min-w-[33%] py-4 px-4 text-gray-900 bg-white rounded-l-lg hover:bg-gray-100 hover:text-green-700 focus:z-10 focus:ring-2 focus:ring-green-700 focus:text-green-700 cursor-not-allowed"
+            className="min-w-[50%] py-4 px-4 text-gray-900 border-r-2 border-gray-200 bg-white rounded-l-lg hover:bg-gray-100 hover:text-green-700 focus:z-10 focus:ring-2 focus:ring-green-700 focus:text-green-700 cursor-not-allowed"
           >
             Thời gian
           </button>
           <button
             disabled
-            className="min-w-[33%] py-4 px-4 text-gray-900 bg-white border-x border-gray-200 hover:bg-gray-100 hover:text-green-700 focus:z-10 focus:ring-2 focus:ring-green-700 focus:text-green-700 cursor-not-allowed"
+            className="min-w-[50%] py-4 px-4 text-gray-900 bg-white rounded-r-lg hover:bg-gray-100 hover:text-green-700 focus:z-10 focus:ring-2 focus:ring-green-700 focus:text-green-700 cursor-not-allowed"
           >
             Thanh toán
           </button>
-          <button
-            disabled
-            className="min-w-[33%] py-4 px-4 text-gray-900 bg-white rounded-r-lg hover:bg-gray-100 hover:text-green-700 focus:z-10 focus:ring-2 focus:ring-green-700 focus:text-green-700 cursor-not-allowed"
-          >
-            Hình thức
-          </button>
         </div>
         <ul className="mt-10">
-          {listEvent.map((item) => {
+          {listEventUser.map((item, index) => {
             const isHost = userData.uid === item.userPayId
             const isPaid = isHost
-              ? (item?.members || []).find((member) => !member.isPaid)
-              : !(item?.members || []).find((member) => member?.uid === userData.uid && member.isPaid)
-
+              ? (listEventDetail || []).filter((event) => event.eventId === item.id).find((member) => !member.isPaid)
+              : !(listEventDetail || []).find((member) => member?.uid === userData.uid && member.isPaid)
             return (
-              <li className="my-4" key={item.id}>
+              <li className="my-4" key={index}>
                 <Link to={item.id!} className="flex bg-white rounded-3xl p-3">
                   <div className="mx-auto mb-5 p-1 w-1/3">
                     <div className="relative">
@@ -73,8 +67,8 @@ const List = () => {
                       </span>
                       <br />
                       <span>
-                        {isHost ? 'Số tiền chưa đòi: ' : 'Số tiền chưa trả: '}
-                        <b>{formatMoney(isHost ? item.billAmount : item.members?.find((member) => member.uid === userData.uid)?.amount)}</b>
+                        Số tiền chưa đòi:
+                        <b>{formatMoney(isHost ? item.billAmount : listEventDetail?.find((member) => member.uid === userData.uid)?.amount)}</b>
                       </span>
                     </div>
                     <span
