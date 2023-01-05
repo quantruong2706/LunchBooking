@@ -1,6 +1,10 @@
 import { configureStore, getDefaultMiddleware } from '@reduxjs/toolkit'
+
 import footerReducer from '../stores/footer'
 import * as eventStore from './events'
+import * as listEventStore from './listEvent'
+import * as clearListEvent from './listEventDetail'
+import * as listUserStore from './listUser'
 import * as userStore from './user'
 
 // ...
@@ -9,6 +13,9 @@ export const store = configureStore({
   reducer: {
     [userStore.namespace]: userStore.reducer,
     [eventStore.namespace]: eventStore.reducer,
+    [listUserStore.namespace]: listUserStore.reducer,
+    [clearListEvent.namespace]: clearListEvent.reducer,
+    [listEventStore.namespace]: listEventStore.reducer,
     footer: footerReducer,
   },
   middleware: [
