@@ -7,28 +7,50 @@ import { Container } from '@mui/system'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAppDispatch } from '../../stores/hook'
-import { getListEvent } from '@app/libs/api/events'
+import { getListEvent, getListEventJoinedByUser, getListEventHostedByUser, getListMemberOfHostedEvent, getListEventIdsHostedByUser } from '@app/libs/api/events'
 import { getToPathname } from '@remix-run/router'
-import { IEvent, User } from '@app/server/firebaseType'
-
+import { IEvent, IEventDetail } from '@app/server/firebaseType'
+import { result } from 'lodash'
 export interface IHomePageProps {
   ahihi: string
 }
 
-export default function HomePage(props: IHomePageProps) {
+export default function HomePage() {
   const user = useAppSelector(userStore)
   const dispatch = useAppDispatch()
 
   useEffect(() => {
     dispatch(setCurrentPage(PAGES.HOME));
-    
-    getListEvent().then((e) => {
-      setListEvent(e)
+
+    getListEventJoinedByUser(user.uid).then((e) => {
+      setListJoinedEvent(e);
+    });
+
+    getListEventHostedByUser(user.uid).then((e) => {
+      setListHostedEvent(e);
+    });
+
+    getListEventIdsHostedByUser(user.uid).then((e) => {
+      setListHostedEventIds(e);
     })
+
+    getListMemberOfHostedEvent(user.uid, listHostedEventIds).then((e) => {
+      setListMemberofHostedEvent(e);
+    });
+    // getListEvent().then((e) => {
+    //   setListEvent(e)
+    // })
   }, [])
 
   const [listEvent, setListEvent] = useState<IEvent[]>([])
-  console.log(listEvent);
+  const [listJoinedEvent, setListJoinedEvent] = useState<IEventDetail[]>([])
+  const [listHostedEvent, setListHostedEvent] = useState<IEvent[]>([])
+  const [listHostedEventIds, setListHostedEventIds] = useState<string[]>([])
+  const [listMemberofHostedEvent, setListMemberofHostedEvent] = useState<IEventDetail[]>([])
+  // console.log('listJoinedEvent',listJoinedEvent);
+  // console.log('listHostedEvent',listHostedEvent);
+  console.log('listHostedEventIds',listHostedEventIds);
+  console.log('listMemberofHostedEvent',listMemberofHostedEvent);
   const css = `
     html {
       width: 100vw;
@@ -105,33 +127,35 @@ export default function HomePage(props: IHomePageProps) {
       color: #0075FF;
     }
   `
-  const getJoinedEvent = () => {
-    let result = listEvent.filter(x => {
-      Object.values(x.members).some(member => member.uid == user.uid);
-    });
-    return result;
-  }
-
-  const getPaidEvent = () => {
-    let result = listEvent.filter(x => x.userPayId == user.uid);
-    return result;
-  }
-
-  const getTotalPaidEvent = () => {
-    let result = listEvent.filter(x => x.userPayId == user.uid).reduce((total, data) => total += data.totalAmount, 0);
-    return Math.round(result);
-  }
 
   const getNotPaidEvent = () => {
-    let result = listEvent.filter(x => {
-      Object.values(x.members).some(member => member.uid == user.uid && (member.isPaid !== undefined && member.isPaid !== true))
-    });
+    const result = listJoinedEvent.filter(x => x.isPaid !== true);
     return result;
   }
 
   const getTotalNotPaidAmount = () => {
-    let result = getNotPaidEvent().reduce((total, data) => total += (data.totalAmount / data.members.length), 0);
-    return Math.round(result);
+    let result = 0;
+    // const result = getNotPaidEvent().reduce(
+    //   (total, data) => (data.members && data.members.length > 0 ? (total += (data.totalAmount || 0) / data.members.length) : 0),
+    //   0
+    // )
+    return Math.round(result)
+  }
+
+  const getNotClaimEvent = (lstEventIds) => {
+    getListMemberOfHostedEvent(lstEventIds).then((e) => {
+      setListNotClaimedEvent(e);
+    });
+    const result = listJoinedEvent.filter(x => x.isPaid !== true);
+    console.log('result', result);
+    return result;
+  }
+
+  const getTotalNotClaimEvent = () => {
+    let result = 0;
+
+    // const result = listHostedEvent.filter((x) => x.userPayId == user.uid).reduce((total, data) => (total += data.totalAmount || 0), 0)
+    return Math.round(result)
   }
 
   return (
@@ -144,18 +168,18 @@ export default function HomePage(props: IHomePageProps) {
         </Grid>
         <Grid item xs={2}>
           <Link to="/profile">
-            <img id="userImg" src={user.photoURL} alt="user_photo" />
+            <img id="userImg" src={user.photoURL} alt="user_photo" referrerPolicy="no-referrer" />
           </Link>
         </Grid>
       </Grid>
       <Grid id="dashboard" container direction="row" alignItems="center" justifyContent="center" spacing={3} sx={{ marginLeft: { xs: '-12px', sm: '0' } }}>
         <Grid className="item box" item xs={6} sm={3} sx={{ maxWidth: { xs: '43vw', sm: '20vw', lg: '14vw' } }}>
           <p className="itemHeader">Tham gia</p>
-          <p className="itemDetail">{getJoinedEvent().length}</p>
+          <p className="itemDetail">{listJoinedEvent.length}</p>
         </Grid>
         <Grid className="item box" item xs={6} sm={3} sx={{ maxWidth: { xs: '43vw', sm: '20vw', lg: '14vw' } }}>
           <p className="itemHeader">Chủ chi</p>
-          <p className="itemDetail">{getPaidEvent().length}</p>
+          <p className="itemDetail">{listHostedEvent.length}</p>
         </Grid>
         <Grid className="item box" item sm={3} sx={{ display: { xs: 'none', sm: 'block' }, maxWidth: { sm: '20vw', lg: '14vw' } }}>
           <p className="itemHeader">Cần trả</p>
@@ -163,7 +187,7 @@ export default function HomePage(props: IHomePageProps) {
         </Grid>
         <Grid className="item box" item sm={3} sx={{ display: { xs: 'none', sm: 'block' }, maxWidth: { sm: '20vw', lg: '14vw' } }}>
           <p className="itemHeader">Cần đòi</p>
-          <p className="itemDetail">{getTotalPaidEvent()}</p>
+          <p className="itemDetail">{getTotalNotClaimEvent()}</p>
         </Grid>
         </Grid>
         <Grid id="list" container direction="row" justifyContent="center" spacing={3} sx={{marginLeft: { xs: '-12px', sm: '0'} }}>
@@ -175,8 +199,8 @@ export default function HomePage(props: IHomePageProps) {
             <hr className="divider"/>
             {getNotPaidEvent().length > 0 ? getNotPaidEvent().map(data =>
               <div key={data.id}>
-                <Link to={'/events/' + data.id} className="text-link">{data.eventName}</Link>
-                <span className="text-right">{Math.round(data.totalAmount / data.members.length)}</span>
+                <Link to={'/events/' + data.eventId} className="text-link">{data.name}</Link>
+                <span className="text-right">{data.amount}</span>
               </div>
              ): <img src="/src/assets/paid_logo.webp" alt="paid"/>}
             <hr className="divider"/>
@@ -187,20 +211,23 @@ export default function HomePage(props: IHomePageProps) {
           </Grid>
           <Grid className="item box" item xs={12} sm={6} sx={{maxWidth: { sm: '43vw', lg: '29vw'} }}>
           <div>
-              <span className="text-bold">Số bữa cần đòi</span>
-              <span className="text-right">{listEvent.filter(x => x.userPayId == user.uid).length} bữa</span>
-            </div>
-            <hr className="divider"/>
-            {listEvent.filter(x => x.userPayId == user.uid).length > 0 ? listEvent.filter(x => x.userPayId == user.uid).map(data =>
+            <span className="text-bold">Số bữa chưa đòi</span>
+            <span className="text-right">{getNotPaidEvent().length} bữa</span>
+          </div>
+          <hr className="divider" />
+          {getNotPaidEvent().length > 0 ? (
+            getNotPaidEvent().map((data) => (
               <div key={data.id}>
-                <Link to={'/events/' + data.id} className="text-link">{data.eventName}</Link>
-                <span className="text-right">{Math.round(data.totalAmount)}</span>
+                <Link to={'/events/' + data.id} className="text-link">
+                  {data.eventName}
+                </Link>
+                <span className="text-right">{data.members ? Math.round(data.totalAmount || 0 / data.members.length) : 0}</span>
               </div>
-             ): <img src="/src/assets/paid_logo.webp" alt="paid"/>}
+             ))): <img src="/src/assets/paid_logo.webp" alt="paid"/>}
             <hr className="divider"/>
             <div>
               <span className="text-bold">Tổng</span>
-              <span className="text-right">{getTotalPaidEvent()}</span>
+              <span className="text-right">{getTotalNotClaimEvent()}</span>
             </div>
           </Grid>
       </Grid>

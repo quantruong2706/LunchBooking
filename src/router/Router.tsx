@@ -60,7 +60,11 @@ export default createBrowserRouter([
         children: [
           {
             path: '',
-            element: <AppSuspense comp={lazy(() => import('@app/page/Events/List'))} />,
+            element: (
+              <LayoutWithFooter>
+                <AppSuspense comp={lazy(() => import('@app/page/Events/List'))} />
+              </LayoutWithFooter>
+            ),
           },
           {
             path: 'add',

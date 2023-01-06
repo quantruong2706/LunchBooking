@@ -11,8 +11,6 @@ export type User = {
   email?: string | null
   lastSeen?: string | null
   uid?: string | null
-  isPaid?: boolean
-  amount?: number
   count?: number
 }
 
@@ -29,4 +27,14 @@ export interface IEvent {
   members?: User[]
   tip?: number
   totalAmount?: number
+}
+export interface IEventDetail {
+  id?: string | null
+  eventId?: string | null
+  email?: string | null
+  name?: string | null
+  uid?: string | null
+  isPaid?: boolean
+  amount?: number
+  count?: number
 }
