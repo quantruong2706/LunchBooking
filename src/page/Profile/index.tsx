@@ -18,7 +18,7 @@ import { Link } from 'react-router-dom'
 const Profile = () => {
   const user = useAppSelector(userStore)
   const status = useAppSelector(userStatus)
-  const [imgPreview, setImgPreview] = useState(user.qrCodeURL)
+  const [imgPreview, setImgPreview] = useState(user?.qrCodeURL)
   const [imgObj, setImgObj] = useState<any>(null)
 
   const handlePreviewChange = (event: any) => {
@@ -29,13 +29,18 @@ const Profile = () => {
     }
   }
 
-  // useEffect(() => {
-  //   return () => {
-  //     if (imgPreview) {
-  //       URL.revokeObjectURL(imgPreview)
-  //     }
-  //   }
-  // }, [imgPreview])
+  useEffect(() => {
+    return () => {
+      if (imgPreview) {
+        URL.revokeObjectURL(imgPreview)
+      }
+    }
+  }, [imgPreview])
+
+  useEffect(() => {
+    setImgPreview(user?.qrCodeURL)
+  }, [user])
+
 
   const dispatch = useAppDispatch()
 

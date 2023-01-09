@@ -9,16 +9,11 @@ import {User} from 'firebase/auth'
 import { User as UserType } from '@app/server/firebaseType'
 
 interface userState {
-  data:UserType,
+  data:UserType | null,
   status:"idle"|"loading"|"succeeded"|"failed"
 }
 const initialState : userState = {
-  data :  { 
-    uid: '',
-    email: '',
-    name: '',
-    photoURL: ''
-},
+  data :  null,
   status:"idle"
 }
 

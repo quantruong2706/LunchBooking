@@ -43,12 +43,7 @@ function App() {
     (uid: string) => {
       const q = query(EventDetailColection)
       onSnapshot(q, (res) => {
-        // dispatch(setListEvent)
         const ListEventDetail = res.docs.map((item) => item.data())
-        // console.log(
-        //   'ListEventDetail',
-        //   ListEventDetail.map((item) => item.eventId)
-        // )
         dispatch(setListEventDetail(ListEventDetail))
         getListEvent(ListEventDetail.map((item) => item.eventId!))
       })
@@ -63,14 +58,7 @@ function App() {
       getListEventDetail(uid)
     }
   }, [loggedInUser, dispatch, getListEventDetail, getListEvent])
-
-  if (loading) {
-    return (
-      <div>
-        <LoadingScreen />
-      </div>
-    )
-  }
+  
   return (
     <ThemeProvider theme={theme}>
       <LocalizationProvider dateAdapter={AdapterDayjs}>
