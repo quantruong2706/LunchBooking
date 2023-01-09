@@ -153,7 +153,10 @@ function Add() {
     setEventState({ ...eventState, tip: value, totalAmount: total })
   }
   const handleCreateEvent = async () => {
-    const { isSuccess, eventId } = await setEvent(eventState)
+    const isAllPaid = selectedListMember.every((item: IEventDetail) => item.isPaid === true)
+    console.log('ispaid', isAllPaid)
+
+    const { isSuccess, eventId } = await setEvent({ ...eventState, isAllPaid })
     selectedListMember.map(async (member) => {
       const eventDetail = { ...member, eventId }
       await setEventDetail(eventDetail)
