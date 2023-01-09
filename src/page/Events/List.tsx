@@ -17,7 +17,7 @@ const List = () => {
   )
   const listEventUser = useMemo(() => listEvent.filter((event) => eventOfUser.includes(event.id)), [eventOfUser, listEvent])
   return (
-    <main className="flex">
+    <main className="flex pb-6 bg-gradient-to-b from-light-green-2 to-light-green-3">
       <div className="mx-auto w-11/12 max-w-md">
         <div className="text-center my-6">
           <h2 className="text-2xl">Lịch sử đi ăn</h2>

@@ -22,6 +22,7 @@ const Footer = () => {
 
   return (
     <div className="w-full text-center h-[60px] flex justify-around" style={{ backgroundColor: '#D9D9D9' }}>
+
       <button className="flex-1" onClick={() => onClickFooterIcon(PAGES.HOME)}>
         <div>
           <HomeIcon sx={{ color: currentPage === PAGES.HOME ? '#439D0D' : '#A0A0A0' }} />
@@ -46,11 +47,11 @@ const Footer = () => {
         </div>
         <div className={`text-[12px] ${currentPage === PAGES.NOTIFICATIONS ? 'text-dark-green-1' : 'text-grey-1'}`}>Notifications</div>
       </button>
-      <button className="flex-1 cursor-not-allowed" disabled onClick={() => onClickFooterIcon(PAGES.MEMEBERS)}>
+      <button className="flex-1 cursor-not-allowed" onClick={() => onClickFooterIcon(PAGES.MEMBERS)}>
         <div>
-          <PeopleIcon sx={{ color: currentPage === PAGES.MEMEBERS ? '#439D0D' : '#A0A0A0' }} />
+          <PeopleIcon sx={{ color: currentPage === PAGES.MEMBERS ? '#439D0D' : '#A0A0A0' }} />
         </div>
-        <div className={`text-[12px] mt-[-6px] ${currentPage === PAGES.MEMEBERS ? 'text-dark-green-1' : 'text-grey-1'}`}>Members</div>
+        <div className={`text-[12px] mt-[-6px] ${currentPage === PAGES.MEMBERS ? 'text-dark-green-1' : 'text-grey-1'}`}>Members</div>
       </button>
     </div>
   )
