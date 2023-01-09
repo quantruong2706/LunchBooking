@@ -1,4 +1,4 @@
-import { PAGE_ROUTES, PAGES } from '@app/contants'
+import { PAGES, PAGE_ROUTES } from '@app/contants'
 import { currentPageStore, setCurrentPage } from '@app/stores/footer'
 import { useAppDispatch } from '@app/stores/hook'
 import AddCircleIcon from '@mui/icons-material/AddCircle'
@@ -21,7 +21,7 @@ const Footer = () => {
   }
 
   return (
-    <div className="w-full self-end text-center h-[60px] flex justify-around" style={{ backgroundColor: '#D9D9D9' }}>
+    <div className="w-full text-center h-[60px] flex justify-around" style={{ backgroundColor: '#D9D9D9' }}>
       <button className="flex-1" onClick={() => onClickFooterIcon(PAGES.HOME)}>
         <div>
           <HomeIcon sx={{ color: currentPage === PAGES.HOME ? '#439D0D' : '#A0A0A0' }} />
@@ -40,13 +40,13 @@ const Footer = () => {
         </div>
         <div className={`text-[12px] mt-[-6px] ${currentPage === PAGES.ADD_BILL ? 'text-dark-green-1' : 'text-grey-1'}`}>Add Bill</div>
       </button>
-      <button className="flex-1 cursor-not-allowed" disabled onClick={() => onClickFooterIcon(PAGES.NOTIFICATIONS)}>
+      <button className="flex-1" onClick={() => onClickFooterIcon(PAGES.NOTIFICATIONS)}>
         <div>
           <NotificationsIcon sx={{ color: currentPage === PAGES.NOTIFICATIONS ? '#439D0D' : '#A0A0A0' }} />
         </div>
         <div className={`text-[12px] ${currentPage === PAGES.NOTIFICATIONS ? 'text-dark-green-1' : 'text-grey-1'}`}>Notifications</div>
       </button>
-      <button className="flex-1 cursor-not-allowed" onClick={() => onClickFooterIcon(PAGES.MEMBERS)}>
+      <button className="flex-1" onClick={() => onClickFooterIcon(PAGES.MEMBERS)}>
         <div>
           <PeopleIcon sx={{ color: currentPage === PAGES.MEMBERS ? '#439D0D' : '#A0A0A0' }} />
         </div>

@@ -1,5 +1,6 @@
 import { getListUser } from '@app/libs/api/EventApi'
 import { User } from '@app/server/firebaseType'
+import CloseIcon from '@mui/icons-material/Close'
 import { Box, Button, Modal, Typography } from '@mui/material'
 import { useEffect, useState } from 'react'
 type PropsType = {
@@ -75,6 +76,9 @@ function PeopleModal({ open, setOpen, handleSelectedMember, selectedListMember }
   return (
     <Modal open={open} onClose={handleOnClose} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
       <Box sx={style}>
+        <button className="absolute top-[10px] right-[10px]" onClick={handleOnClose}>
+          <CloseIcon />
+        </button>
         <Typography variant="h5">Chọn người đi ăn</Typography>
         {allMembers?.map((item: User) => (
           <Box
@@ -86,7 +90,7 @@ function PeopleModal({ open, setOpen, handleSelectedMember, selectedListMember }
           </Box>
         ))}
         <Button onClick={handleAdd} variant="contained">
-          Save
+          OK
         </Button>
       </Box>
     </Modal>

@@ -32,6 +32,7 @@ export interface IEvent {
   isAllPaid?: boolean
 }
 export interface IEventDetail {
+  id?: string | null
   eventId?: string | null
   email?: string | null
   name?: string | null

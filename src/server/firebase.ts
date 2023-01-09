@@ -1,7 +1,7 @@
 import { getApp, getApps, initializeApp } from 'firebase/app'
-import { getAuth, GoogleAuthProvider } from 'firebase/auth'
-import { initializeFirestore } from 'firebase/firestore'
-import { getStorage } from 'firebase/storage'
+import { getAuth, GoogleAuthProvider, connectAuthEmulator } from 'firebase/auth'
+import { initializeFirestore, getFirestore, connectFirestoreEmulator } from 'firebase/firestore'
+import { getStorage, connectStorageEmulator } from 'firebase/storage'
 
 const { VITE_BASE_API_KEY } = import.meta.env
 
@@ -32,10 +32,6 @@ const auth = getAuth(app)
 const googleAuthProvider = new GoogleAuthProvider()
 const storage = getStorage(app)
 
-// if (window.location.hostname === 'localhost') {
-//   const db = getFirestore()
-//   connectFirestoreEmulator(db, 'localhost', 8080)
-// }
 // connectAuthEmulator(auth, "http://localhost:9099");
 // if(window.location.hostname === 'localhost'){
 //   connectFirestoreEmulator(db, 'localhost', 8080);

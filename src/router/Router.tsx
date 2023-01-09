@@ -1,10 +1,14 @@
 import Layout from '@app/components/Layout'
 import LayoutWithFooter from '@app/components/LayoutWithFooter'
 import AppSuspense from '@app/components/Suspense'
-import { useAppSelector } from '@app/stores/hook'
-import { userStore } from '@app/stores/user'
+import { useAppDispatch, useAppSelector } from '@app/stores/hook'
+import { userStore , userStatus} from '@app/stores/user'
 import { lazy, useEffect } from 'react'
 import { createBrowserRouter, Navigate, Outlet, useNavigate } from 'react-router-dom'
+import { useAuthState } from 'react-firebase-hooks/auth'
+import { auth } from '../server/firebase'
+import { LoadingScreen } from '@app/components/Suspense'
+import { initializeUser } from '@app/stores/user'
 
 interface PrivateRouteProps {
   Comp: () => JSX.Element
@@ -12,24 +16,27 @@ interface PrivateRouteProps {
 }
 
 const PrivateRoute = ({ Comp }: PrivateRouteProps) => {
+  const [loggedInUser, loading] = useAuthState(auth)
+  const statusUser = useAppSelector(userStatus)
   const user = useAppSelector(userStore)
   const navigate = useNavigate()
+
   useEffect(() => {
-    const checkRouteTimeOut = setTimeout(() => {
-      if (!user.uid) {
+    if(loading){
+      return
+    }else{
+      if(!loggedInUser){
         navigate('/login', { state: window.location.pathname })
       }
-      // if (!user.bankAccount && user.uid) {
-      //   navigate('/profile')
-      // }
-    }, 0)
-    return () => {
-      clearTimeout(checkRouteTimeOut)
     }
-    // if (!user.bankAccount && user.uid) {
-    //   navigate('/profile')
-    // }
-  }, [navigate, user])
+
+  }, [navigate, loading,loggedInUser])
+
+  if(loading || statusUser === "loading" || !user)
+    return (<div>
+      <LoadingScreen/>
+    </div>)
+
   return <Comp />
 }
 
@@ -98,6 +105,14 @@ export default createBrowserRouter([
           },
         ],
       },
+      {
+        path: 'notifications',
+        element: (
+          <LayoutWithFooter>
+            <AppSuspense comp={lazy(() => import('@app/page/Notification'))} />
+          </LayoutWithFooter>
+        ),
+      },
     ],
   },
   {
@@ -109,4 +124,5 @@ export default createBrowserRouter([
     path: '*',
     element: <AppSuspense comp={lazy(() => import('@app/page/notfound'))} />,
   },
+
 ])

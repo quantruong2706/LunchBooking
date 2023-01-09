@@ -15,7 +15,7 @@ const Login = () => {
     signInWithGoogle()
   }
   useEffect(() => {
-    if (user.uid) {
+    if (user?.uid) {
       navigate(location.state || '/')
     }
   }, [user, navigate, location])
