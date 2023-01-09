@@ -12,8 +12,8 @@ export type User = {
   lastSeen?: string | null
   uid?: string | null
   count?: number
-  photoURL ?: string | null
-  qrCodeURL ?:string
+  photoURL?: string | null
+  qrCodeURL?: string
 }
 
 // export type PayHistory = {}
@@ -40,4 +40,5 @@ export interface IEventDetail {
   isPaid?: boolean
   amount?: number
   count?: number
+  amountToPay?: number
 }
