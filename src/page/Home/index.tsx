@@ -1,4 +1,5 @@
 import { PAGES } from '@app/contants'
+
 import { getHomeData } from '@app/libs/api/home'
 import { setSelectedListMember } from '@app/stores/events'
 import { setCurrentPage } from '@app/stores/footer'
@@ -10,10 +11,7 @@ import { Container } from '@mui/system'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 
-import { useAppDispatch } from '../../stores/hook'
-export interface IHomePageProps {
-  ahihi: string
-}
+import { useAppDispatch } from '@app/stores/hook'
 
 export default function HomePage() {
   const user = useAppSelector(userStore)
