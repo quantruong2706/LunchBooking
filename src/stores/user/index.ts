@@ -1,23 +1,117 @@
 import { IUser } from '@app/libs/types'
 import { RootState } from '@app/stores'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import {getUserByUid , createUser , updateUser , uploadQRImg} from '@app/libs/api/userAPI'
 export const namespace = 'USER'
-const initialState: IUser = {
-  uid: '',
-  email: '',
-  displayName: '',
-  photoURL: '',
+import { AnyAction } from 'redux'
+import { ThunkAction } from 'redux-thunk'
+import {User} from 'firebase/auth'
+import { User as UserType } from '@app/server/firebaseType'
+
+interface userState {
+  data:UserType,
+  status:"idle"|"loading"|"succeeded"|"failed"
+}
+const initialState : userState = {
+  data :  { 
+    uid: '',
+    email: '',
+    name: '',
+    photoURL: ''
+},
+  status:"idle"
 }
 
 const slice = createSlice({
   name: namespace,
   initialState,
   reducers: {
-    setUser: (state, action: PayloadAction<IUser>) => action.payload,
+    idle(state) {
+      state.status = "idle";
+    },
+    initialize(state) {
+      state.status = "loading";
+    },
+    initializeSucceeded(state, action: PayloadAction<UserType>) {
+      state.data = {...action.payload};
+      state.status = "idle";
+    },
+    initializeFailed(state) {
+      state.status = "idle";
+    },
+    update(state) {
+      state.status = "loading";
+    },
+    updateSucceeded(state, action: PayloadAction<UserType>) {
+      state.data = {...action.payload};
+      state.status = "succeeded";
+    },
+    updateFailed(state) {
+      state.status = "failed";
+    },
     clearUser: () => initialState,
   },
 })
 
-export const { setUser, clearUser } = slice.actions
-export const userStore = (state: RootState) => state[namespace]
+
+//Actions
+export const {  clearUser , idle , initialize , initializeSucceeded , initializeFailed , update , updateSucceeded , updateFailed} = slice.actions
+
+//Selector
+export const userStore = (state: RootState) => state[namespace].data
+export const userStatus = (state: RootState) => state[namespace].status
+
+//Thunk
+export function initializeUser(authUser:User) :  ThunkAction<void, RootState, unknown, AnyAction>{
+  return async (dispatch)=>{
+    const {  uid, displayName, email, photoURL } = authUser
+    const user = await getUserByUid(uid)
+    dispatch(initialize())
+    if(!user?.uid){
+      const userInfo : UserType = {
+        uid,
+        name: displayName || 'unknown',
+        email: email || 'undefined',
+        photoURL: photoURL || '',
+        ldapAcc:'',
+        bankAccount:'',
+        bankAccountName:'',
+        address:'',
+        phone:''
+      }
+
+      try {
+        await createUser(userInfo)
+        dispatch(initializeSucceeded(userInfo))
+      } catch (error) {
+        dispatch(initializeFailed())
+        dispatch(idle())
+      }
+  }else{
+    dispatch(initializeSucceeded({
+      ...user
+    }))
+  }
+  }
+}
+
+
+export function updateUserInfo(uid:string ,userInfo : UserType , imgObj : any) :  ThunkAction<void, RootState, unknown, AnyAction>{
+  return async (dispatch)=>{
+    dispatch(update())
+    try {
+      if(imgObj){
+        const qrURL = await uploadQRImg(imgObj)
+        console.log(qrURL)
+        userInfo.qrCodeURL = qrURL;
+      }
+      await updateUser(uid, userInfo)
+      dispatch(updateSucceeded(userInfo))
+    } catch (error) {
+      dispatch(updateFailed())
+      dispatch(idle())
+    }
+  }
+}
+
 export const reducer = slice.reducer
