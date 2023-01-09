@@ -52,7 +52,11 @@ export default createBrowserRouter([
       },
       {
         path: 'profile',
-        element: <AppSuspense comp={lazy(() => import('@app/page/Profile'))} />,
+        element: (
+          <LayoutWithFooter>
+            <AppSuspense comp={lazy(() => import('@app/page/Profile'))} />
+          </LayoutWithFooter>
+        ),
       },
       {
         path: 'events',
@@ -77,6 +81,20 @@ export default createBrowserRouter([
           {
             path: ':id',
             element: <AppSuspense comp={lazy(() => import('@app/page/Events/LunchDetail'))} />,
+          },
+        ],
+      },
+      {
+        path: 'members',
+        element: <Outlet />,
+        children: [
+          {
+            path: '',
+            element: (
+              <LayoutWithFooter>
+                <AppSuspense comp={lazy(() => import('@app/page/Members'))} />
+              </LayoutWithFooter>
+            ),
           },
         ],
       },

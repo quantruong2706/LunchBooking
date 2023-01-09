@@ -1,11 +1,13 @@
 import { PAGES } from '@app/contants'
 import { getListEvent } from '@app/libs/api/events'
+
 import { IEvent } from '@app/server/firebaseType'
 import { setCurrentPage } from '@app/stores/footer'
 import { useAppSelector } from '@app/stores/hook'
 import { userStore } from '@app/stores/user'
 import { Grid } from '@mui/material'
 import { Container } from '@mui/system'
+import { getToPathname } from '@remix-run/router'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 
@@ -154,6 +156,7 @@ export default function HomePage() {
   }
 
   const getTotalPaidEvent = () => {
+
     const result = listEvent.filter((x) => x.userPayId == user.uid).reduce((total, data) => (total += data.totalAmount || 0), 0)
     return Math.round(result)
   }
@@ -204,6 +207,7 @@ export default function HomePage() {
       </Grid>
       <Grid id="list" container direction="row" justifyContent="center" spacing={3} sx={{ marginLeft: { xs: '-12px', sm: '0' } }}>
         <Grid className="item box" item xs={12} sm={6} sx={{ maxWidth: { sm: '43vw', lg: '29vw' } }}>
+
           <div>
             <span className="text-bold">Số bữa chưa trả</span>
             <span className="text-right">{getNotPaidEvent().length} bữa</span>
@@ -241,6 +245,7 @@ export default function HomePage() {
                   <Link to={'/events/' + data.id} className="text-link">
                     {data.eventName}
                   </Link>
+
                   <span className="text-right">{data.totalAmount ? Math.round(data.totalAmount) : 0}</span>
                 </div>
               ))
