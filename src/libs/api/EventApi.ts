@@ -1,6 +1,6 @@
-import { IEvent, User } from '@app/server/firebaseType'
-import { EventColection, UserDetail, usersColection } from '@app/server/useDB'
-import { doc, getDocs, setDoc, updateDoc } from 'firebase/firestore'
+import { IEvent, IEventDetail, User } from '@app/server/firebaseType'
+import { EventColection, EventDetailColection, UserDetail, usersColection } from '@app/server/useDB'
+import { addDoc, getDocs, updateDoc } from 'firebase/firestore'
 
 export const getListUser = async () => {
   const userDocs = await getDocs(usersColection)
@@ -12,14 +12,28 @@ export const getListUser = async () => {
   return listUser
 }
 export const setEvent = async (data: IEvent) => {
-  const userRef = doc(EventColection)
   let isSuccess = false
-  await setDoc(userRef, data).then(() => {
+  let eventId = ''
+  await addDoc(EventColection, data).then((docRef) => {
     isSuccess = true
+    eventId = docRef.id
   })
-  return isSuccess
+  return { isSuccess, eventId }
+}
+export const setEventDetail = async (data: IEventDetail) => {
+  let isSuccess = false
+  let eventId = ''
+  await addDoc(EventDetailColection, data).then((docRef) => {
+    isSuccess = true
+    eventId = docRef.id
+  })
+  return { isSuccess, eventId }
 }
 
 export const updateMemberInfo = async (member_id: string, data: User) => {
   updateDoc(UserDetail(member_id), data)
+}
+
+export const updatePayCount = async (member_id: string, count: number) => {
+  updateDoc(UserDetail(member_id), { count: count })
 }

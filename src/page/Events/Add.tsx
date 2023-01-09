@@ -1,13 +1,29 @@
 // import { ReactComponent as DishImg } from '@app/assets/react.svg'
+import TextNumberInput from '@app/components/Input/NumericInput'
 import PeopleModal from '@app/components/Modal/PeopleModal'
-import { setEvent, updateMemberInfo } from '@app/libs/api/EventApi'
-import { IEvent, User } from '@app/server/firebaseType'
-import { billStore, setSelectedListMember } from '@app/stores/events'
-import { useAppDispatch, useAppSelector } from '@app/stores/hook'
+import { setEvent, setEventDetail, updatePayCount } from '@app/libs/api/EventApi'
+import { IEvent, IEventDetail, User } from '@app/server/firebaseType'
+import { billStore } from '@app/stores/events'
+import { useAppSelector } from '@app/stores/hook'
+import { listEventStore } from '@app/stores/listEvent'
+import { listEventDetailStore } from '@app/stores/listEventDetail'
 import AddIcon from '@mui/icons-material/Add'
 import DeleteIcon from '@mui/icons-material/Delete'
 import ReplyIcon from '@mui/icons-material/Reply'
-import { Box, CardContent, Modal, TextField, Typography } from '@mui/material'
+import {
+  Box,
+  CardContent,
+  FormControl,
+  FormControlLabel,
+  FormLabel,
+  Input,
+  InputAdornment,
+  Modal,
+  Radio,
+  RadioGroup,
+  TextField,
+  Typography,
+} from '@mui/material'
 import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import Checkbox from '@mui/material/Checkbox'
@@ -18,9 +34,9 @@ import ListItemIcon from '@mui/material/ListItemIcon'
 import { styled } from '@mui/material/styles'
 import { DatePicker } from '@mui/x-date-pickers/DatePicker'
 import * as dayjs from 'dayjs'
-import _ from 'lodash'
-import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import _, { round } from 'lodash'
+import { useEffect, useMemo, useState } from 'react'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 
 const TextFieldStyled = styled(TextField)(({ theme }) => ({
   '& .MuiFormLabel-root': {
@@ -60,18 +76,25 @@ const initEventValue = {
   userPayId: '',
   userPayName: '',
 }
-
+export const enum bonusTypeEnum {
+  PERCENT = 'PERCENT',
+  MONEY = 'MONEY',
+}
 function Add() {
-  const { selectedListMember, billDetail, isEditBill } = useAppSelector(billStore)
-  const [eventState, setEventState] = useState<IEvent>(isEditBill ? billDetail : initEventValue)
+  const params = useParams()
+  const listEventDetail = useAppSelector(listEventDetailStore)
+  const listEvent = useAppSelector(listEventStore)
+  const userInEvent = useMemo(() => listEventDetail.filter((event) => event.eventId === params.id), [listEventDetail, params])
+  const eventInfo = useMemo(() => listEvent.find((item) => item.id === params.id), [listEvent, params.id])
+  // const { billDetail, isEditBill } = useAppSelector(billStore)
+  const [eventState, setEventState] = useState<IEvent>(params.id && eventInfo ? eventInfo : initEventValue)
   const [openModalSuccess, setOpenModalSuccess] = useState<boolean>(false)
   const [listBillOwner, setListBillOwner] = useState<User[]>([])
-
-  const dispatch = useAppDispatch()
-
-  useEffect(() => {
-    setListBillOwner([...selectedListMember])
-  }, [selectedListMember])
+  const [selectedListMember, setSelectedListMember] = useState<IEventDetail[]>([...userInEvent])
+  const [memberToPayState, setMemberToPayState] = useState<IEventDetail>()
+  const [bonusType, setBonusType] = useState<bonusTypeEnum>(bonusTypeEnum.PERCENT)
+  const navigate = useNavigate()
+  // const dispatch = useAppDispatch()
 
   const handleToggle = (memberId: string) => {
     const tempMembers = _.cloneDeep(selectedListMember)
@@ -80,18 +103,23 @@ function Add() {
       const isPaid = tempMembers[index].isPaid
       tempMembers[index].isPaid = !isPaid
     }
-    dispatch(setSelectedListMember(tempMembers))
+    setSelectedListMember(tempMembers)
   }
 
   const handleChangeAmount = (memberId: string | null | undefined, value: number) => {
     const tempMembers = _.cloneDeep(selectedListMember)
+    const tempEvenState = _.cloneDeep(eventState)
     const index = tempMembers.findIndex((u) => u.uid === memberId)
     if (index > -1) {
       tempMembers[index].amount = value
     }
-    dispatch(setSelectedListMember(tempMembers))
+    const newTotalAmount = tempMembers.reduce((acc: number, item: IEventDetail) => acc + (item.amount || 0), 0)
+    setSelectedListMember(tempMembers)
+    setEventState({ ...tempEvenState, billAmount: newTotalAmount })
   }
-
+  const handleSelectedMember = (listSelectingMembers: IEventDetail[]) => {
+    setSelectedListMember(listSelectingMembers)
+  }
   const [open, setOpen] = useState(false)
 
   const handleDelete = (member: User) => {
@@ -100,7 +128,7 @@ function Add() {
     if (index > -1) {
       newSelectedMember.splice(index, 1)
     }
-    dispatch(setSelectedListMember(newSelectedMember))
+    setSelectedListMember(newSelectedMember)
   }
 
   const handleChangeTextField = (field: string, value: string | number) => {
@@ -111,16 +139,34 @@ function Add() {
     const total = eventState.tip ? eventState.tip + value : value
     setEventState({ ...eventState, billAmount: value, totalAmount: total })
   }
-
+  const calBonus = (value: number) => {
+    let bonus = 0
+    if (bonusType === bonusTypeEnum.PERCENT) {
+      bonus = eventState.billAmount && value > 0 ? (eventState.billAmount * value) / 100 : 0
+    } else {
+      bonus = value
+    }
+    return Math.round(bonus)
+  }
   const handleChangeTip = (value: number) => {
-    const total = eventState.billAmount ? eventState.billAmount + value : value
+    const bonus = calBonus(value)
+    const total = eventState.billAmount ? Number(eventState.billAmount + bonus) : bonus
     setEventState({ ...eventState, tip: value, totalAmount: total })
   }
-
   const handleCreateEvent = async () => {
-    const newEventData = { ...eventState, members: selectedListMember }
-    const isSuccess = await setEvent(newEventData)
-    updateMemberInfo(selectedListMember[0].uid!, { ...selectedListMember[0], count: 10 })
+    const isAllPaid = selectedListMember.every((item: IEventDetail) => item.isPaid === true)
+    console.log('ispaid', isAllPaid)
+
+    const { isSuccess, eventId } = await setEvent({ ...eventState, isAllPaid })
+    selectedListMember.map(async (member) => {
+      const eventDetail = { ...member, eventId }
+      await setEventDetail(eventDetail)
+    })
+
+    if (memberToPayState?.uid) {
+      const payCount = (memberToPayState?.count || 0) + 1
+      updatePayCount(memberToPayState.uid, payCount)
+    }
     if (isSuccess) {
       setOpenModalSuccess(true)
     }
@@ -131,23 +177,36 @@ function Add() {
     const numberOfMember = selectedListMembersWithMoney.length
     if (numberOfMember > 0) {
       const amount = Math.round(eventState.totalAmount! / numberOfMember)
-      selectedListMembersWithMoney.map((item) => (item.amount = amount))
+      selectedListMembersWithMoney.map((item: IEventDetail) => (item.amount = amount))
     }
-    dispatch(setSelectedListMember(selectedListMembersWithMoney))
+    setSelectedListMember(selectedListMembersWithMoney)
   }
 
   const handleGenerate = () => {
     const sortListBillOwner = listBillOwner.sort((a, b) => (a.count || 0) - (b.count || 0))
     const memberToPay = sortListBillOwner.pop()
     setListBillOwner(sortListBillOwner)
-    if (memberToPay && memberToPay.uid) {
-      setEventState({ ...eventState, userPayId: memberToPay.uid, userPayName: memberToPay.name ? memberToPay.name : 'no name' })
+    if (memberToPay && memberToPay.uid && memberToPay.email) {
+      setMemberToPayState(memberToPay)
+      setEventState({ ...eventState, userPayId: memberToPay.uid, userPayName: memberToPay.name ? memberToPay.name : memberToPay.email })
     }
   }
+  const handleCloseModalSuccess = () => {
+    setOpenModalSuccess(false)
+    navigate('/')
+  }
+  useEffect(() => {
+    setListBillOwner([...selectedListMember])
+  }, [selectedListMember])
+  useEffect(() => {
+    const bonus = calBonus(eventState.tip || 0)
+    const total = (eventState.billAmount || 0) + bonus
+    setEventState({ ...eventState, totalAmount: total })
+  }, [eventState.billAmount])
 
   return (
     <>
-      <CardStyled variant="outlined" className="max-w-[500px]">
+      <CardStyled variant="outlined" className="mx-5">
         <CardContent>
           <button className="px-4">
             <Link to="/">
@@ -200,10 +259,10 @@ function Add() {
             <>
               <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
                 <ListItem disablePadding>
-                  <Typography className="min-w-[50px]" variant="subtitle2">
+                  <Typography className="min-w-fit" variant="subtitle2">
                     Đã trả
                   </Typography>
-                  <Box className="ml-5">
+                  <Box className="min-w">
                     <Typography className="min-w-[150px]" variant="subtitle2">
                       Tên
                     </Typography>
@@ -232,13 +291,12 @@ function Add() {
                         <Typography noWrap>{member.name || member.email}</Typography>
                       </Box>
                       <Box className="ml-5 min-w-[150px]">
-                        <TextFieldStyled
+                        <TextNumberInput
                           fullWidth
-                          type="number"
                           id="filled-required"
                           variant="standard"
                           value={member.amount}
-                          onChange={(e) => handleChangeAmount(member.uid, Number(e.target.value))}
+                          onValueChange={(values) => handleChangeAmount(member.uid, round(_.toNumber(values.value), 3))}
                           InputLabelProps={{
                             shrink: true,
                           }}
@@ -281,35 +339,51 @@ function Add() {
             </Grid>
           </Box>
           <Box className="mt-5">
-            <TextFieldStyled
+            <TextNumberInput
+              allowLeadingZeros={false}
               fullWidth
-              type="number"
-              id="filled-required"
               variant="standard"
               label="Tổng bill"
               value={eventState?.billAmount}
-              onChange={(e) => handleChangeBill(Number(e.target.value))}
+              onValueChange={(values) => {
+                handleChangeBill(round(_.toNumber(values.value), 3))
+              }}
               InputLabelProps={{
                 shrink: true,
               }}
             />
           </Box>
-          <Box className="mt-5">
-            <TextFieldStyled
-              fullWidth
-              type="number"
-              id="filled-required"
-              label="Hoa hồng"
+          <Box className="mt-5 flex items-center">
+            <FormControl>
+              <FormLabel>Hoa Hồng</FormLabel>
+              <RadioGroup
+                row
+                aria-labelledby="demo-form-control-label-placement"
+                name="position"
+                defaultValue="top"
+                onChange={(e) => {
+                  setBonusType(e.target.value as bonusTypeEnum)
+                }}
+              >
+                <FormControlLabel value={bonusTypeEnum.MONEY} checked={bonusType === bonusTypeEnum.MONEY} control={<Radio />} label="nhập số" />
+                <FormControlLabel value={bonusTypeEnum.PERCENT} checked={bonusType === bonusTypeEnum.PERCENT} control={<Radio />} label="phần trăm" />
+              </RadioGroup>
+            </FormControl>
+            <Input
               value={eventState?.tip}
-              onChange={(e) => handleChangeTip(Number(e.target.value))}
-              variant="standard"
-              InputLabelProps={{
-                shrink: true,
+              onChange={(e) => {
+                handleChangeTip(round(_.toNumber(e.target.value), 3))
               }}
+              endAdornment={bonusType === bonusTypeEnum.PERCENT ? <InputAdornment position="end">%</InputAdornment> : null}
+              type="number"
+              // variant="standard"
+              // InputLabelProps={{
+              //   shrink: true,
+              // }}
             />
           </Box>
           <Box className="mt-5">
-            <TextFieldStyled
+            <TextNumberInput
               fullWidth
               id="filled-required"
               label="Tổng tiền"
@@ -328,8 +402,8 @@ function Add() {
           </Box>
         </CardContent>
       </CardStyled>
-      <PeopleModal open={open} setOpen={setOpen} />
-      <Modal open={openModalSuccess} onClose={() => setOpenModalSuccess(false)} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
+      <PeopleModal open={open} setOpen={setOpen} handleSelectedMember={handleSelectedMember} selectedListMember={selectedListMember} />
+      <Modal open={openModalSuccess} onClose={handleCloseModalSuccess} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
         <Box sx={style}>
           <Typography variant="h5">thành công</Typography>
         </Box>

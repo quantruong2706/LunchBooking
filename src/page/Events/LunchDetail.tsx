@@ -1,56 +1,43 @@
 import { LoadingScreen } from '@app/components/Suspense'
-import { getDetailEvent } from '@app/libs/api/events'
 import { TEXT__HOST, TEXT__MEMBER, TEXT__PAYMENT_PAID, TEXT__PAYMENT_REMIND } from '@app/libs/constant'
 import { formatMoney } from '@app/libs/functions'
-import { IEvent, User } from '@app/server/firebaseType'
-import { UserDetail } from '@app/server/useDB'
 import { useAppSelector } from '@app/stores/hook'
+import { listEventStore } from '@app/stores/listEvent'
+import { listEventDetailStore } from '@app/stores/listEventDetail'
+import { listUserStore } from '@app/stores/listUser'
 import { userStore } from '@app/stores/user'
 import BorderColorIcon from '@mui/icons-material/BorderColor'
 import ReplyIcon from '@mui/icons-material/Reply'
 import Alert from '@mui/material/Alert'
 import Snackbar from '@mui/material/Snackbar'
-import { getDoc } from 'firebase/firestore'
 import { useEffect, useMemo, useState } from 'react'
-import { useParams } from 'react-router-dom'
 
+import { useNavigate, useParams } from 'react-router-dom'
 const LunchDetail = () => {
+  const params = useParams<{ id: string }>()
   const { uid } = useAppSelector(userStore)
-  const [detailData, setDetailData] = useState<IEvent>()
-  const [host, setHostData] = useState<User>()
-  const [loading, setLoading] = useState<boolean>(true)
+  const listEventDetail = useAppSelector(listEventDetailStore)
+  const listEvent = useAppSelector(listEventStore)
+  const listUser = useAppSelector(listUserStore)
+  const userInEvent = useMemo(() => listEventDetail.filter((event) => event.eventId === params.id), [listEventDetail, params])
+  const eventInfo = useMemo(() => listEvent.find((item) => item.id === params.id), [listEvent, params.id])
 
   const [openAlert, setOpenAlert] = useState(false)
+  const [loading, setLoading] = useState(true)
 
-  const isHost = useMemo(() => detailData?.userPayId === uid, [detailData?.userPayId, uid])
+  const isHost = useMemo(() => eventInfo?.userPayId === uid, [eventInfo?.userPayId, uid])
+  const hostInfo = useMemo(() => listUser.find((user) => user.uid === eventInfo?.userPayId), [eventInfo?.userPayId, listUser])
+  const navigate = useNavigate()
   const isPaid = useMemo(() => {
-    const member = detailData?.members!.find((member) => member.uid === uid)
-    if (member && member.uid !== detailData?.userPayId) {
+    const member = userInEvent.find((member) => member.uid === uid)
+    if (member && member.uid !== eventInfo?.userPayId) {
       return member.isPaid
     } else {
-      return !detailData?.members?.find((member) => !member.isPaid)
+      return !userInEvent.find((member) => !member.isPaid)
     }
-  }, [detailData, uid])
-
-  const params = useParams<{ id: string }>()
-  useEffect(() => {
-    getDetailEvent(params.id!)
-      .then((e) => {
-        setDetailData(e)
-        getDoc(UserDetail(e.userPayId!)).then((res) => {
-          setHostData(res.data())
-        })
-      })
-      .catch((e) => {
-        throw Error(e)
-      })
-      .finally(() => {
-        setLoading(false)
-      })
-  }, [params])
-
+  }, [eventInfo?.userPayId, uid, userInEvent])
   const handleClick = () => {
-    navigator.clipboard.writeText(host?.bankAccount || '')
+    navigator.clipboard.writeText(listUser.find((user) => user.uid === eventInfo?.userPayId)?.bankAccount || '')
     setOpenAlert(true)
   }
 
@@ -61,6 +48,12 @@ const LunchDetail = () => {
 
     setOpenAlert(false)
   }
+
+  useEffect(() => {
+    if (eventInfo && hostInfo) {
+      setLoading(false)
+    }
+  }, [eventInfo, hostInfo])
 
   return loading ? (
     <LoadingScreen />
@@ -93,21 +86,22 @@ const LunchDetail = () => {
                 {isHost ? TEXT__HOST : TEXT__MEMBER}
               </span>
             </div>
-            <h2 className="text-2xl text-center mb-2">{detailData?.eventName}</h2>
-            <time className="mb-2">{detailData?.date}</time>
+            <h2 className="text-2xl text-center mb-2">{eventInfo?.eventName}</h2>
+            <time className="mb-2">{eventInfo?.date}</time>
             <p className="my-4">
               <span>
-                <b>{TEXT__HOST}</b>&nbsp;{detailData?.userPayName}
+                {TEXT__HOST}
+                <b>&nbsp;{eventInfo?.userPayName}</b>
               </span>
               &emsp;{'-'}&emsp;
               <span>
-                <b>Tham gia</b>&nbsp;{detailData?.members?.length} người
+                Tham gia&nbsp;<b>{userInEvent?.length} người</b>
               </span>
             </p>
           </div>
           <div>
             {isHost ? (
-              <button className="h-[36px]">
+              <button className="h-[36px]" onClick={() => navigate(`/events/edit/${params.id}`)}>
                 <BorderColorIcon fontSize={'large'} />
               </button>
             ) : (
@@ -117,42 +111,71 @@ const LunchDetail = () => {
         </div>
       </div>
       <div className="py-3 px-5">
-        <div className="mb-3">
+        <div className="flex justify-between">
+          <span className="text-gray-400 font-bold block mb-3">Tổng bill</span>
+          <p className="text-end">
+            <span className="text-black">{formatMoney(eventInfo?.billAmount)}</span>
+          </p>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-gray-400 font-bold block mb-3">Hoa hồng</span>
+          <p className="text-end">
+            <span className="text-black">{formatMoney(eventInfo?.billAmount)}</span>
+          </p>
+        </div>
+        <div className="flex justify-between">
           <span className="text-gray-400 font-bold block mb-3">Tổng tiền</span>
-          <p className="block text-end">
-            <span className="text-black">{formatMoney(detailData?.billAmount)}</span>
+          <p className="text-end">
+            <span className="text-black">{formatMoney(eventInfo?.billAmount)}</span>
           </p>
         </div>
         <div className="border-y-[1px] border-gray-400">
-          <span className="text-gray-400 font-bold block my-3">Thành viên</span>
-          <ul>
-            {detailData?.members?.map((user) => (
-              <li className="my-4" key={user.uid}>
-                <div className="flex justify-between cursor-pointer">
-                  <label className="inline-flex items-center cursor-pointer">
-                    <input
-                      type="checkbox"
-                      className="w-6 h-6 accent-green-600 text-green-600 border-0 rounded-md focus:ring-0"
-                      readOnly
-                      disabled={!user.isPaid}
-                      checked={user.isPaid}
-                    />
-                    <span className="ml-3">{user.name || user.ldapAcc || user.email}</span>
-                  </label>
-                  <span>{formatMoney(user.amount)}</span>
-                </div>
-              </li>
-            ))}
-          </ul>
+          <div className="relative overflow-x-auto">
+            <table className="w-full text-left">
+              <thead>
+                <tr className="text-gray-400 font-bold">
+                  <th scope="col" className="py-3">
+                    Thành viên
+                  </th>
+                  <th scope="col" className="py-3 text-center">
+                    Tiền bill
+                  </th>
+                  <th scope="col" className="py-3 text-right">
+                    Thành tiền
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {userInEvent.map((user) => (
+                  <tr key={user.uid}>
+                    <td>
+                      <label className="inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          className="w-6 h-6 accent-green-600 text-green-600 border-0 rounded-md focus:ring-0"
+                          readOnly
+                          disabled={!user.isPaid}
+                          checked={user.isPaid}
+                        />
+                        <span className="ml-3">{user.name || user.email}</span>
+                      </label>
+                    </td>
+                    <td className="text-center">50k</td>
+                    <td className="text-right">100k</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
         {!isPaid ? (
           <>
             <div className="my-3">
               <span className="text-gray-400 font-bold block mb-3">Bank Account</span>
               <p>
-                Chủ tài khoản: {host?.bankAccountName} <br />
-                Ngân hàng: {host?.bankName} <br />
-                Số Tài khoản: <b>{host?.bankAccount}</b>{' '}
+                Chủ tài khoản: {hostInfo?.bankAccountName} <br />
+                Ngân hàng: {hostInfo?.bankName} <br />
+                Số Tài khoản: <b>{hostInfo?.bankAccount}</b>{' '}
                 <button className="px-2 rounded bg-gray-300" onClick={handleClick}>
                   Copy
                 </button>

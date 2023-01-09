@@ -1,5 +1,7 @@
 import { PAGES } from '@app/contants'
 import { getListEvent } from '@app/libs/api/events'
+
+import { IEvent } from '@app/server/firebaseType'
 import { setCurrentPage } from '@app/stores/footer'
 import { useAppSelector } from '@app/stores/hook'
 import { userStore } from '@app/stores/user'
@@ -14,7 +16,7 @@ export interface IHomePageProps {
   ahihi: string
 }
 
-export default function HomePage(props: IHomePageProps) {
+export default function HomePage() {
   const user = useAppSelector(userStore)
   const dispatch = useAppDispatch()
 
@@ -26,9 +28,8 @@ export default function HomePage(props: IHomePageProps) {
     })
   }, [])
 
-  const [listEvent, setListEvent] = useState<Event[]>([])
+  const [listEvent, setListEvent] = useState<IEvent[]>([])
 
-  useEffect(() => {}, [])
   const dataEvents = [
     {
       id: 1,
@@ -155,16 +156,20 @@ export default function HomePage(props: IHomePageProps) {
   }
 
   const getTotalPaidEvent = () => {
-    const result = listEvent.filter((x) => x.userPayId == user.uid).reduce((total, data) => (total += data.totalAmount), 0)
+
+    const result = listEvent.filter((x) => x.userPayId == user.uid).reduce((total, data) => (total += data.totalAmount || 0), 0)
     return Math.round(result)
   }
 
   const getNotPaidEvent = () => {
-    return listEvent.filter((x) => x.members.filter((member) => member.uid == user.uid))
+    return listEvent.filter((x) => x.members && x.members.filter((member) => member.uid == user.uid))
   }
 
   const getTotalNotPaidAmount = () => {
-    const result = getNotPaidEvent().reduce((total, data) => (total += data.totalAmount / data.members.length), 0)
+    const result = getNotPaidEvent().reduce(
+      (total, data) => (data.members && data.members.length > 0 ? (total += (data.totalAmount || 0) / data.members.length) : 0),
+      0
+    )
     return Math.round(result)
   }
 
@@ -174,11 +179,11 @@ export default function HomePage(props: IHomePageProps) {
       <Grid id="header" container direction="row" alignItems="center">
         <Grid item xs={10}>
           <p id="hello">Xin chào</p>
-          <p id="username">{user.displayName}</p>
+          <p id="username">{user.name}</p>
         </Grid>
         <Grid item xs={2}>
           <Link to="/profile">
-            <img id="userImg" src={user.photoURL} alt="user_photo" />
+            <img id="userImg" src={user.photoURL as string} alt="user_photo" referrerPolicy="no-referrer" />
           </Link>
         </Grid>
       </Grid>
@@ -202,6 +207,7 @@ export default function HomePage(props: IHomePageProps) {
       </Grid>
       <Grid id="list" container direction="row" justifyContent="center" spacing={3} sx={{ marginLeft: { xs: '-12px', sm: '0' } }}>
         <Grid className="item box" item xs={12} sm={6} sx={{ maxWidth: { sm: '43vw', lg: '29vw' } }}>
+
           <div>
             <span className="text-bold">Số bữa chưa trả</span>
             <span className="text-right">{getNotPaidEvent().length} bữa</span>
@@ -213,7 +219,7 @@ export default function HomePage(props: IHomePageProps) {
                 <Link to={'/events/' + data.id} className="text-link">
                   {data.eventName}
                 </Link>
-                <span className="text-right">{Math.round(data.totalAmount / data.members.length)}</span>
+                <span className="text-right">{data.members ? Math.round(data.totalAmount || 0 / data.members.length) : 0}</span>
               </div>
             ))
           ) : (
@@ -239,7 +245,8 @@ export default function HomePage(props: IHomePageProps) {
                   <Link to={'/events/' + data.id} className="text-link">
                     {data.eventName}
                   </Link>
-                  <span className="text-right">{Math.round(data.totalAmount)}</span>
+
+                  <span className="text-right">{data.totalAmount ? Math.round(data.totalAmount) : 0}</span>
                 </div>
               ))
           ) : (
