@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
-import {useState , useEffect} from 'react'
+import { useState, useEffect } from 'react'
 import LogoutIcon from '@mui/icons-material/Logout'
 import ReplyIcon from '@mui/icons-material/Reply'
 import TextField from '@mui/material/TextField'
@@ -19,9 +19,9 @@ const Profile = () => {
   const user = useAppSelector(userStore)
   const status = useAppSelector(userStatus)
   const [imgPreview, setImgPreview] = useState(user.qrCodeURL)
-  const [imgObj,setImgObj] = useState<any>(null)
+  const [imgObj, setImgObj] = useState<any>(null)
 
-  const handlePreviewChange = (event : any) => {
+  const handlePreviewChange = (event: any) => {
     const fileUploaded = event.target ? event.target.files[0] : null
     if (fileUploaded) {
       setImgObj(fileUploaded)
@@ -50,7 +50,7 @@ const Profile = () => {
   }
 
   return (
-    <div className="bg-white">
+    <div className="min-h-screen bg-white">
       {/*Header section*/}
       <div className="bg-gradient-to-b from-[#CAF5B1] to-[#8AD769] h-72 rounded-b-2xl flex flex-col items-center justify-center">
         <div className="flex justify-between pb-2 self-stretch">
@@ -67,7 +67,8 @@ const Profile = () => {
         <span className="py-2 text-xl">{user?.name || ''}</span>
         <span className="text-md">{user?.email || ''}</span>
         <span className="pt-4 text-md">
-          <span className="font-bold">Chủ chi</span>: 4 lần |<span className="font-bold"> Tham gia</span>: 4 lần
+          <span className="font-bellota">Chủ chi</span>: <span className="font-bold">4 lần</span> |<span className="font-bellota"> Tham gia</span>:{' '}
+          <span className="font-bold">4 lần</span>
         </span>
       </div>
       {/*Details section*/}
@@ -75,13 +76,13 @@ const Profile = () => {
         <Formik
           initialValues={{ ...user }}
           onSubmit={(values) => {
-            dispatch(updateUserInfo(values.uid as string, values , imgObj))
+            dispatch(updateUserInfo(values.uid as string, values, imgObj))
           }}
         >
           {({ values, errors, touched, handleChange, handleBlur, handleSubmit, isSubmitting }) => (
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} className="flex flex-col gap-3">
               <TextField
-                label="Ldap"
+                label="LDAP"
                 variant="standard"
                 fullWidth={true}
                 id="ldapAcc"
@@ -130,17 +131,21 @@ const Profile = () => {
                 onChange={handleChange}
                 onBlur={handleBlur}
               />
-              <IconButton color="primary" aria-label="upload picture" component="label" onChange={handlePreviewChange}>
-                <input hidden accept="image/*" type="file" />
-                <PhotoCamera />
-              </IconButton>
-              {imgPreview && <div>
-                <img alt="qrcode" src={imgPreview} />
-              </div>}
-              {/* <TextField label="Mã QR" variant="standard" fullWidth={true}/> */}
-              <Button variant="contained" fullWidth type="submit" disabled={status === 'loading'}>
-                Save
-              </Button>
+              <div className="flex flex-col pt-3">
+                <span className="font-serif">Mã QR</span>
+                {imgPreview && (
+                  <div className="self-center pt-3">
+                    <img alt="qrcode" className="h-56" src={imgPreview} />
+                  </div>
+                )}
+                <IconButton size={'large'} color="primary" aria-label="upload picture" component="label" onChange={handlePreviewChange}>
+                  <input hidden accept="image/*" type="file" />
+                  <PhotoCamera fontSize={'large'} />
+                </IconButton>
+                <Button variant="contained" type="submit" className="self-center" disabled={status === 'loading'}>
+                  Save
+                </Button>
+              </div>
             </form>
           )}
         </Formik>
