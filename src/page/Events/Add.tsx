@@ -37,6 +37,7 @@ import * as dayjs from 'dayjs'
 import _, { round } from 'lodash'
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
+
 const TextFieldStyled = styled(TextField)(({ theme }) => ({
   '& .MuiFormLabel-root': {
     ...theme.typography.subtitle1,
@@ -153,7 +154,10 @@ function Add() {
     setEventState({ ...eventState, tip: value, totalAmount: total })
   }
   const handleCreateEvent = async () => {
-    const { isSuccess, eventId } = await setEvent(eventState)
+    const isAllPaid = selectedListMember.every((item: IEventDetail) => item.isPaid === true)
+    console.log('ispaid', isAllPaid)
+
+    const { isSuccess, eventId } = await setEvent({ ...eventState, isAllPaid })
     selectedListMember.map(async (member) => {
       const eventDetail = { ...member, eventId }
       await setEventDetail(eventDetail)

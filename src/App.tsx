@@ -8,15 +8,13 @@ import { useCallback, useEffect } from 'react'
 import { useAuthState } from 'react-firebase-hooks/auth'
 import { RouterProvider } from 'react-router-dom'
 
-import { getListUser } from './libs/api/events'
 import Router from './router/Router'
 import { auth } from './server/firebase'
 import { EventColection, EventDetailColection, UserDetail, usersColection } from './server/useDB'
 import { useAppDispatch } from './stores/hook'
 import { setListEvent } from './stores/listEvent'
 import { setListEventDetail } from './stores/listEventDetail'
-import { setListUser } from './stores/listUser'
-import { setUser } from './stores/user'
+import { initializeUser } from './stores/user'
 
 function App() {
   const [loggedInUser, loading] = useAuthState(auth)
@@ -59,49 +57,13 @@ function App() {
   )
 
   useEffect(() => {
-    getListUser().then((e) => {
-      dispatch(setListUser(e))
-    })
-    const setUserInDb = async () => {
-      try {
-        await setDoc(
-          doc(usersColection, loggedInUser?.uid as string),
-          {
-            email: loggedInUser?.email,
-            lastSeen: serverTimestamp(),
-            uid: loggedInUser?.uid,
-            address: '',
-            age: '',
-            bankAccount: '',
-            name: loggedInUser?.displayName,
-            phone: '',
-            // photoURL: loggedInUser?.photoURL
-          },
-          { merge: true }
-        )
-      } catch (error) {
-        console.log('ERROR SETTING USER INFO IN DB', error)
-      }
-    }
-
     if (loggedInUser) {
       const { uid, displayName, email, photoURL } = loggedInUser
-      getDoc(UserDetail(uid)).then((res) => {
-        if (!res.data()?.uid) {
-          setUserInDb()
-        }
-      })
-      dispatch(
-        setUser({
-          uid,
-          displayName: displayName || 'unknown',
-          email: email || 'undefined',
-          photoURL: photoURL || '',
-        })
-      )
+      dispatch(initializeUser(loggedInUser))
       getListEventDetail(uid)
     }
   }, [loggedInUser, dispatch, getListEventDetail, getListEvent])
+
   if (loading) {
     return (
       <div>
