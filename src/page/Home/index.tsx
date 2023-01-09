@@ -1,12 +1,12 @@
 import { PAGES } from '@app/contants'
-import { getListEvent } from '@app/libs/api/events'
-import { IEvent } from '@app/server/firebaseType'
+// import { getListEvent } from '@app/libs/api/events'
 import { setCurrentPage } from '@app/stores/footer'
 import { useAppSelector } from '@app/stores/hook'
+import { listEventStore } from '@app/stores/listEvent'
 import { userStore } from '@app/stores/user'
 import { Grid } from '@mui/material'
 import { Container } from '@mui/system'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 
 import { useAppDispatch } from '../../stores/hook'
@@ -16,62 +16,20 @@ export interface IHomePageProps {
 
 export default function HomePage() {
   const user = useAppSelector(userStore)
+  const listEvent = useAppSelector(listEventStore)
+  console.log('listEvent', listEvent)
+
   const dispatch = useAppDispatch()
 
   useEffect(() => {
     dispatch(setCurrentPage(PAGES.HOME))
 
-    getListEvent().then((e) => {
-      setListEvent(e)
-    })
+    // getListEvent().then((e) => {
+    //   setListEvent(e)
+    // })
   }, [])
+  // const [listEvent, setListEvent] = useState<IEvent[]>([])
 
-  const [listEvent, setListEvent] = useState<IEvent[]>([])
-
-  const dataEvents = [
-    {
-      id: 1,
-      name: 'Gà Mạnh Hoạch',
-      type: 'admin',
-      total: 1200000,
-      cost: 100000,
-    },
-    {
-      id: 2,
-      name: 'Phật Nhảy Tường',
-      type: 'admin',
-      total: 1200000,
-      cost: 100000,
-    },
-    {
-      id: 3,
-      name: '1900s',
-      type: 'member',
-      total: 1200000,
-      cost: 100000,
-    },
-    {
-      id: 4,
-      name: 'Bia Tạ Hiện',
-      type: 'member',
-      total: 1200000,
-      cost: 100000,
-    },
-    {
-      id: 5,
-      name: 'Trà Sữa sương sương',
-      type: 'member',
-      total: 1200000,
-      cost: 80000,
-    },
-    {
-      id: 6,
-      name: 'Bánh Mì Hội An',
-      type: 'member',
-      total: 1200000,
-      cost: 50000,
-    },
-  ]
   const css = `
     html {
       width: 100vw;
