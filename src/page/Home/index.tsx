@@ -1,5 +1,5 @@
 import { PAGES } from '@app/contants'
-import { getListEvent } from '@app/libs/api/events'
+import { getListEventByUser } from '@app/libs/api/events'
 
 import { IEvent } from '@app/server/firebaseType'
 import { setCurrentPage } from '@app/stores/footer'
@@ -11,10 +11,7 @@ import { getToPathname } from '@remix-run/router'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 
-import { useAppDispatch } from '../../stores/hook'
-export interface IHomePageProps {
-  ahihi: string
-}
+import { useAppDispatch } from '@app/stores/hook'
 
 export default function HomePage() {
   const user = useAppSelector(userStore)
@@ -23,7 +20,7 @@ export default function HomePage() {
   useEffect(() => {
     dispatch(setCurrentPage(PAGES.HOME))
 
-    getListEvent().then((e) => {
+    getListEventByUser(1).then((e) => {
       setListEvent(e)
     })
   }, [])
@@ -183,7 +180,7 @@ export default function HomePage() {
         </Grid>
         <Grid item xs={2}>
           <Link to="/profile">
-            <img id="userImg" src={user.photoURL as string} alt="user_photo" referrerPolicy="no-referrer" />
+            <img id="userImg" src={user.photoURL} alt="user_photo" referrerPolicy="no-referrer" />
           </Link>
         </Grid>
       </Grid>
