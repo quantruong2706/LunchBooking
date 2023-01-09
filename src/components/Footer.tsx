@@ -1,4 +1,4 @@
-import { PAGE_ROUTES, PAGES } from '@app/contants'
+import { PAGES, PAGE_ROUTES } from '@app/contants'
 import { currentPageStore, setCurrentPage } from '@app/stores/footer'
 import { useAppDispatch } from '@app/stores/hook'
 import AddCircleIcon from '@mui/icons-material/AddCircle'
@@ -46,7 +46,7 @@ const Footer = () => {
         </div>
         <div className={`text-[12px] ${currentPage === PAGES.NOTIFICATIONS ? 'text-dark-green-1' : 'text-grey-1'}`}>Notifications</div>
       </button>
-      <button className="flex-1 cursor-not-allowed" onClick={() => onClickFooterIcon(PAGES.MEMBERS)}>
+      <button className="flex-1" onClick={() => onClickFooterIcon(PAGES.MEMBERS)}>
         <div>
           <PeopleIcon sx={{ color: currentPage === PAGES.MEMBERS ? '#439D0D' : '#A0A0A0' }} />
         </div>
