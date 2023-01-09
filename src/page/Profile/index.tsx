@@ -72,7 +72,7 @@ const Profile = () => {
         </span>
       </div>
       {/*Details section*/}
-      <div className="px-6 py-10">
+      <div className="px-6 py-4">
         <Formik
           initialValues={{ ...user }}
           onSubmit={(values) => {
@@ -131,7 +131,7 @@ const Profile = () => {
                 onChange={handleChange}
                 onBlur={handleBlur}
               />
-              <div className="flex flex-col pt-2">
+              <div className="flex flex-col pt-2 pb-8">
                 <span className="font-serif text-sm">Mã QR</span>
                 {imgPreview && (
                   <div className="self-center pt-3">
