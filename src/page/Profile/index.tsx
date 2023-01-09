@@ -80,55 +80,59 @@ const Profile = () => {
         <span className="pt-2 text-md">
           <span className="font-bellota">Chủ chi</span>: <span className="font-bold">4 lần</span> |<span className="font-bellota"> Tham gia</span>:{' '}
           <span className="font-bold">4 lần</span>
-          <button className="ml-4" onClick={handleClickEdit}>
-            {edit ? (
-              <div onClick={handleUpdateItem}>
-                <CheckCircleIcon />
-              </div>
-            ) : (
-              <EditIcon />
-            )}
-          </button>
         </span>
       </div>
 
       {/*Details section*/}
       <div className="px-6 py-4">
-        <div className="flex flex-col pb-4">
+        <div className="flex flex-col pb-2">
           <label htmlFor="" className="pb-1 font-bold text-gray-500">
             LDAP
           </label>
           {edit ? <TextField variant={'standard'} defaultValue={userData?.ldapAcc} inputRef={ldapAccField} /> : <p>{userData?.ldapAcc}</p>}
         </div>
-        <div className="flex flex-col pb-4">
+        <div className="flex flex-col pb-2">
           <label htmlFor="" className="pb-1 font-bold text-gray-500">
             Mobile
           </label>
           {edit ? <TextField variant={'standard'} defaultValue={userData?.phone} inputRef={phoneField} /> : <p>{userData?.phone}</p>}
         </div>
-        <div className="flex flex-col pb-4">
+        <div className="flex flex-col pb-2">
           <label htmlFor="" className="pb-1 font-bold text-gray-500">
             Address
           </label>
           {edit ? <TextField variant={'standard'} defaultValue={userData?.address} inputRef={addressField} /> : <p>{userData?.address}</p>}
         </div>
-        <div className="flex flex-col pb-4">
+        <div className="flex flex-col pb-2">
           <label htmlFor="" className="pb-1 font-bold text-gray-500">
             Bank
           </label>
           {edit ? <TextField variant={'standard'} defaultValue={userData?.bankName} inputRef={bankNameField} /> : <p>{userData?.bankName}</p>}
         </div>
-        <div className="flex flex-col pb-4">
+        <div className="flex flex-col pb-2">
           <label htmlFor="" className="pb-1 font-bold text-gray-500">
             Account
           </label>
           {edit ? <TextField variant={'standard'} defaultValue={userData?.bankAccount} inputRef={bankAccountField} /> : <p>{userData?.bankAccount}</p>}
         </div>
         <div className="flex flex-col items-center ">
-          <label htmlFor="" className="pb-1 self-start font-bold text-gray-500">
+          <label htmlFor="" className="self-start font-bold text-gray-500">
             Account QR
           </label>
           <img src="src/assets/profile-picture.png" alt="QR code" className="h-48 w-48" />
+          <button onClick={handleClickEdit}>
+            {edit ? (
+              <div onClick={handleUpdateItem} className="flex gap-2 bg-green-400 rounded-full px-4 py-2">
+                <CheckCircleIcon />
+                <span>Save</span>
+              </div>
+            ) : (
+              <div className="flex gap-2 bg-green-400 rounded-full px-4 py-2">
+                <EditIcon />
+                <span>Edit</span>
+              </div>
+            )}
+          </button>
         </div>
       </div>
     </div>
