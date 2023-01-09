@@ -97,7 +97,6 @@ export function updateUserInfo(uid:string ,userInfo : UserType , imgObj : any) :
     try {
       if(imgObj){
         const qrURL = await uploadQRImg(imgObj)
-        console.log(qrURL)
         userInfo.qrCodeURL = qrURL;
       }
       await updateUser(uid, userInfo)

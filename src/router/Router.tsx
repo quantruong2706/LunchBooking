@@ -36,9 +36,7 @@ const PrivateRoute = ({ Comp }: PrivateRouteProps) => {
     return (<div>
       <LoadingScreen/>
     </div>)
-
-      console.log("loading",loading)
-    
+        
   return <Comp />
 }
 
@@ -107,6 +105,14 @@ export default createBrowserRouter([
           },
         ],
       },
+      {
+        path: 'notification',
+        element: (
+          <LayoutWithFooter>
+            <AppSuspense comp={lazy(() => import('@app/page/Notification'))} />
+          </LayoutWithFooter>
+        ),
+      },
     ],
   },
   {
@@ -118,4 +124,5 @@ export default createBrowserRouter([
     path: '*',
     element: <AppSuspense comp={lazy(() => import('@app/page/notfound'))} />,
   },
+
 ])
