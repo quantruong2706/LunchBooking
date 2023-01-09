@@ -90,7 +90,7 @@ function PeopleModal({ open, setOpen, handleSelectedMember, selectedListMember }
           </Box>
         ))}
         <Button onClick={handleAdd} variant="contained">
-          Save
+          OK
         </Button>
       </Box>
     </Modal>
