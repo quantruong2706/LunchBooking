@@ -6,6 +6,7 @@ import { listEventDetailStore } from '@app/stores/listEventDetail'
 import { userStore } from '@app/stores/user'
 import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
+
 const List = () => {
   const userData = useAppSelector(userStore)
   const listEvent = useAppSelector(listEventStore)

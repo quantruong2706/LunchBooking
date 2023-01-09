@@ -1,10 +1,10 @@
-import { serverTimestamp, setDoc, getDoc, doc  , updateDoc } from 'firebase/firestore'
+import { serverTimestamp, setDoc, getDoc, doc, updateDoc } from 'firebase/firestore'
 // import {User} from 'firebase/auth'
 import { usersColection, UserDetail } from '@app/server/useDB'
 import { User } from '@app/server/firebaseType'
 import { storage } from '@app/server/firebase'
-import { ref , uploadBytes , getDownloadURL } from 'firebase/storage'
-import {uniqueId} from 'lodash'
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
+import { uniqueId } from 'lodash'
 
 export async function createUser(userInfo: User) {
   try {
@@ -31,21 +31,19 @@ export async function getUserByUid(uid: string) {
 }
 
 export async function updateUser(uid: string, userInfo: User) {
-    try {
-        await updateDoc(UserDetail(uid),userInfo)
-    } catch (error) {
-        console.log('ERROR UPDATE USER INFO FAILD', error)
-
-    }
+  try {
+    await updateDoc(UserDetail(uid), userInfo)
+  } catch (error) {
+    console.log('ERROR UPDATE USER INFO FAILED', error)
+  }
 }
 
-export async function uploadQRImg(obj:any) {
-  const imgRef = ref(storage,`images/qr/${obj.name + uniqueId()}`)
+export async function uploadQRImg(obj: any) {
+  const imgRef = ref(storage, `images/qr/${obj.name + uniqueId()}`)
   try {
-    await uploadBytes(imgRef,obj)
+    await uploadBytes(imgRef, obj)
     return getDownloadURL(imgRef)
   } catch (error) {
-    console.log('ERROR UPLOAD QR FAILD', error)
-
+    console.log('ERROR UPLOAD QR FAILED', error)
   }
 }

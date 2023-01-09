@@ -1,54 +1,43 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
-import { auth, db } from '@app/server/firebase'
-import { User } from '@app/server/firebaseType'
-import { UserDetail } from '@app/server/useDB'
-import { store } from '@app/stores'
-import { useAppSelector } from '@app/stores/hook'
-import { clearUser, userStore } from '@app/stores/user'
+import { useState, useEffect } from 'react'
 import LogoutIcon from '@mui/icons-material/Logout'
 import ReplyIcon from '@mui/icons-material/Reply'
+import TextField from '@mui/material/TextField'
+import Button from '@mui/material/Button'
+import IconButton from '@mui/material/IconButton'
+import PhotoCamera from '@mui/icons-material/PhotoCamera'
+
+import { auth } from '@app/server/firebase'
+import { store } from '@app/stores'
+import { useAppSelector, useAppDispatch } from '@app/stores/hook'
+import { clearUser, userStore, userStatus, updateUserInfo } from '@app/stores/user'
+import { Formik } from 'formik'
 import { signOut } from 'firebase/auth'
-import { doc, getDoc, updateDoc } from 'firebase/firestore'
-import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { TextField } from '@mui/material'
-import EditIcon from '@mui/icons-material/Edit'
-import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 
 const Profile = () => {
   const user = useAppSelector(userStore)
+  const status = useAppSelector(userStatus)
+  const [imgPreview, setImgPreview] = useState(user.qrCodeURL)
+  const [imgObj, setImgObj] = useState<any>(null)
 
-  const [userData, setUserData] = useState<User>({})
-  const [edit, setEdit] = useState(false)
-
-  const ldapAccField = useRef()
-  const phoneField = useRef()
-  const addressField = useRef()
-  const bankNameField = useRef()
-  const bankAccountField = useRef()
-
-  useEffect(() => {
-    if (user.uid) {
-      getDoc(UserDetail(user.uid)).then((res) => {
-        setUserData(res.data()!)
-      })
+  const handlePreviewChange = (event: any) => {
+    const fileUploaded = event.target ? event.target.files[0] : null
+    if (fileUploaded) {
+      setImgObj(fileUploaded)
+      setImgPreview(URL.createObjectURL(fileUploaded))
     }
-  }, [user.uid, ldapAccField.current?.value])
-
-  const handleClickEdit = () => {
-    setEdit(!edit)
   }
 
-  const handleUpdateItem = async () => {
-    const infoItemRef = doc(db, 'Users', user.uid)
-    await updateDoc(infoItemRef, {
-      ldapAcc: ldapAccField.current?.value,
-      phone: phoneField.current?.value,
-      address: addressField.current?.value,
-      bankName: bankNameField.current?.value,
-      bankAccount: bankAccountField.current?.value,
-    })
-  }
+  // useEffect(() => {
+  //   return () => {
+  //     if (imgPreview) {
+  //       URL.revokeObjectURL(imgPreview)
+  //     }
+  //   }
+  // }, [imgPreview])
+
+  const dispatch = useAppDispatch()
 
   const logout = async () => {
     try {
@@ -61,7 +50,7 @@ const Profile = () => {
   }
 
   return (
-    <div className="bg-white h-screen">
+    <div className="min-h-screen bg-white">
       {/*Header section*/}
       <div className="bg-gradient-to-b from-[#CAF5B1] to-[#8AD769] h-72 rounded-b-2xl flex flex-col items-center justify-center">
         <div className="flex justify-between pb-2 self-stretch">
@@ -75,65 +64,91 @@ const Profile = () => {
           </button>
         </div>
         <img src="/src/assets/profile-picture.png" alt="" referrerPolicy="no-referrer" className="rounded-full w-28" />
-        <span className="py-2 text-xl">{userData?.name || ''}</span>
-        <span className="text-md">{userData?.email || ''}</span>
-        <span className="pt-2 text-md">
+        <span className="py-2 text-xl">{user?.name || ''}</span>
+        <span className="text-md">{user?.email || ''}</span>
+        <span className="pt-4 text-md">
           <span className="font-bellota">Chủ chi</span>: <span className="font-bold">4 lần</span> |<span className="font-bellota"> Tham gia</span>:{' '}
           <span className="font-bold">4 lần</span>
         </span>
       </div>
-
       {/*Details section*/}
       <div className="px-6 py-4">
-        <div className="flex flex-col pb-2">
-          <label htmlFor="" className="pb-1 font-bold text-gray-500">
-            LDAP
-          </label>
-          {edit ? <TextField variant={'standard'} defaultValue={userData?.ldapAcc} inputRef={ldapAccField} /> : <p>{userData?.ldapAcc}</p>}
-        </div>
-        <div className="flex flex-col pb-2">
-          <label htmlFor="" className="pb-1 font-bold text-gray-500">
-            Mobile
-          </label>
-          {edit ? <TextField variant={'standard'} defaultValue={userData?.phone} inputRef={phoneField} /> : <p>{userData?.phone}</p>}
-        </div>
-        <div className="flex flex-col pb-2">
-          <label htmlFor="" className="pb-1 font-bold text-gray-500">
-            Address
-          </label>
-          {edit ? <TextField variant={'standard'} defaultValue={userData?.address} inputRef={addressField} /> : <p>{userData?.address}</p>}
-        </div>
-        <div className="flex flex-col pb-2">
-          <label htmlFor="" className="pb-1 font-bold text-gray-500">
-            Bank
-          </label>
-          {edit ? <TextField variant={'standard'} defaultValue={userData?.bankName} inputRef={bankNameField} /> : <p>{userData?.bankName}</p>}
-        </div>
-        <div className="flex flex-col pb-2">
-          <label htmlFor="" className="pb-1 font-bold text-gray-500">
-            Account
-          </label>
-          {edit ? <TextField variant={'standard'} defaultValue={userData?.bankAccount} inputRef={bankAccountField} /> : <p>{userData?.bankAccount}</p>}
-        </div>
-        <div className="flex flex-col items-center ">
-          <label htmlFor="" className="self-start font-bold text-gray-500">
-            Account QR
-          </label>
-          <img src="src/assets/profile-picture.png" alt="QR code" className="h-48 w-48" />
-          <button onClick={handleClickEdit}>
-            {edit ? (
-              <div onClick={handleUpdateItem} className="flex gap-2 bg-green-400 rounded-full px-4 py-2">
-                <CheckCircleIcon />
-                <span>Save</span>
+        <Formik
+          initialValues={{ ...user }}
+          onSubmit={(values) => {
+            dispatch(updateUserInfo(values.uid as string, values, imgObj))
+          }}
+        >
+          {({ values, errors, touched, handleChange, handleBlur, handleSubmit, isSubmitting }) => (
+            <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+              <TextField
+                label="LDAP"
+                variant="standard"
+                fullWidth={true}
+                id="ldapAcc"
+                name="ldapAcc"
+                value={values.ldapAcc}
+                onChange={handleChange}
+                onBlur={handleBlur}
+              />
+              <TextField
+                label="Điện thoại"
+                variant="standard"
+                fullWidth={true}
+                id="phone"
+                name="phone"
+                value={values.phone}
+                onChange={handleChange}
+                onBlur={handleBlur}
+              />
+              <TextField
+                label="Địa chỉ"
+                variant="standard"
+                fullWidth={true}
+                id="address"
+                name="address"
+                value={values.address}
+                onChange={handleChange}
+                onBlur={handleBlur}
+              />
+              <TextField
+                label="Ngân hàng"
+                variant="standard"
+                fullWidth={true}
+                id="bankAccountName"
+                name="bankAccountName"
+                value={values.bankAccountName}
+                onChange={handleChange}
+                onBlur={handleBlur}
+              />
+              <TextField
+                label="Số tài khoản"
+                variant="standard"
+                fullWidth={true}
+                id="bankAccount"
+                name="bankAccount"
+                value={values.bankAccount}
+                onChange={handleChange}
+                onBlur={handleBlur}
+              />
+              <div className="flex flex-col pt-3">
+                <span className="font-serif">Mã QR</span>
+                {imgPreview && (
+                  <div className="self-center pt-3">
+                    <img alt="qrcode" className="h-56" src={imgPreview} />
+                  </div>
+                )}
+                <IconButton size={'large'} color="primary" aria-label="upload picture" component="label" onChange={handlePreviewChange}>
+                  <input hidden accept="image/*" type="file" />
+                  <PhotoCamera fontSize={'large'} />
+                </IconButton>
+                <Button variant="contained" type="submit" className="self-center" disabled={status === 'loading'}>
+                  Save
+                </Button>
               </div>
-            ) : (
-              <div className="flex gap-2 bg-green-400 rounded-full px-4 py-2">
-                <EditIcon />
-                <span>Edit</span>
-              </div>
-            )}
-          </button>
-        </div>
+            </form>
+          )}
+        </Formik>
       </div>
     </div>
   )
