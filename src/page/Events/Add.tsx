@@ -110,8 +110,10 @@ function Add() {
     const tempMembers = _.cloneDeep(selectedListMember)
     const tempEvenState = _.cloneDeep(eventState)
     const index = tempMembers.findIndex((u) => u.uid === memberId)
+    // const bonus = calBonus(eventState.tip || 0)
     if (index > -1) {
       tempMembers[index].amount = value
+      // tempMembers[index].amountToPay = value + bonus / tempMembers.length
     }
     const newTotalAmount = tempMembers.reduce((acc: number, item: IEventDetail) => acc + (item.amount || 0), 0)
     setSelectedListMember(tempMembers)
@@ -150,13 +152,16 @@ function Add() {
   }
   const handleChangeTip = (value: number) => {
     const bonus = calBonus(value)
+    const tempMembers = _.cloneDeep(selectedListMember)
+    tempMembers.forEach((item, index, arr) => {
+      arr[index].amountToPay = Math.round((item.amount || 0) + bonus / tempMembers.length)
+    })
     const total = eventState.billAmount ? Number(eventState.billAmount + bonus) : bonus
+    setSelectedListMember(tempMembers)
     setEventState({ ...eventState, tip: value, totalAmount: total })
   }
   const handleCreateEvent = async () => {
     const isAllPaid = selectedListMember.every((item: IEventDetail) => item.isPaid === true)
-    console.log('ispaid', isAllPaid)
-
     const { isSuccess, eventId } = await setEvent({ ...eventState, isAllPaid })
     selectedListMember.map(async (member) => {
       const eventDetail = { ...member, eventId }
@@ -176,19 +181,35 @@ function Add() {
     const selectedListMembersWithMoney = _.cloneDeep(selectedListMember)
     const numberOfMember = selectedListMembersWithMoney.length
     if (numberOfMember > 0) {
-      const amount = Math.round(eventState.totalAmount! / numberOfMember)
-      selectedListMembersWithMoney.map((item: IEventDetail) => (item.amount = amount))
+      const amount = Math.round((eventState.billAmount || 0) / numberOfMember)
+      const amountToPay = Math.round((eventState.totalAmount || 0) / numberOfMember)
+      selectedListMembersWithMoney.forEach((item: IEventDetail, index: number, arr: IEventDetail[]) => {
+        arr[index].amount = amount
+        arr[index].amountToPay = amountToPay
+      })
     }
     setSelectedListMember(selectedListMembersWithMoney)
   }
 
   const handleGenerate = () => {
     const sortListBillOwner = listBillOwner.sort((a, b) => (a.count || 0) - (b.count || 0))
-    const memberToPay = sortListBillOwner.pop()
+    const memberToPayNew = sortListBillOwner.pop()
+    // const memberPayIdNew = memberToPayNew?.uid
+    // const memberPayIdOld = memberToPayState?.uid
+    // const tempMembers = _.cloneDeep(selectedListMember)
+    // const indexNew = tempMembers.findIndex((u) => u.uid === memberPayIdNew)
+    // const indexOld = tempMembers.findIndex((u) => u.uid === memberPayIdOld)
+    // if (indexNew > -1) {
+    //   tempMembers[indexNew].isPaid = true
+    // }
+    // if (indexOld > -1) {
+    //   tempMembers[indexOld].isPaid = false
+    // }
+    // setSelectedListMember(tempMembers)
     setListBillOwner(sortListBillOwner)
-    if (memberToPay && memberToPay.uid && memberToPay.email) {
-      setMemberToPayState(memberToPay)
-      setEventState({ ...eventState, userPayId: memberToPay.uid, userPayName: memberToPay.name ? memberToPay.name : memberToPay.email })
+    if (memberToPayNew && memberToPayNew.uid && memberToPayNew.email) {
+      setMemberToPayState(memberToPayNew)
+      setEventState({ ...eventState, userPayId: memberToPayNew.uid, userPayName: memberToPayNew.name ? memberToPayNew.name : memberToPayNew.email })
     }
   }
   const handleCloseModalSuccess = () => {
@@ -205,8 +226,8 @@ function Add() {
   }, [eventState.billAmount])
 
   return (
-    <>
-      <CardStyled variant="outlined" className="mx-5">
+    <div className="w-full flex justify-center ">
+      <CardStyled variant="outlined" className="mx-5 md:px-3 md:max-w-xl">
         <CardContent>
           <button className="px-4">
             <Link to="/">
@@ -262,14 +283,17 @@ function Add() {
                   <Typography className="min-w-fit" variant="subtitle2">
                     Đã trả
                   </Typography>
-                  <Box className="min-w">
-                    <Typography className="min-w-[150px]" variant="subtitle2">
-                      Tên
+                  <Box className="min-w-[100px] ml-5">
+                    <Typography variant="subtitle2">Tên</Typography>
+                  </Box>
+                  <Box className="ml-5">
+                    <Typography className="min-w-[100px]" variant="subtitle2">
+                      Tiền Bill
                     </Typography>
                   </Box>
                   <Box className="ml-5">
-                    <Typography className="min-w-[150px]" variant="subtitle2">
-                      Tiền
+                    <Typography className="min-w-[100px]" variant="subtitle2">
+                      Thành Tiền
                     </Typography>
                   </Box>
                 </ListItem>
@@ -287,16 +311,28 @@ function Add() {
                           inputProps={{ 'aria-labelledby': labelId }}
                         />
                       </ListItemIcon>
-                      <Box className="ml-5 min-w-[150px]">
+                      <Box className="ml-5 min-w-[100px]">
                         <Typography noWrap>{member.name || member.email}</Typography>
                       </Box>
-                      <Box className="ml-5 min-w-[150px]">
+                      <Box className="ml-5 min-w-[100px]">
                         <TextNumberInput
                           fullWidth
                           id="filled-required"
                           variant="standard"
                           value={member.amount}
                           onValueChange={(values) => handleChangeAmount(member.uid, round(_.toNumber(values.value), 3))}
+                          InputLabelProps={{
+                            shrink: true,
+                          }}
+                        />
+                      </Box>
+                      <Box className="ml-5 min-w-[100px]">
+                        <TextNumberInput
+                          fullWidth
+                          id="filled-required"
+                          variant="standard"
+                          value={member.amountToPay}
+                          disabled
                           InputLabelProps={{
                             shrink: true,
                           }}
@@ -319,12 +355,12 @@ function Add() {
           <Typography variant="subtitle2">Người trả bill</Typography>
           <Box sx={{ flexGrow: 1 }} className="mt-2">
             <Grid container spacing={2}>
-              <Grid item xs={4}>
+              <Grid item md={4} xs={5}>
                 <ButtonStyled variant="contained" onClick={handleGenerate} disabled={!listBillOwner.length}>
-                  <Typography>Generate</Typography>
+                  <Typography>Auto Pick</Typography>
                 </ButtonStyled>
               </Grid>
-              <Grid item xs={8}>
+              <Grid item md={8} xs={7}>
                 <TextFieldStyled
                   fullWidth
                   disabled
@@ -369,17 +405,18 @@ function Add() {
                 <FormControlLabel value={bonusTypeEnum.PERCENT} checked={bonusType === bonusTypeEnum.PERCENT} control={<Radio />} label="phần trăm" />
               </RadioGroup>
             </FormControl>
-            <Input
+            <TextNumberInput
               value={eventState?.tip}
               onChange={(e) => {
-                handleChangeTip(round(_.toNumber(e.target.value), 3))
+                handleChangeTip(_.toNumber(e.target.value))
               }}
-              endAdornment={bonusType === bonusTypeEnum.PERCENT ? <InputAdornment position="end">%</InputAdornment> : null}
-              type="number"
-              // variant="standard"
-              // InputLabelProps={{
-              //   shrink: true,
-              // }}
+              InputProps={{
+                endAdornment: bonusType === bonusTypeEnum.PERCENT ? <InputAdornment position="end">%</InputAdornment> : null,
+              }}
+              variant="standard"
+              InputLabelProps={{
+                shrink: true,
+              }}
             />
           </Box>
           <Box className="mt-5">
@@ -408,7 +445,7 @@ function Add() {
           <Typography variant="h5">thành công</Typography>
         </Box>
       </Modal>
-    </>
+    </div>
   )
 }
 
