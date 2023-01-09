@@ -39,9 +39,7 @@ const List = () => {
         <ul className="mt-10">
           {listEventUser.map((item, index) => {
             const isHost = userData.uid === item.userPayId
-            const isPaid = isHost
-              ? (listEventDetail || []).filter((event) => event.eventId === item.id).find((member) => !member.isPaid)
-              : !(listEventDetail || []).find((member) => member?.uid === userData.uid && member.isPaid)
+            const isPaid = isHost ? item.isAllPaid : !(listEventDetail || []).find((member) => member?.uid === userData.uid && member.isPaid)
             return (
               <li className="my-4" key={index}>
                 <Link to={item.id!} className="flex bg-white rounded-3xl p-3">
@@ -73,9 +71,9 @@ const List = () => {
                       </span>
                     </div>
                     <span
-                      className={'absolute py-1 px-3 block font-normal text-white rounded-xl text-xl top-0 right-0 ' + (isPaid ? 'bg-red-700' : 'bg-green-600')}
+                      className={'absolute py-1 px-3 block font-normal text-white rounded-xl text-xl top-0 right-0 ' + (isPaid ? 'bg-green-600' : 'bg-red-700')}
                     >
-                      {!isPaid ? TEXT__PAID : TEXT__UNPAID}
+                      {isPaid ? TEXT__PAID : TEXT__UNPAID}
                     </span>
                   </div>
                 </Link>

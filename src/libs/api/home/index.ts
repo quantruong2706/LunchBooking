@@ -6,7 +6,7 @@ const getBy = async <T = any>(cloection: CollectionReference<T>, params: string)
   return (await getDocs(query(cloection, where(params, '==', store.getState().USER.data.uid)))).docs.map((item) => ({ ...item.data(), id: item.id }))
 }
 export const getHomeData = async () => {
-  //số bữa ăn user chủ chi
+  //list bữa ăn user chủ chi
   const isHost = await getBy(EventColection, 'userPayId')
   // số bữa ăn user tham gia
   const isMember = await getBy(EventDetailColection, 'uid')
@@ -15,9 +15,11 @@ export const getHomeData = async () => {
   // list bữa ăn user chưa đòi
   const requirePaymentList = isHost.filter((item) => !item.isAllPaid)
 
+  const isMemberCount = isMember.length - isHost.length
+
   return {
-    isHost,
-    isMember,
+    isHostCount: isHost.length,
+    isMemberCount: isMemberCount > 0 ? isMemberCount : 0,
     unPaidList,
     requirePaymentList,
   }
