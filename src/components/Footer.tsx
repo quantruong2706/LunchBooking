@@ -40,7 +40,7 @@ const Footer = () => {
         </div>
         <div className={`text-[12px] mt-[-6px] ${currentPage === PAGES.ADD_BILL ? 'text-dark-green-1' : 'text-grey-1'}`}>Add Bill</div>
       </button>
-      <button className="flex-1 cursor-not-allowed" disabled onClick={() => onClickFooterIcon(PAGES.NOTIFICATIONS)}>
+      <button className="flex-1" onClick={() => onClickFooterIcon(PAGES.NOTIFICATIONS)}>
         <div>
           <NotificationsIcon sx={{ color: currentPage === PAGES.NOTIFICATIONS ? '#439D0D' : '#A0A0A0' }} />
         </div>
