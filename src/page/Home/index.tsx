@@ -1,17 +1,16 @@
 import { PAGES } from '@app/contants'
+import { getHomeData } from '@app/libs/api/home'
+import { setSelectedListMember } from '@app/stores/events'
 import { setCurrentPage } from '@app/stores/footer'
 import { useAppSelector } from '@app/stores/hook'
 import { userStore } from '@app/stores/user'
+import { list } from '@firebase/storage'
 import { Grid } from '@mui/material'
 import { Container } from '@mui/system'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 
 import { useAppDispatch } from '../../stores/hook'
-// import { getListEventJoinedByUser, getListEventHostedByUser, getListMemberOfHostedEvent, getListEventIdsHostedByUser } from '@app/libs/api/events'
-import { getToPathname } from '@remix-run/router'
-import { IEvent, IEventDetail } from '@app/server/firebaseType'
-import { result } from 'lodash'
 export interface IHomePageProps {
   ahihi: string
 }
@@ -23,35 +22,13 @@ export default function HomePage() {
   useEffect(() => {
     dispatch(setCurrentPage(PAGES.HOME));
 
-    // getListEventJoinedByUser(user.uid).then((e) => {
-    //   setListJoinedEvent(e);
-    // });
-
-    // getListEventHostedByUser(user.uid).then((e) => {
-    //   setListHostedEvent(e);
-    // });
-
-    // getListEventIdsHostedByUser(user.uid).then((e) => {
-    //   setListHostedEventIds(e);
-    // })
-
-    // getListMemberOfHostedEvent(user.uid, listHostedEventIds).then((e) => {
-    //   setListMemberofHostedEvent(e);
-    // });
-    // getListEventByUser(10).then((e) => {
-    //   setListEvent(e)
-    // })
+    getHomeData().then((e) => {
+      setListEvent(e)
+    })
   }, [])
 
-  const [listEvent, setListEvent] = useState<IEventDetail[]>([])
-  const [listJoinedEvent, setListJoinedEvent] = useState<IEventDetail[]>([])
-  const [listHostedEvent, setListHostedEvent] = useState<IEvent[]>([])
-  const [listHostedEventIds, setListHostedEventIds] = useState<string[]>([])
-  const [listMemberofHostedEvent, setListMemberofHostedEvent] = useState<IEventDetail[]>([])
-  // console.log('listJoinedEvent',listJoinedEvent);
-  // console.log('listHostedEvent',listHostedEvent);
-  console.log('listHostedEventIds',listHostedEventIds);
-  console.log('listMemberofHostedEvent',listMemberofHostedEvent);
+  const [listEvent, setListEvent] = useState<any>()
+  console.log('listEvent',listEvent);
   const css = `
     html {
       width: 100vw;
@@ -129,43 +106,22 @@ export default function HomePage() {
     }
   `
 
-  const getNotPaidEvent = () => {
-    const result = listJoinedEvent.filter(x => x.isPaid !== true);
-    return result;
+  const getTotalUnPaidAmount = () => {
+    return 0;
   }
 
-  const getTotalNotPaidAmount = () => {
-    let result = 0;
-    // const result = getNotPaidEvent().reduce(
-    //   (total, data) => (data.members && data.members.length > 0 ? (total += (data.totalAmount || 0) / data.members.length) : 0),
-    //   0
-    // )
-    return Math.round(result)
-  }
-
-  // const getNotClaimEvent = (lstEventIds) => {
-  //   getListMemberOfHostedEvent(user.uid,lstEventIds).then((e) => {
-  //     setListNotClaimedEvent(e);
-  //   });
-  //   const result = listJoinedEvent.filter(x => x.isPaid !== true);
-  //   console.log('result', result);
-  //   return result;
-  // }
-
-  const getTotalNotClaimEvent = () => {
-    let result = 0;
-
-    // const result = listHostedEvent.filter((x) => x.userPayId == user.uid).reduce((total, data) => (total += data.totalAmount || 0), 0)
-    return Math.round(result)
+  const getTotalRequirePayment = () => {
+    return 0;
   }
 
   return (
+    (listEvent ? 
     <Container>
       <style>{css}</style>
       <Grid id="header" container direction="row" alignItems="center">
         <Grid item xs={10}>
           <p id="hello">Xin chào</p>
-          <p id="username">{user.displayName}</p>
+          <p id="username">{user.name}</p>
         </Grid>
         <Grid item xs={2}>
           <Link to="/profile">
@@ -176,29 +132,29 @@ export default function HomePage() {
       <Grid id="dashboard" container direction="row" alignItems="center" justifyContent="center" spacing={3} sx={{ marginLeft: { xs: '-12px', sm: '0' } }}>
         <Grid className="item box" item xs={6} sm={3} sx={{ maxWidth: { xs: '43vw', sm: '20vw', lg: '14vw' } }}>
           <p className="itemHeader">Tham gia</p>
-          <p className="itemDetail">{listJoinedEvent.length}</p>
+          <p className="itemDetail">{listEvent.isMember.length}</p>
         </Grid>
         <Grid className="item box" item xs={6} sm={3} sx={{ maxWidth: { xs: '43vw', sm: '20vw', lg: '14vw' } }}>
           <p className="itemHeader">Chủ chi</p>
-          <p className="itemDetail">{listHostedEvent.length}</p>
+          <p className="itemDetail">{listEvent.isHost.length}</p>
         </Grid>
         <Grid className="item box" item sm={3} sx={{ display: { xs: 'none', sm: 'block' }, maxWidth: { sm: '20vw', lg: '14vw' } }}>
           <p className="itemHeader">Cần trả</p>
-          <p className="itemDetail">{getTotalNotPaidAmount()}</p>
+          <p className="itemDetail">{listEvent.unPaidList.length}</p>
         </Grid>
         <Grid className="item box" item sm={3} sx={{ display: { xs: 'none', sm: 'block' }, maxWidth: { sm: '20vw', lg: '14vw' } }}>
           <p className="itemHeader">Cần đòi</p>
-          <p className="itemDetail">{getTotalNotClaimEvent()}</p>
+          <p className="itemDetail">{listEvent.requirePaymentList.length}</p>
         </Grid>
         </Grid>
         <Grid id="list" container direction="row" justifyContent="center" spacing={3} sx={{marginLeft: { xs: '-12px', sm: '0'} }}>
           <Grid className="item box" item xs={12} sm={6} sx={{maxWidth: { sm: '43vw', lg: '29vw'} }}>
             <div>
               <span className="text-bold">Số bữa chưa trả</span>
-              <span className="text-right">{getNotPaidEvent().length} bữa</span>
+              <span className="text-right">{listEvent.unPaidList.length} bữa</span>
             </div>
             <hr className="divider"/>
-            {getNotPaidEvent().length > 0 ? getNotPaidEvent().map(data =>
+            {listEvent.unPaidList.length > 0 ? listEvent.unPaidList.map(data =>
               <div key={data.id}>
                 <Link to={'/events/' + data.eventId} className="text-link">{data.name}</Link>
                 <span className="text-right">{data.amount}</span>
@@ -207,32 +163,33 @@ export default function HomePage() {
             <hr className="divider"/>
             <div>
               <span className="text-bold">Tổng</span>
-              <span className="text-right">{getTotalNotPaidAmount()}</span>
+              <span className="text-right">{getTotalUnPaidAmount()}</span>
             </div>
           </Grid>
           <Grid className="item box" item xs={12} sm={6} sx={{maxWidth: { sm: '43vw', lg: '29vw'} }}>
           <div>
             <span className="text-bold">Số bữa chưa đòi</span>
-            <span className="text-right">{getNotPaidEvent().length} bữa</span>
+            <span className="text-right">{listEvent.requirePaymentList.length} bữa</span>
           </div>
           <hr className="divider" />
-          {getNotPaidEvent().length > 0 ? (
-            getNotPaidEvent().map((data) => (
+          {listEvent.requirePaymentList.length > 0 ? (
+            listEvent.requirePaymentList.map((data) => (
               <div key={data.id}>
                 <Link to={'/events/' + data.id} className="text-link">
-                  {/* {data.eventName} */}
+                  {data.eventName}
                 </Link>
-                {/* <span className="text-right">{data.members ? Math.round(data.totalAmount || 0 / data.members.length) : 0}</span> */}
+                <span className="text-right">{data.members ? Math.round(data.totalAmount || 0 / data.members.length) : 0}</span>
               </div>
              ))): <img src="/src/assets/paid_logo.webp" alt="paid"/>}
             <hr className="divider"/>
             <div>
               <span className="text-bold">Tổng</span>
-              <span className="text-right">{getTotalNotClaimEvent()}</span>
+              <span className="text-right">{getTotalRequirePayment()}</span>
             </div>
           </Grid>
       </Grid>
       <div></div>
     </Container>
+    : <></>)
   )
 }

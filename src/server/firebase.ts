@@ -1,6 +1,7 @@
 import { getApp, getApps, initializeApp } from 'firebase/app'
 import { getAuth, GoogleAuthProvider } from 'firebase/auth'
-import { connectFirestoreEmulator, getFirestore, initializeFirestore } from 'firebase/firestore'
+import { initializeFirestore } from 'firebase/firestore'
+import { getStorage } from 'firebase/storage'
 
 const { VITE_BASE_API_KEY } = import.meta.env
 
@@ -12,6 +13,14 @@ const firebaseConfig = {
   messagingSenderId: '593640378675',
   appId: '1:593640378675:web:aef77080d743c6ccfb2e46',
   measurementId: 'G-FD0279B6RW',
+  // apiKey: 'AIzaSyDcsGPXU5iaQXyr5fxxft0q9Bvf8wcNu9Q',
+  // authDomain: 'an-lunch.firebaseapp.com',
+  // databaseURL: 'https://an-lunch-default-rtdb.asia-southeast1.firebasedatabase.app',
+  // projectId: 'an-lunch',
+  // storageBucket: 'an-lunch.appspot.com',
+  // messagingSenderId: '593640378675',
+  // appId: '1:593640378675:web:aef77080d743c6ccfb2e46',
+  // measurementId: 'G-FD0279B6RW',
 }
 
 const app = getApps().length ? getApp() : initializeApp(firebaseConfig)
@@ -21,10 +30,16 @@ const db = initializeFirestore(app, {
 })
 const auth = getAuth(app)
 const googleAuthProvider = new GoogleAuthProvider()
+const storage = getStorage(app)
 
-if (window.location.hostname === 'localhost') {
-  const db = getFirestore()
-  connectFirestoreEmulator(db, 'localhost', 8080)
-}
+// if (window.location.hostname === 'localhost') {
+//   const db = getFirestore()
+//   connectFirestoreEmulator(db, 'localhost', 8080)
+// }
+// connectAuthEmulator(auth, "http://localhost:9099");
+// if(window.location.hostname === 'localhost'){
+//   connectFirestoreEmulator(db, 'localhost', 8080);
+//   connectStorageEmulator(storage,'localhost',9199)
+// }
 
-export { auth, db, googleAuthProvider }
+export { auth, db, googleAuthProvider, storage }

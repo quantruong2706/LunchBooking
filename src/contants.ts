@@ -3,13 +3,13 @@ export const PAGES = {
   HISTORY: 'history',
   ADD_BILL: 'addBill',
   NOTIFICATIONS: 'notifications',
-  MEMEBERS: 'memebers',
+  MEMBERS: 'members',
 }
 
 export const PAGE_ROUTES = {
   [PAGES.HOME]: '/home',
   [PAGES.ADD_BILL]: '/events/add',
   [PAGES.NOTIFICATIONS]: '/notifications',
-  [PAGES.MEMEBERS]: '/members',
+  [PAGES.MEMBERS]: '/members',
   [PAGES.HISTORY]: '/events',
 }

@@ -1,29 +1,43 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
-import { auth } from '@app/server/firebase'
-import { User } from '@app/server/firebaseType'
-import { UserDetail } from '@app/server/useDB'
-import { store } from '@app/stores'
-import { useAppSelector } from '@app/stores/hook'
-import { clearUser, userStore } from '@app/stores/user'
+import {useState , useEffect} from 'react'
 import LogoutIcon from '@mui/icons-material/Logout'
 import ReplyIcon from '@mui/icons-material/Reply'
+import TextField from '@mui/material/TextField'
+import Button from '@mui/material/Button'
+import IconButton from '@mui/material/IconButton'
+import PhotoCamera from '@mui/icons-material/PhotoCamera'
+
+import { auth } from '@app/server/firebase'
+import { store } from '@app/stores'
+import { useAppSelector, useAppDispatch } from '@app/stores/hook'
+import { clearUser, userStore, userStatus, updateUserInfo } from '@app/stores/user'
+import { Formik } from 'formik'
 import { signOut } from 'firebase/auth'
-import { getDoc } from 'firebase/firestore'
-import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 
 const Profile = () => {
   const user = useAppSelector(userStore)
+  const status = useAppSelector(userStatus)
+  const [imgPreview, setImgPreview] = useState(user.qrCodeURL)
+  const [imgObj,setImgObj] = useState<any>(null)
 
-  const [userData, setUserData] = useState<User>({})
-
-  useEffect(() => {
-    if (user.uid) {
-      getDoc(UserDetail(user.uid)).then((res) => {
-        setUserData(res.data()!)
-      })
+  const handlePreviewChange = (event : any) => {
+    const fileUploaded = event.target ? event.target.files[0] : null
+    if (fileUploaded) {
+      setImgObj(fileUploaded)
+      setImgPreview(URL.createObjectURL(fileUploaded))
     }
-  }, [user.uid])
+  }
+
+  // useEffect(() => {
+  //   return () => {
+  //     if (imgPreview) {
+  //       URL.revokeObjectURL(imgPreview)
+  //     }
+  //   }
+  // }, [imgPreview])
+
+  const dispatch = useAppDispatch()
 
   const logout = async () => {
     try {
@@ -50,50 +64,86 @@ const Profile = () => {
           </button>
         </div>
         <img src="/src/assets/profile-picture.png" alt="" referrerPolicy="no-referrer" className="rounded-full w-28" />
-        <span className="py-2 text-xl">{userData?.name || ''}</span>
-        <span className="text-md">{userData?.email || ''}</span>
+        <span className="py-2 text-xl">{user?.name || ''}</span>
+        <span className="text-md">{user?.email || ''}</span>
         <span className="pt-4 text-md">
           <span className="font-bold">Chủ chi</span>: 4 lần |<span className="font-bold"> Tham gia</span>: 4 lần
         </span>
       </div>
       {/*Details section*/}
       <div className="px-6 py-4">
-        <div className="flex flex-col pb-4">
-          <label htmlFor="" className="pb-1 font-bold text-gray-500">
-            LDAP
-          </label>
-          <input type="text" placeholder="Example: ntphuc1" className="border-b-2" value={userData?.ldapAcc} />
-        </div>
-        <div className="flex flex-col pb-4">
-          <label htmlFor="" className="pb-1 font-bold text-gray-500">
-            Mobile
-          </label>
-          <input type="number" placeholder="" className="border-b-2" value={userData?.phone} />
-        </div>
-        <div className="flex flex-col pb-4">
-          <label htmlFor="" className="pb-1 font-bold text-gray-500">
-            Address
-          </label>
-          <input type="text" placeholder="Example: Cau Giay, Ha Noi" className="border-b-2" value={userData?.address} />
-        </div>
-        <div className="flex flex-col pb-4">
-          <label htmlFor="" className="pb-1 font-bold text-gray-500">
-            Bank
-          </label>
-          <input type="text" placeholder="" className="border-b-2" value={userData?.bankName} />
-        </div>
-        <div className="flex flex-col pb-4">
-          <label htmlFor="" className="pb-1 font-bold text-gray-500">
-            Account
-          </label>
-          <input type="text" placeholder="" className="border-b-2" value={userData?.bankAccount} />
-        </div>
-        <div className="flex flex-col items-center ">
-          <label htmlFor="" className="pb-1 self-start font-bold text-gray-500">
-            Account QR
-          </label>
-          <img src="src/assets/profile-picture.png" alt="QR code" className="h-64 w-6h-64" />
-        </div>
+        <Formik
+          initialValues={{ ...user }}
+          onSubmit={(values) => {
+            dispatch(updateUserInfo(values.uid as string, values , imgObj))
+          }}
+        >
+          {({ values, errors, touched, handleChange, handleBlur, handleSubmit, isSubmitting }) => (
+            <form onSubmit={handleSubmit}>
+              <TextField
+                label="Ldap"
+                variant="standard"
+                fullWidth={true}
+                id="ldapAcc"
+                name="ldapAcc"
+                value={values.ldapAcc}
+                onChange={handleChange}
+                onBlur={handleBlur}
+              />
+              <TextField
+                label="Điện thoại"
+                variant="standard"
+                fullWidth={true}
+                id="phone"
+                name="phone"
+                value={values.phone}
+                onChange={handleChange}
+                onBlur={handleBlur}
+              />
+              <TextField
+                label="Địa chỉ"
+                variant="standard"
+                fullWidth={true}
+                id="address"
+                name="address"
+                value={values.address}
+                onChange={handleChange}
+                onBlur={handleBlur}
+              />
+              <TextField
+                label="Ngân hàng"
+                variant="standard"
+                fullWidth={true}
+                id="bankAccountName"
+                name="bankAccountName"
+                value={values.bankAccountName}
+                onChange={handleChange}
+                onBlur={handleBlur}
+              />
+              <TextField
+                label="Số tài khoản"
+                variant="standard"
+                fullWidth={true}
+                id="bankAccount"
+                name="bankAccount"
+                value={values.bankAccount}
+                onChange={handleChange}
+                onBlur={handleBlur}
+              />
+              <IconButton color="primary" aria-label="upload picture" component="label" onChange={handlePreviewChange}>
+                <input hidden accept="image/*" type="file" />
+                <PhotoCamera />
+              </IconButton>
+              {imgPreview && <div>
+                <img alt="qrcode" src={imgPreview} />
+              </div>}
+              {/* <TextField label="Mã QR" variant="standard" fullWidth={true}/> */}
+              <Button variant="contained" fullWidth type="submit" disabled={status === 'loading'}>
+                Save
+              </Button>
+            </form>
+          )}
+        </Formik>
       </div>
     </div>
   )
