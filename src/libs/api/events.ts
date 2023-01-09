@@ -1,80 +1,31 @@
-import { IEvent, IEventDetail } from '@app/server/firebaseType'
-import { EventColection, EventDetail, EventDetailColection } from '@app/server/useDB'
-import { useAppSelector } from '@app/stores/hook'
-import { userStore } from '@app/stores/user'
-import { getDoc, getDocs, query, where } from 'firebase/firestore'
+import { IEvent } from '@app/server/firebaseType'
+import { EventColection, EventDetail, EventDetailColection, UserDetail, usersColection } from '@app/server/useDB'
+import { store } from '@app/stores'
+import { getCountFromServer, getDoc, getDocs, limit, query, QueryDocumentSnapshot, startAt, where } from 'firebase/firestore'
 
+export async function getListEventByUser(pageSize: number, pageIndex?: QueryDocumentSnapshot<IEvent>) {
+  const queryCondition = pageIndex ? [startAt(pageIndex), limit(pageSize)] : [limit(pageSize)]
+  const whereCondition = where('uid', '==', store.getState().USER.uid)
+  const eventDocs = await getDocs(query(EventDetailColection, ...queryCondition, whereCondition))
+  const snapshot = await getCountFromServer(query(EventDetailColection, whereCondition))
 
-// const user = useAppSelector(userStore)
+  const lastVisible = eventDocs.docs[eventDocs.docs.length - 1]
 
-export const getListEvent = async (): Promise<IEvent[]> => {
-  const eventDocs = await getDocs(EventColection)
-  const listEvent: IEvent[] = []
-
-  eventDocs.docs.forEach((eventDoc) => {
-    const event = eventDoc.data()
-    event.id = eventDoc.id
-    listEvent.push(event)
-  })
-
-  return listEvent
+  // eventDocs.docs.forEach((eventDoc) => {
+  //   const event = eventDoc.data()
+  //   event.id = eventDoc.id
+  //   console.log(eventDoc)
+  // })
+  return eventDocs
 }
 
-// danh sach event user tham gia
-export const getListEventJoinedByUser = async (uid: string): Promise<IEventDetail[]> => {
-  const q = query(EventDetailColection, where("uid", "==", uid));
-  const eventDocs = await getDocs(q)
-  const listEvent : any[] = []
-
-  eventDocs.docs.forEach((eventDoc) => {
-    const event = eventDoc.data()
-    event.id = eventDoc.id
-    listEvent.push(event)
-  })
-  return listEvent
+export const getUserDetail = async (uid: string) => {
+  return getDoc(UserDetail(uid)).then((res) => res.data())
 }
 
-// danh sach event user chu tri
-export const getListEventHostedByUser = async (uid: string): Promise<IEvent[]> => {
-  const q = query(EventColection, where("userPayId", "==", uid));
-  const eventDocs = await getDocs(q)
-  const listEvent : any[] = []
-
-  eventDocs.docs.forEach((eventDoc) => {
-    const event = eventDoc.data()
-    event.id = eventDoc.id
-    listEvent.push(event)
-  })
-  return listEvent
+export const getListUser = async () => {
+  return getDocs(usersColection).then((res) => res.docs.map((user) => user.data()))
 }
-
-// danh sach eventIds user chu tri
-export const getListEventIdsHostedByUser = async (uid: string): Promise<string[]> => {
-  const q = query(EventColection, where("userPayId", "==", uid));
-  const eventDocs = await getDocs(q)
-  const listEventIds : any[] = []
-
-  eventDocs.docs.forEach((eventDoc) => {
-    listEventIds.push(eventDoc.id)
-  })
-  return listEventIds
-}
-
-// danh sach member tham gia event cua user
-export const getListMemberOfHostedEvent = async (uid: string, lstEventIds: string[]): Promise<IEventDetail[]> => {
-  if (lstEventIds.length > 0) {
-    const q = query(EventDetailColection, where("eventId", "in", lstEventIds), where("uid", "!=", uid));
-    const eventDocs = await getDocs(q)
-    const listMember : any[] = []
-
-    eventDocs.docs.forEach((eventDoc) => {
-      const event = eventDoc.data()
-      event.id = eventDoc.id
-      listMember.push(event)
-    })
-    return listMember
-  } else return [];
-} 
 
 export const getDetailEvent = async (id: string) => {
   const eventDocs = await getDoc(EventDetail(id))

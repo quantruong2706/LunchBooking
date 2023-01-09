@@ -5,10 +5,25 @@ import { setEvent, setEventDetail, updatePayCount } from '@app/libs/api/EventApi
 import { IEvent, IEventDetail, User } from '@app/server/firebaseType'
 import { billStore } from '@app/stores/events'
 import { useAppSelector } from '@app/stores/hook'
+import { listEventStore } from '@app/stores/listEvent'
+import { listEventDetailStore } from '@app/stores/listEventDetail'
 import AddIcon from '@mui/icons-material/Add'
 import DeleteIcon from '@mui/icons-material/Delete'
 import ReplyIcon from '@mui/icons-material/Reply'
-import { Box, CardContent, Modal, TextField, Typography } from '@mui/material'
+import {
+  Box,
+  CardContent,
+  FormControl,
+  FormControlLabel,
+  FormLabel,
+  Input,
+  InputAdornment,
+  Modal,
+  Radio,
+  RadioGroup,
+  TextField,
+  Typography,
+} from '@mui/material'
 import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import Checkbox from '@mui/material/Checkbox'
@@ -20,8 +35,8 @@ import { styled } from '@mui/material/styles'
 import { DatePicker } from '@mui/x-date-pickers/DatePicker'
 import * as dayjs from 'dayjs'
 import _, { round } from 'lodash'
-import { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useEffect, useMemo, useState } from 'react'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 const TextFieldStyled = styled(TextField)(({ theme }) => ({
   '& .MuiFormLabel-root': {
     ...theme.typography.subtitle1,
@@ -60,14 +75,23 @@ const initEventValue = {
   userPayId: '',
   userPayName: '',
 }
-
+export const enum bonusTypeEnum {
+  PERCENT = 'PERCENT',
+  MONEY = 'MONEY',
+}
 function Add() {
-  const { billDetail, isEditBill } = useAppSelector(billStore)
-  const [eventState, setEventState] = useState<IEvent>(isEditBill ? billDetail : initEventValue)
+  const params = useParams()
+  const listEventDetail = useAppSelector(listEventDetailStore)
+  const listEvent = useAppSelector(listEventStore)
+  const userInEvent = useMemo(() => listEventDetail.filter((event) => event.eventId === params.id), [listEventDetail, params])
+  const eventInfo = useMemo(() => listEvent.find((item) => item.id === params.id), [listEvent, params.id])
+  // const { billDetail, isEditBill } = useAppSelector(billStore)
+  const [eventState, setEventState] = useState<IEvent>(params.id && eventInfo ? eventInfo : initEventValue)
   const [openModalSuccess, setOpenModalSuccess] = useState<boolean>(false)
   const [listBillOwner, setListBillOwner] = useState<User[]>([])
-  const [selectedListMember, setSelectedListMember] = useState<IEventDetail[]>([])
+  const [selectedListMember, setSelectedListMember] = useState<IEventDetail[]>([...userInEvent])
   const [memberToPayState, setMemberToPayState] = useState<IEventDetail>()
+  const [bonusType, setBonusType] = useState<bonusTypeEnum>(bonusTypeEnum.PERCENT)
   const navigate = useNavigate()
   // const dispatch = useAppDispatch()
 
@@ -84,13 +108,11 @@ function Add() {
   const handleChangeAmount = (memberId: string | null | undefined, value: number) => {
     const tempMembers = _.cloneDeep(selectedListMember)
     const tempEvenState = _.cloneDeep(eventState)
-    let prevAmount = 0
     const index = tempMembers.findIndex((u) => u.uid === memberId)
     if (index > -1) {
-      prevAmount = tempMembers[index].amount || 0
       tempMembers[index].amount = value
     }
-    const newTotalAmount = (tempEvenState.billAmount || 0) - prevAmount + value
+    const newTotalAmount = tempMembers.reduce((acc: number, item: IEventDetail) => acc + (item.amount || 0), 0)
     setSelectedListMember(tempMembers)
     setEventState({ ...tempEvenState, billAmount: newTotalAmount })
   }
@@ -116,13 +138,25 @@ function Add() {
     const total = eventState.tip ? eventState.tip + value : value
     setEventState({ ...eventState, billAmount: value, totalAmount: total })
   }
-
+  const calBonus = (value: number) => {
+    let bonus = 0
+    if (bonusType === bonusTypeEnum.PERCENT) {
+      bonus = eventState.billAmount && value > 0 ? (eventState.billAmount * value) / 100 : 0
+    } else {
+      bonus = value
+    }
+    return Math.round(bonus)
+  }
   const handleChangeTip = (value: number) => {
-    const total = eventState.billAmount ? eventState.billAmount + value : value
+    const bonus = calBonus(value)
+    const total = eventState.billAmount ? Number(eventState.billAmount + bonus) : bonus
     setEventState({ ...eventState, tip: value, totalAmount: total })
   }
   const handleCreateEvent = async () => {
-    const { isSuccess, eventId } = await setEvent(eventState)
+    const isAllPaid = selectedListMember.every((item: IEventDetail) => item.isPaid === true)
+    console.log('ispaid', isAllPaid)
+
+    const { isSuccess, eventId } = await setEvent({ ...eventState, isAllPaid })
     selectedListMember.map(async (member) => {
       const eventDetail = { ...member, eventId }
       await setEventDetail(eventDetail)
@@ -164,7 +198,8 @@ function Add() {
     setListBillOwner([...selectedListMember])
   }, [selectedListMember])
   useEffect(() => {
-    const total = (eventState.billAmount || 0) + (eventState.tip || 0)
+    const bonus = calBonus(eventState.tip || 0)
+    const total = (eventState.billAmount || 0) + bonus
     setEventState({ ...eventState, totalAmount: total })
   }, [eventState.billAmount])
 
@@ -317,19 +352,33 @@ function Add() {
               }}
             />
           </Box>
-          <Box className="mt-5">
-            <TextNumberInput
-              allowLeadingZeros={false}
-              fullWidth
-              label="Hoa hồng"
+          <Box className="mt-5 flex items-center">
+            <FormControl>
+              <FormLabel>Hoa Hồng</FormLabel>
+              <RadioGroup
+                row
+                aria-labelledby="demo-form-control-label-placement"
+                name="position"
+                defaultValue="top"
+                onChange={(e) => {
+                  setBonusType(e.target.value as bonusTypeEnum)
+                }}
+              >
+                <FormControlLabel value={bonusTypeEnum.MONEY} checked={bonusType === bonusTypeEnum.MONEY} control={<Radio />} label="nhập số" />
+                <FormControlLabel value={bonusTypeEnum.PERCENT} checked={bonusType === bonusTypeEnum.PERCENT} control={<Radio />} label="phần trăm" />
+              </RadioGroup>
+            </FormControl>
+            <Input
               value={eventState?.tip}
-              onValueChange={(values) => {
-                handleChangeTip(round(_.toNumber(values.value), 3))
+              onChange={(e) => {
+                handleChangeTip(round(_.toNumber(e.target.value), 3))
               }}
-              variant="standard"
-              InputLabelProps={{
-                shrink: true,
-              }}
+              endAdornment={bonusType === bonusTypeEnum.PERCENT ? <InputAdornment position="end">%</InputAdornment> : null}
+              type="number"
+              // variant="standard"
+              // InputLabelProps={{
+              //   shrink: true,
+              // }}
             />
           </Box>
           <Box className="mt-5">

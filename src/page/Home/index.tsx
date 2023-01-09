@@ -6,8 +6,9 @@ import { Grid } from '@mui/material'
 import { Container } from '@mui/system'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+
 import { useAppDispatch } from '../../stores/hook'
-import { getListEvent, getListEventJoinedByUser, getListEventHostedByUser, getListMemberOfHostedEvent, getListEventIdsHostedByUser } from '@app/libs/api/events'
+// import { getListEventJoinedByUser, getListEventHostedByUser, getListMemberOfHostedEvent, getListEventIdsHostedByUser } from '@app/libs/api/events'
 import { getToPathname } from '@remix-run/router'
 import { IEvent, IEventDetail } from '@app/server/firebaseType'
 import { result } from 'lodash'
@@ -22,27 +23,27 @@ export default function HomePage() {
   useEffect(() => {
     dispatch(setCurrentPage(PAGES.HOME));
 
-    getListEventJoinedByUser(user.uid).then((e) => {
-      setListJoinedEvent(e);
-    });
+    // getListEventJoinedByUser(user.uid).then((e) => {
+    //   setListJoinedEvent(e);
+    // });
 
-    getListEventHostedByUser(user.uid).then((e) => {
-      setListHostedEvent(e);
-    });
+    // getListEventHostedByUser(user.uid).then((e) => {
+    //   setListHostedEvent(e);
+    // });
 
-    getListEventIdsHostedByUser(user.uid).then((e) => {
-      setListHostedEventIds(e);
-    })
+    // getListEventIdsHostedByUser(user.uid).then((e) => {
+    //   setListHostedEventIds(e);
+    // })
 
-    getListMemberOfHostedEvent(user.uid, listHostedEventIds).then((e) => {
-      setListMemberofHostedEvent(e);
-    });
-    // getListEvent().then((e) => {
+    // getListMemberOfHostedEvent(user.uid, listHostedEventIds).then((e) => {
+    //   setListMemberofHostedEvent(e);
+    // });
+    // getListEventByUser(10).then((e) => {
     //   setListEvent(e)
     // })
   }, [])
 
-  const [listEvent, setListEvent] = useState<IEvent[]>([])
+  const [listEvent, setListEvent] = useState<IEventDetail[]>([])
   const [listJoinedEvent, setListJoinedEvent] = useState<IEventDetail[]>([])
   const [listHostedEvent, setListHostedEvent] = useState<IEvent[]>([])
   const [listHostedEventIds, setListHostedEventIds] = useState<string[]>([])
@@ -142,14 +143,14 @@ export default function HomePage() {
     return Math.round(result)
   }
 
-  const getNotClaimEvent = (lstEventIds) => {
-    getListMemberOfHostedEvent(lstEventIds).then((e) => {
-      setListNotClaimedEvent(e);
-    });
-    const result = listJoinedEvent.filter(x => x.isPaid !== true);
-    console.log('result', result);
-    return result;
-  }
+  // const getNotClaimEvent = (lstEventIds) => {
+  //   getListMemberOfHostedEvent(user.uid,lstEventIds).then((e) => {
+  //     setListNotClaimedEvent(e);
+  //   });
+  //   const result = listJoinedEvent.filter(x => x.isPaid !== true);
+  //   console.log('result', result);
+  //   return result;
+  // }
 
   const getTotalNotClaimEvent = () => {
     let result = 0;
@@ -219,9 +220,9 @@ export default function HomePage() {
             getNotPaidEvent().map((data) => (
               <div key={data.id}>
                 <Link to={'/events/' + data.id} className="text-link">
-                  {data.eventName}
+                  {/* {data.eventName} */}
                 </Link>
-                <span className="text-right">{data.members ? Math.round(data.totalAmount || 0 / data.members.length) : 0}</span>
+                {/* <span className="text-right">{data.members ? Math.round(data.totalAmount || 0 / data.members.length) : 0}</span> */}
               </div>
              ))): <img src="/src/assets/paid_logo.webp" alt="paid"/>}
             <hr className="divider"/>

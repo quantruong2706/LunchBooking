@@ -27,6 +27,7 @@ export interface IEvent {
   members?: User[]
   tip?: number
   totalAmount?: number
+  isAllPaid?: boolean
 }
 export interface IEventDetail {
   id?: string | null
