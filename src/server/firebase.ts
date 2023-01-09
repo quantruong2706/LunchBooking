@@ -2,11 +2,19 @@ import { getApp, getApps, initializeApp } from 'firebase/app'
 import { getAuth, GoogleAuthProvider } from 'firebase/auth'
 import { connectFirestoreEmulator, getFirestore, initializeFirestore } from 'firebase/firestore'
 
-const { VITE_BASE_API_KEY } = import.meta.env
+// const { VITE_BASE_API_KEY } = import.meta.env
 
 const firebaseConfig = {
-  apiKey: VITE_BASE_API_KEY,
+  // apiKey: VITE_BASE_API_KEY,
+  // authDomain: 'an-lunch.firebaseapp.com',
+  // projectId: 'an-lunch',
+  // storageBucket: 'an-lunch.appspot.com',
+  // messagingSenderId: '593640378675',
+  // appId: '1:593640378675:web:aef77080d743c6ccfb2e46',
+  // measurementId: 'G-FD0279B6RW',
+  apiKey: 'AIzaSyDcsGPXU5iaQXyr5fxxft0q9Bvf8wcNu9Q',
   authDomain: 'an-lunch.firebaseapp.com',
+  databaseURL: 'https://an-lunch-default-rtdb.asia-southeast1.firebasedatabase.app',
   projectId: 'an-lunch',
   storageBucket: 'an-lunch.appspot.com',
   messagingSenderId: '593640378675',
@@ -22,9 +30,9 @@ const db = initializeFirestore(app, {
 const auth = getAuth(app)
 const googleAuthProvider = new GoogleAuthProvider()
 
-if (window.location.hostname === 'localhost') {
-  const db = getFirestore()
-  connectFirestoreEmulator(db, 'localhost', 8080)
-}
+// if (window.location.hostname === 'localhost') {
+//   const db = getFirestore()
+//   connectFirestoreEmulator(db, 'localhost', 8080)
+// }
 
 export { auth, db, googleAuthProvider }
