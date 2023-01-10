@@ -1,9 +1,3 @@
-import { Outlet } from 'react-router-dom'
-
-export default function Layout() {
-  return (
-    <div className="flex flex-col justify-between">
-      <Outlet />
-    </div>
-  )
+export default function Layout({ children }: any) {
+  return <div className="flex justify-center min-h-screen">{children}</div>
 }

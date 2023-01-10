@@ -1,14 +1,13 @@
 import Layout from '@app/components/Layout'
 import LayoutWithFooter from '@app/components/LayoutWithFooter'
-import AppSuspense from '@app/components/Suspense'
-import { useAppDispatch, useAppSelector } from '@app/stores/hook'
-import { userStore, userStatus } from '@app/stores/user'
+import AppSuspense, { LoadingScreen } from '@app/components/Suspense'
+import { useAppSelector } from '@app/stores/hook'
+import { userStatus, userStore } from '@app/stores/user'
 import { lazy, useEffect } from 'react'
-import { createBrowserRouter, Navigate, Outlet, useNavigate } from 'react-router-dom'
 import { useAuthState } from 'react-firebase-hooks/auth'
+import { createBrowserRouter, Navigate, Outlet, useNavigate } from 'react-router-dom'
 import { auth } from '../server/firebase'
-import { LoadingScreen } from '@app/components/Suspense'
-import { initializeUser } from '@app/stores/user'
+
 
 interface PrivateRouteProps {
   Comp: () => JSX.Element
@@ -44,7 +43,7 @@ const PrivateRoute = ({ Comp }: PrivateRouteProps) => {
 export default createBrowserRouter([
   {
     path: '/',
-    element: <PrivateRoute Comp={Layout} />,
+    // element: <PrivateRoute Comp={Layout} />,
     children: [
       {
         path: '',
@@ -80,7 +79,11 @@ export default createBrowserRouter([
           },
           {
             path: 'add',
-            element: <AppSuspense comp={lazy(() => import('@app/page/Events/Add'))} />,
+            element: (
+              <Layout>
+                <AppSuspense comp={lazy(() => import('@app/page/Events/Add'))} />
+              </Layout>
+            ),
           },
           {
             path: 'edit/:id',
