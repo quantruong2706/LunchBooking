@@ -255,6 +255,7 @@ function Add() {
           </Box>
           <Box className="flex items-center mt-3">
             <Typography variant="subtitle2">Thành viên</Typography>
+            &nbsp; {selectedListMember?.length || 0}
             <ButtonStyled>
               <AddIcon
                 color="success"
