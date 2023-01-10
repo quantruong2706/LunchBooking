@@ -21,7 +21,7 @@ const Footer = () => {
   }
 
   return (
-    <div className="w-full text-center h-[60px] flex justify-around" style={{ backgroundColor: '#D9D9D9' }}>
+    <div className="fixed bottom-0 w-full text-center h-[60px] flex justify-around" style={{ backgroundColor: '#D9D9D9' }}>
       <button className="flex-1" onClick={() => onClickFooterIcon(PAGES.HOME)}>
         <div>
           <HomeIcon sx={{ color: currentPage === PAGES.HOME ? '#439D0D' : '#A0A0A0' }} />
