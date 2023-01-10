@@ -102,7 +102,9 @@ function Add() {
       // tempMembers[index].amountToPay = value + bonus / tempMembers.length
     }
     const newTotalAmount = tempMembers.reduce((acc: number, item: IEventDetail) => acc + (item.amount || 0), 0)
-    setSelectedListMember(tempMembers)
+    const bonus = calBonus(newTotalAmount, eventState.tip || 0)
+    const tempMembersAfterCaculate = recalculateMoneyToPay(tempMembers, bonus)
+    setSelectedListMember(tempMembersAfterCaculate)
     setEventState({ ...tempEvenState, billAmount: newTotalAmount })
   }
   const handleSelectedMember = (listSelectingMembers: IEventDetail[]) => {
@@ -125,25 +127,36 @@ function Add() {
 
   const handleChangeBill = (value: number) => {
     const total = eventState.tip ? eventState.tip + value : value
+    const tempMembers = _.cloneDeep(selectedListMember)
+    tempMembers.forEach((item, index, arr) => {
+      arr[index].amountToPay = 0
+      arr[index].amount = 0
+    })
+    setSelectedListMember(tempMembers)
     setEventState({ ...eventState, billAmount: value, totalAmount: total })
   }
-  const calBonus = (value: number) => {
+  const calBonus = (billAmount: number, tipAmount: number) => {
     let bonus = 0
     if (bonusType === bonusTypeEnum.PERCENT) {
-      bonus = eventState.billAmount && value > 0 ? (eventState.billAmount * value) / 100 : 0
+      bonus = billAmount && tipAmount > 0 ? (billAmount * tipAmount) / 100 : 0
     } else {
-      bonus = value
+      bonus = tipAmount
     }
     return Math.round(bonus)
   }
-  const handleChangeTip = (value: number) => {
-    const bonus = calBonus(value)
-    const tempMembers = _.cloneDeep(selectedListMember)
-    tempMembers.forEach((item, index, arr) => {
-      arr[index].amountToPay = Math.round((item.amount || 0) + bonus / tempMembers.length)
+  const recalculateMoneyToPay = (arrListMember: IEventDetail[], bonus: number) => {
+    arrListMember.forEach((item, index, arr) => {
+      arr[index].amountToPay = Math.round((item.amount || 0) + bonus / arrListMember.length)
     })
+    return arrListMember
+  }
+  const handleChangeTip = (value: number) => {
+    const bonus = calBonus(eventState.billAmount || 0, value)
+
+    const tempMembers = _.cloneDeep(selectedListMember)
+    const tempMembersAfterCaculate = recalculateMoneyToPay(tempMembers, bonus)
+    setSelectedListMember(tempMembersAfterCaculate)
     const total = eventState.billAmount ? Number(eventState.billAmount + bonus) : bonus
-    setSelectedListMember(tempMembers)
     setEventState({ ...eventState, tip: value, totalAmount: total })
   }
   const handleCreateEvent = async () => {
@@ -206,7 +219,7 @@ function Add() {
     setListBillOwner([...selectedListMember])
   }, [selectedListMember])
   useEffect(() => {
-    const bonus = calBonus(eventState.tip || 0)
+    const bonus = calBonus(eventState.billAmount || 0, eventState.tip || 0)
     const total = (eventState.billAmount || 0) + bonus
     setEventState({ ...eventState, totalAmount: total })
   }, [eventState.billAmount])
@@ -277,7 +290,7 @@ function Add() {
                   </Box>
                   <Box className="ml-5">
                     <Typography className="min-w-[100px]" variant="subtitle2">
-                      Tiền Bill
+                      Bill
                     </Typography>
                   </Box>
                   <Box className="ml-5">
@@ -370,7 +383,7 @@ function Add() {
               allowLeadingZeros={false}
               fullWidth
               variant="standard"
-              label="Tổng bill"
+              label="Bill"
               value={eventState?.billAmount}
               onValueChange={(values) => {
                 handleChangeBill(round(_.toNumber(values.value), 3))
