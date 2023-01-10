@@ -8,6 +8,7 @@ import { listEventStore } from '@app/stores/listEvent'
 import { listEventDetailStore } from '@app/stores/listEventDetail'
 import AddIcon from '@mui/icons-material/Add'
 import DeleteIcon from '@mui/icons-material/Delete'
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline'
 import ReplyIcon from '@mui/icons-material/Reply'
 import { Box, CardContent, FormControl, FormControlLabel, FormLabel, InputAdornment, Modal, Radio, RadioGroup, TextField, Typography } from '@mui/material'
 import Button from '@mui/material/Button'
@@ -18,6 +19,7 @@ import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
 import ListItemIcon from '@mui/material/ListItemIcon'
 import { styled } from '@mui/material/styles'
+import Tooltip from '@mui/material/Tooltip'
 import { DatePicker } from '@mui/x-date-pickers/DatePicker'
 import * as dayjs from 'dayjs'
 import _, { round } from 'lodash'
@@ -198,10 +200,12 @@ function Add() {
       setEventState({ ...eventState, userPayId: memberToPayNew.uid, userPayName: memberToPayNew.name ? memberToPayNew.name : memberToPayNew.email })
     }
   }
+
   const handleCloseModalSuccess = () => {
     setOpenModalSuccess(false)
     navigate('/')
   }
+
   useEffect(() => {
     setListBillOwner([...selectedListMember])
   }, [selectedListMember])
@@ -219,7 +223,7 @@ function Add() {
             <Link to="/">
               <ReplyIcon fontSize={'large'} />
             </Link>
-          </button>{' '}
+          </button>
           <Box className="mt-6">
             <TextFieldStyled
               fullWidth
@@ -350,6 +354,9 @@ function Add() {
                 <ButtonStyled variant="contained" onClick={handleGenerate} disabled={!listBillOwner.length}>
                   <Typography>Auto Pick</Typography>
                 </ButtonStyled>
+                <Tooltip title="Chọn thành viên trước khi pick người chủ chi" placement="top-start">
+                  <ErrorOutlineIcon sx={{ marginTop: '-16px', fontSize: '20px', marginLeft: '3px', color: '#9c9c9c' }} />
+                </Tooltip>
               </Grid>
               <Grid item md={8} xs={7}>
                 <TextFieldStyled
