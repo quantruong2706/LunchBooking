@@ -1,7 +1,7 @@
 // import { ReactComponent as DishImg } from '@app/assets/react.svg'
 import TextNumberInput from '@app/components/Input/NumericInput'
 import PeopleModal from '@app/components/Modal/PeopleModal'
-import { setEvent, setEventDetail, updatePayCount } from '@app/libs/api/EventApi'
+import { setEvent, setEventDetail, updateEvent, updateEventDetail, updatePayCount } from '@app/libs/api/EventApi'
 import { IEvent, IEventDetail, User } from '@app/server/firebaseType'
 import { useAppSelector } from '@app/stores/hook'
 import { listEventStore } from '@app/stores/listEvent'
@@ -161,18 +161,35 @@ function Add() {
   }
   const handleCreateEvent = async () => {
     const isAllPaid = selectedListMember.every((item: IEventDetail) => item.isPaid === true)
-    const { isSuccess, eventId } = await setEvent({ ...eventState, isAllPaid })
-    selectedListMember.map(async (member) => {
-      const eventDetail = { ...member, eventId }
-      await setEventDetail(eventDetail)
-    })
+    const eventData = { ...eventState, isAllPaid }
+
+    if (params.id) {
+      const { isSuccess, eventId } = await updateEvent(params.id, eventData)
+      if (isSuccess) {
+        const promises: Promise<any>[] = []
+        selectedListMember.map((member) => {
+          const eventDetail = { ...member, eventId }
+          if (member.id) promises.push(updateEventDetail(member.id, eventDetail))
+        })
+        await Promise.all(promises)
+        setOpenModalSuccess(true)
+      }
+    } else {
+      const { isSuccess, eventId } = await setEvent(eventData)
+      if (isSuccess) {
+        const promises: Promise<any>[] = []
+        selectedListMember.map((member) => {
+          const eventDetail = { ...member, eventId }
+          if (member.id) setEventDetail(eventDetail)
+        })
+        await Promise.all(promises)
+        setOpenModalSuccess(true)
+      }
+    }
 
     if (memberToPayState?.uid) {
       const payCount = (memberToPayState?.count || 0) + 1
       updatePayCount(memberToPayState.uid, payCount)
-    }
-    if (isSuccess) {
-      setOpenModalSuccess(true)
     }
   }
 
