@@ -3,13 +3,15 @@ import { store } from '@app/stores'
 import { CollectionReference, getDocs, query, where } from 'firebase/firestore'
 
 const getBy = async <T = any>(cloection: CollectionReference<T>, params?: string) => {
-  return (await getDocs(params ? query(cloection, where(params, '==', store.getState().USER.data.uid)) : cloection)).docs.map((item) => ({
+  return (await getDocs(params ? query(cloection, where(params, '==', store.getState().USER.data?.uid)) : cloection)).docs.map((item) => ({
     ...item.data(),
     id: item.id,
   }))
 }
 export const getHomeData = async () => {
-  const uid = store.getState().USER.data.uid
+  const uid = store.getState().USER.data?.uid
+  console.log('uid', uid)
+
   //list bữa ăn user chủ chi
   const allEvent = await getBy(EventColection)
   const isHost = allEvent.filter((item) => item.userPayId === uid)
@@ -22,7 +24,7 @@ export const getHomeData = async () => {
   const unPaidList = isMember
     .filter((item) => !item.isPaid)
     .map((item) => ({ ...item, eventName: allEvent.find((event) => event.id === item.eventId)?.eventName }))
-
+  console.log('unPaidList', unPaidList)
   // list bữa ăn user chưa đòi
   const requirePaymentList = isHost
     .filter((item) => !item.isAllPaid)
@@ -33,6 +35,7 @@ export const getHomeData = async () => {
         totalAmount: item.totalAmount! - paid,
       }
     })
+  console.log('requirePaymentList', requirePaymentList)
 
   const isMemberCount = isMember.length - isHost.length
 

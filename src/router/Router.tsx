@@ -2,7 +2,7 @@ import Layout from '@app/components/Layout'
 import LayoutWithFooter from '@app/components/LayoutWithFooter'
 import AppSuspense from '@app/components/Suspense'
 import { useAppDispatch, useAppSelector } from '@app/stores/hook'
-import { userStore , userStatus} from '@app/stores/user'
+import { userStore, userStatus } from '@app/stores/user'
 import { lazy, useEffect } from 'react'
 import { createBrowserRouter, Navigate, Outlet, useNavigate } from 'react-router-dom'
 import { useAuthState } from 'react-firebase-hooks/auth'
@@ -22,20 +22,21 @@ const PrivateRoute = ({ Comp }: PrivateRouteProps) => {
   const navigate = useNavigate()
 
   useEffect(() => {
-    if(loading){
+    if (loading) {
       return
-    }else{
-      if(!loggedInUser){
+    } else {
+      if (!loggedInUser) {
         navigate('/login', { state: window.location.pathname })
       }
     }
+  }, [navigate, loading, loggedInUser])
 
-  }, [navigate, loading,loggedInUser])
-
-  if(loading || statusUser === "loading" || !user)
-    return (<div>
-      <LoadingScreen/>
-    </div>)
+  if (loading || statusUser === 'loading' || !user)
+    return (
+      <div>
+        <LoadingScreen />
+      </div>
+    )
 
   return <Comp />
 }
@@ -124,5 +125,4 @@ export default createBrowserRouter([
     path: '*',
     element: <AppSuspense comp={lazy(() => import('@app/page/notfound'))} />,
   },
-
 ])

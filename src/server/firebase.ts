@@ -1,19 +1,18 @@
 import { getApp, getApps, initializeApp } from 'firebase/app'
-import { getAuth, GoogleAuthProvider, connectAuthEmulator } from 'firebase/auth'
-import { initializeFirestore, getFirestore, connectFirestoreEmulator } from 'firebase/firestore'
-import { getStorage, connectStorageEmulator } from 'firebase/storage'
+import { getAuth, GoogleAuthProvider } from 'firebase/auth'
+import { initializeFirestore } from 'firebase/firestore'
+import { getStorage } from 'firebase/storage'
 
 const { VITE_BASE_API_KEY } = import.meta.env
 
 const firebaseConfig = {
-  // apiKey: VITE_BASE_API_KEY,
-  apiKey: "AIzaSyDBiz4TUFtdQTE9ISHK5S5dtP6GIUaF8AU",
-  authDomain: "lunchbooking-d4fbf.firebaseapp.com",
-  projectId: "lunchbooking-d4fbf",
-  storageBucket: "lunchbooking-d4fbf.appspot.com",
-  messagingSenderId: "123054878462",
-  appId: "1:123054878462:web:7673277f92786f742abfaf",
-  measurementId: "G-Q9MMWCJ82S"
+  apiKey: 'AIzaSyDBiz4TUFtdQTE9ISHK5S5dtP6GIUaF8AU',
+  authDomain: 'lunchbooking-d4fbf.firebaseapp.com',
+  projectId: 'lunchbooking-d4fbf',
+  storageBucket: 'lunchbooking-d4fbf.appspot.com',
+  messagingSenderId: '123054878462',
+  appId: '1:123054878462:web:7673277f92786f742abfaf',
+  measurementId: 'G-Q9MMWCJ82S',
   // apiKey: 'AIzaSyDcsGPXU5iaQXyr5fxxft0q9Bvf8wcNu9Q',
   // authDomain: 'an-lunch.firebaseapp.com',
   // databaseURL: 'https://an-lunch-default-rtdb.asia-southeast1.firebasedatabase.app',

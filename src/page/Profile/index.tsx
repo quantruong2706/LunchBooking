@@ -41,7 +41,6 @@ const Profile = () => {
     setImgPreview(user?.qrCodeURL)
   }, [user])
 
-
   const dispatch = useAppDispatch()
 
   const logout = async () => {

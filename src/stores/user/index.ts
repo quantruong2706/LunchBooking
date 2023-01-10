@@ -1,20 +1,20 @@
 import { IUser } from '@app/libs/types'
 import { RootState } from '@app/stores'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import {getUserByUid , createUser , updateUser , uploadQRImg} from '@app/libs/api/userAPI'
+import { getUserByUid, createUser, updateUser, uploadQRImg } from '@app/libs/api/userAPI'
 export const namespace = 'USER'
 import { AnyAction } from 'redux'
 import { ThunkAction } from 'redux-thunk'
-import {User} from 'firebase/auth'
+import { User } from 'firebase/auth'
 import { User as UserType } from '@app/server/firebaseType'
 
 interface userState {
-  data:UserType | null,
-  status:"idle"|"loading"|"succeeded"|"failed"
+  data: UserType | null
+  status: 'idle' | 'loading' | 'succeeded' | 'failed'
 }
-const initialState : userState = {
-  data :  null,
-  status:"idle"
+const initialState: userState = {
+  data: { uid: '' },
+  status: 'idle',
 }
 
 const slice = createSlice({
@@ -22,57 +22,56 @@ const slice = createSlice({
   initialState,
   reducers: {
     idle(state) {
-      state.status = "idle";
+      state.status = 'idle'
     },
     initialize(state) {
-      state.status = "loading";
+      state.status = 'loading'
     },
     initializeSucceeded(state, action: PayloadAction<UserType>) {
-      state.data = {...action.payload};
-      state.status = "idle";
+      state.data = { ...action.payload }
+      state.status = 'idle'
     },
     initializeFailed(state) {
-      state.status = "idle";
+      state.status = 'idle'
     },
     update(state) {
-      state.status = "loading";
+      state.status = 'loading'
     },
     updateSucceeded(state, action: PayloadAction<UserType>) {
-      state.data = {...action.payload};
-      state.status = "succeeded";
+      state.data = { ...action.payload }
+      state.status = 'succeeded'
     },
     updateFailed(state) {
-      state.status = "failed";
+      state.status = 'failed'
     },
     clearUser: () => initialState,
   },
 })
 
-
 //Actions
-export const {  clearUser , idle , initialize , initializeSucceeded , initializeFailed , update , updateSucceeded , updateFailed} = slice.actions
+export const { clearUser, idle, initialize, initializeSucceeded, initializeFailed, update, updateSucceeded, updateFailed } = slice.actions
 
 //Selector
 export const userStore = (state: RootState) => state[namespace].data
 export const userStatus = (state: RootState) => state[namespace].status
 
 //Thunk
-export function initializeUser(authUser:User) :  ThunkAction<void, RootState, unknown, AnyAction>{
-  return async (dispatch)=>{
-    const {  uid, displayName, email, photoURL } = authUser
-    const user = await getUserByUid(uid)
+export function initializeUser(authUser: User): ThunkAction<void, RootState, unknown, AnyAction> {
+  return async (dispatch) => {
+    const { uid, displayName, email, photoURL } = authUser
     dispatch(initialize())
-    if(!user?.uid){
-      const userInfo : UserType = {
+    const user = await getUserByUid(uid)
+    if (!user?.uid) {
+      const userInfo: UserType = {
         uid,
         name: displayName || 'unknown',
         email: email || 'undefined',
         photoURL: photoURL || '',
-        ldapAcc:'',
-        bankAccount:'',
-        bankAccountName:'',
-        address:'',
-        phone:''
+        ldapAcc: '',
+        bankAccount: '',
+        bankAccountName: '',
+        address: '',
+        phone: '',
       }
 
       try {
@@ -82,22 +81,23 @@ export function initializeUser(authUser:User) :  ThunkAction<void, RootState, un
         dispatch(initializeFailed())
         dispatch(idle())
       }
-  }else{
-    dispatch(initializeSucceeded({
-      ...user
-    }))
-  }
+    } else {
+      dispatch(
+        initializeSucceeded({
+          ...user,
+        })
+      )
+    }
   }
 }
 
-
-export function updateUserInfo(uid:string ,userInfo : UserType , imgObj : any) :  ThunkAction<void, RootState, unknown, AnyAction>{
-  return async (dispatch)=>{
+export function updateUserInfo(uid: string, userInfo: UserType, imgObj: any): ThunkAction<void, RootState, unknown, AnyAction> {
+  return async (dispatch) => {
     dispatch(update())
     try {
-      if(imgObj){
+      if (imgObj) {
         const qrURL = await uploadQRImg(imgObj)
-        userInfo.qrCodeURL = qrURL;
+        userInfo.qrCodeURL = qrURL
       }
       await updateUser(uid, userInfo)
       dispatch(updateSucceeded(userInfo))

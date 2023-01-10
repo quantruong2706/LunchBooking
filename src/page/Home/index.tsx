@@ -1,16 +1,14 @@
 import { PAGES } from '@app/contants'
-
 import { getHomeData } from '@app/libs/api/home'
 import { IEvent, IEventDetail } from '@app/server/firebaseType'
 import { setCurrentPage } from '@app/stores/footer'
 import { useAppSelector } from '@app/stores/hook'
+import { useAppDispatch } from '@app/stores/hook'
 import { userStore } from '@app/stores/user'
 import { Grid } from '@mui/material'
 import { Container } from '@mui/system'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-
-import { useAppDispatch } from '@app/stores/hook'
 
 export default function HomePage() {
   const user = useAppSelector(userStore)
@@ -23,7 +21,7 @@ export default function HomePage() {
       setListEvent(e)
       // console.log("aaa", e);
     })
-  }, [])
+  }, [dispatch])
 
   const [listEvent, setListEvent] = useState<any>()
   // console.log('listEvent', listEvent)
@@ -122,11 +120,11 @@ export default function HomePage() {
       <Grid id="header" container direction="row" alignItems="center">
         <Grid item xs={10}>
           <p id="hello">Xin chào</p>
-          <p id="username">{user.name}</p>
+          <p id="username">{user?.name}</p>
         </Grid>
         <Grid item xs={2}>
           <Link to="/profile">
-            <img id="userImg" src={user.photoURL!} alt="user_photo" referrerPolicy="no-referrer" />
+            <img id="userImg" src={user?.photoURL || ''} alt="user_photo" referrerPolicy="no-referrer" />
           </Link>
         </Grid>
       </Grid>

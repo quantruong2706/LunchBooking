@@ -1,33 +1,53 @@
 import { LoadingScreen } from '@app/components/Suspense'
-import { TEXT__HOST, TEXT__MEMBER, TEXT__PAYMENT_PAID, TEXT__PAYMENT_REMIND } from '@app/libs/constant'
+import { createNoti } from '@app/libs/api/noti'
+import {
+  DATE_NOW,
+  FORMAT__DATE,
+  TEXT__HOST,
+  TEXT__MEMBER,
+  TEXT__PAYMENT_PAID,
+  TEXT__PAYMENT_PAID_MSG,
+  TEXT__PAYMENT_REMIND,
+  TEXT__PAYMENT_REMIND_MSG,
+} from '@app/libs/constant'
 import { formatMoney } from '@app/libs/functions'
 import { useAppSelector } from '@app/stores/hook'
 import { listEventStore } from '@app/stores/listEvent'
 import { listEventDetailStore } from '@app/stores/listEventDetail'
 import { listUserStore } from '@app/stores/listUser'
+import { listNotiStore } from '@app/stores/noti'
 import { userStore } from '@app/stores/user'
 import BorderColorIcon from '@mui/icons-material/BorderColor'
 import ReplyIcon from '@mui/icons-material/Reply'
 import Alert from '@mui/material/Alert'
 import Snackbar from '@mui/material/Snackbar'
-import { useEffect, useMemo, useState } from 'react'
-
+import dayjs from 'dayjs'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 const LunchDetail = () => {
+  // navigate
+  const navigate = useNavigate()
+  // params
   const params = useParams<{ id: string }>()
+
+  //store
   const { uid } = useAppSelector(userStore)
   const listEventDetail = useAppSelector(listEventDetailStore)
   const listEvent = useAppSelector(listEventStore)
   const listUser = useAppSelector(listUserStore)
+  const listNoti = useAppSelector(listNotiStore)
+
+  // state
+  const [openAlert, setOpenAlert] = useState('')
+  const [loading, setLoading] = useState(true)
+  const [disableNoti, setDisableNoti] = useState(false)
+
+  // calc - memo
   const userInEvent = useMemo(() => listEventDetail.filter((event) => event.eventId === params.id), [listEventDetail, params])
   const eventInfo = useMemo(() => listEvent.find((item) => item.id === params.id), [listEvent, params.id])
 
-  const [openAlert, setOpenAlert] = useState(false)
-  const [loading, setLoading] = useState(true)
-
   const isHost = useMemo(() => eventInfo?.userPayId === uid, [eventInfo?.userPayId, uid])
   const hostInfo = useMemo(() => listUser.find((user) => user.uid === eventInfo?.userPayId), [eventInfo?.userPayId, listUser])
-  const navigate = useNavigate()
   const isPaid = useMemo(() => {
     const member = userInEvent.find((member) => member.uid === uid)
     if (member && member.uid !== eventInfo?.userPayId) {
@@ -36,9 +56,11 @@ const LunchDetail = () => {
       return !userInEvent.find((member) => !member.isPaid)
     }
   }, [eventInfo?.userPayId, uid, userInEvent])
+
+  //handle
   const handleClick = () => {
     navigator.clipboard.writeText(listUser.find((user) => user.uid === eventInfo?.userPayId)?.bankAccount || '')
-    setOpenAlert(true)
+    setOpenAlert('Copied!')
   }
 
   const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
@@ -46,7 +68,7 @@ const LunchDetail = () => {
       return
     }
 
-    setOpenAlert(false)
+    setOpenAlert('')
   }
 
   useEffect(() => {
@@ -54,14 +76,34 @@ const LunchDetail = () => {
       setLoading(false)
     }
   }, [eventInfo, hostInfo])
+  useEffect(() => {
+    if (listNoti.find((noti) => noti.fromUid === uid || Boolean(noti.toUids?.includes(uid!)))) {
+      setDisableNoti(true)
+    }
+  }, [listNoti, uid])
+
+  const handleNoti = useCallback(() => {
+    setDisableNoti(true)
+    createNoti({
+      date: dayjs(DATE_NOW).format(FORMAT__DATE),
+      content: (isHost ? TEXT__PAYMENT_REMIND_MSG : TEXT__PAYMENT_PAID_MSG) + ' ' + formatMoney(userInEvent.find((user) => user.uid === uid)?.amount),
+      fromUid: uid!,
+      toUids: isHost ? userInEvent.filter((user) => !user.isPaid).map((user) => user.uid!) : [eventInfo?.userPayId || ''],
+      eventId: eventInfo?.id || '',
+    }).then((res) => {
+      if (res.isSuccess) {
+        setOpenAlert('Đã Thông báo')
+      }
+    })
+  }, [eventInfo, isHost, uid, userInEvent])
 
   return loading ? (
     <LoadingScreen />
   ) : (
     <div className="bg-white h-screen">
-      <Snackbar open={openAlert} autoHideDuration={1500} onClose={handleClose}>
+      <Snackbar open={!!openAlert} autoHideDuration={1500} onClose={handleClose}>
         <Alert onClose={handleClose} severity="success" sx={{ width: '100%', backgroundColor: '#baf7c2' }}>
-          <span className="font-bold">copied!</span>
+          <span className="font-bold">{openAlert}</span>
         </Alert>
       </Snackbar>
       <div className="bg-gradient-to-t from-green-300 to-light-color rounded-b-3xl">
@@ -120,13 +162,13 @@ const LunchDetail = () => {
         <div className="flex justify-between">
           <span className="text-gray-400 font-bold block mb-3">Hoa hồng</span>
           <p className="text-end">
-            <span className="text-black">{formatMoney(eventInfo?.billAmount)}</span>
+            <span className="text-black">{formatMoney(eventInfo?.tip)}</span>
           </p>
         </div>
         <div className="flex justify-between">
           <span className="text-gray-400 font-bold block mb-3">Tổng tiền</span>
           <p className="text-end">
-            <span className="text-black">{formatMoney(eventInfo?.billAmount)}</span>
+            <span className="text-black">{formatMoney(eventInfo?.totalAmount)}</span>
           </p>
         </div>
         <div className="border-y-[1px] border-gray-400">
@@ -160,8 +202,8 @@ const LunchDetail = () => {
                         <span className="ml-3">{user.name || user.email}</span>
                       </label>
                     </td>
-                    <td className="text-center">50k</td>
-                    <td className="text-right">100k</td>
+                    <td className="text-center">{formatMoney(user.amount)}</td>
+                    <td className="text-right">{formatMoney(user.amountToPay)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -187,9 +229,12 @@ const LunchDetail = () => {
               <div className="flex w-full">
                 <button
                   type="button"
+                  onClick={handleNoti}
+                  disabled={disableNoti}
                   className={
                     'focus:outline-none text-white focus:ring-4 font-medium rounded-lg px-5 py-2.5 mx-auto ' +
-                    (isHost ? 'bg-green-600 hover:bg-green-700 focus:ring-green-400' : 'bg-[#B91D37]')
+                    (isHost ? 'bg-green-600 hover:bg-green-700 focus:ring-green-400 ' : 'bg-[#B91D37] ') +
+                    (disableNoti ? 'cursor-not-allowed hover:bg-green-600' : '')
                   }
                 >
                   {isHost ? TEXT__PAYMENT_REMIND : TEXT__PAYMENT_PAID}

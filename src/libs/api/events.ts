@@ -1,15 +1,12 @@
 import { IEvent } from '@app/server/firebaseType'
-import { EventColection, EventDetail, EventDetailColection, UserDetail, usersColection } from '@app/server/useDB'
+import { EventDetail, EventDetailColection, UserDetail, usersColection } from '@app/server/useDB'
 import { store } from '@app/stores'
-import { getCountFromServer, getDoc, getDocs, limit, query, QueryDocumentSnapshot, startAt, where } from 'firebase/firestore'
+import { getDoc, getDocs, limit, query, QueryDocumentSnapshot, startAt, where } from 'firebase/firestore'
 
 export async function getListEventByUser(pageSize: number, pageIndex?: QueryDocumentSnapshot<IEvent>) {
   const queryCondition = pageIndex ? [startAt(pageIndex), limit(pageSize)] : [limit(pageSize)]
-  const whereCondition = where('uid', '==', store.getState().USER.uid)
+  const whereCondition = where('uid', '==', store.getState().USER.data?.uid)
   const eventDocs = await getDocs(query(EventDetailColection, ...queryCondition, whereCondition))
-  const snapshot = await getCountFromServer(query(EventDetailColection, whereCondition))
-
-  const lastVisible = eventDocs.docs[eventDocs.docs.length - 1]
 
   // eventDocs.docs.forEach((eventDoc) => {
   //   const event = eventDoc.data()

@@ -42,3 +42,13 @@ export interface IEventDetail {
   count?: number
   amountToPay?: number
 }
+export interface INoti {
+  id?: string
+  date: string
+  content: string
+  fromUid: string
+  toUids: string[]
+  userSeen: string[]
+  eventId: string
+  isSeen?: boolean
+}
