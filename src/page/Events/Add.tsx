@@ -229,14 +229,16 @@ function Add() {
   }, [eventState.billAmount])
 
   return (
-    <div className="w-full flex justify-center ">
-      <CardStyled variant="outlined" className="mx-5 md:px-3 md:max-w-xl">
+    <div>
+      <button className="px-4">
+        <Link to="/">
+          <ReplyIcon fontSize={'large'} />
+        </Link>
+      </button>
+      <div className="text-center font-[Bellota] text-[24px]">Tạo mới hoá đơn</div>
+
+      <CardStyled variant="outlined" className="mx-5 md:px-3 md:max-w-xl" sx={{ marginTop: '30px', marginBottom: '15px', overflow: 'scroll' }}>
         <CardContent>
-          <button className="px-4">
-            <Link to="/">
-              <ReplyIcon fontSize={'large'} />
-            </Link>
-          </button>
           <Box className="mt-6">
             <TextFieldStyled
               fullWidth
@@ -318,7 +320,11 @@ function Add() {
                         />
                       </ListItemIcon>
                       <Box className="ml-5 min-w-[100px]">
-                        <Typography noWrap>{member.name || member.email}</Typography>
+                        <Typography noWrap>
+                          <Tooltip title={member.name || member.email}>
+                            <span> {member.name || member.email} </span>
+                          </Tooltip>
+                        </Typography>
                       </Box>
                       <Box className="ml-5 min-w-[100px]">
                         <TextNumberInput
@@ -363,7 +369,7 @@ function Add() {
           <Typography variant="subtitle2">Người trả bill</Typography>
           <Box sx={{ flexGrow: 1 }} className="mt-2">
             <Grid container spacing={2}>
-              <Grid item md={4} xs={5}>
+              <Grid item md={4} xs={5} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                 <ButtonStyled variant="contained" onClick={handleGenerate} disabled={!listBillOwner.length}>
                   <Typography>Auto Pick</Typography>
                 </ButtonStyled>
@@ -403,7 +409,7 @@ function Add() {
           </Box>
           <Box className="mt-5 flex items-center">
             <FormControl>
-              <FormLabel>Hoa Hồng</FormLabel>
+              <FormLabel>Hoa hồng</FormLabel>
               <RadioGroup
                 row
                 aria-labelledby="demo-form-control-label-placement"
@@ -413,8 +419,8 @@ function Add() {
                   setBonusType(e.target.value as bonusTypeEnum)
                 }}
               >
-                <FormControlLabel value={bonusTypeEnum.MONEY} checked={bonusType === bonusTypeEnum.MONEY} control={<Radio />} label="nhập số" />
-                <FormControlLabel value={bonusTypeEnum.PERCENT} checked={bonusType === bonusTypeEnum.PERCENT} control={<Radio />} label="phần trăm" />
+                <FormControlLabel value={bonusTypeEnum.MONEY} checked={bonusType === bonusTypeEnum.MONEY} control={<Radio />} label="Nhập số" />
+                <FormControlLabel value={bonusTypeEnum.PERCENT} checked={bonusType === bonusTypeEnum.PERCENT} control={<Radio />} label="Phần trăm" />
               </RadioGroup>
             </FormControl>
             <TextNumberInput
