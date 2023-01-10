@@ -3,27 +3,13 @@ import TextNumberInput from '@app/components/Input/NumericInput'
 import PeopleModal from '@app/components/Modal/PeopleModal'
 import { setEvent, setEventDetail, updatePayCount } from '@app/libs/api/EventApi'
 import { IEvent, IEventDetail, User } from '@app/server/firebaseType'
-import { billStore } from '@app/stores/events'
 import { useAppSelector } from '@app/stores/hook'
 import { listEventStore } from '@app/stores/listEvent'
 import { listEventDetailStore } from '@app/stores/listEventDetail'
 import AddIcon from '@mui/icons-material/Add'
 import DeleteIcon from '@mui/icons-material/Delete'
 import ReplyIcon from '@mui/icons-material/Reply'
-import {
-  Box,
-  CardContent,
-  FormControl,
-  FormControlLabel,
-  FormLabel,
-  Input,
-  InputAdornment,
-  Modal,
-  Radio,
-  RadioGroup,
-  TextField,
-  Typography,
-} from '@mui/material'
+import { Box, CardContent, FormControl, FormControlLabel, FormLabel, InputAdornment, Modal, Radio, RadioGroup, TextField, Typography } from '@mui/material'
 import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import Checkbox from '@mui/material/Checkbox'
@@ -244,6 +230,8 @@ function Add() {
               InputLabelProps={{
                 shrink: true,
               }}
+              error={!eventState.eventName}
+              helperText="Vui lòng nhập tên"
             />
           </Box>
           <Box className="mt-6">
@@ -324,6 +312,7 @@ function Add() {
                           InputLabelProps={{
                             shrink: true,
                           }}
+                          defaultValue={0}
                         />
                       </Box>
                       <Box className="ml-5 min-w-[100px]">
@@ -336,6 +325,7 @@ function Add() {
                           InputLabelProps={{
                             shrink: true,
                           }}
+                          defaultValue={0}
                         />
                       </Box>
                       <ButtonStyled onClick={() => handleDelete(member)}>
@@ -387,6 +377,7 @@ function Add() {
               InputLabelProps={{
                 shrink: true,
               }}
+              defaultValue={0}
             />
           </Box>
           <Box className="mt-5 flex items-center">
@@ -417,6 +408,7 @@ function Add() {
               InputLabelProps={{
                 shrink: true,
               }}
+              defaultValue={0}
             />
           </Box>
           <Box className="mt-5">
@@ -430,10 +422,11 @@ function Add() {
               InputLabelProps={{
                 shrink: true,
               }}
+              defaultValue={0}
             />
           </Box>
           <Box className="flex justify-center my-7">
-            <ButtonStyled variant="contained" onClick={handleCreateEvent}>
+            <ButtonStyled variant="contained" onClick={handleCreateEvent} disabled={!eventState.eventName}>
               <Typography>Tạo hóa đơn</Typography>
             </ButtonStyled>
           </Box>
