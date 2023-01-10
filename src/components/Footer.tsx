@@ -20,6 +20,7 @@ const Footer = () => {
     navigateTo(PAGE_ROUTES[page])
   }
 
+
   return (
     <div className="fixed bottom-0 w-full text-center h-[60px] flex justify-around" style={{ backgroundColor: '#D9D9D9' }}>
       <button className="flex-1" onClick={() => onClickFooterIcon(PAGES.HOME)}>
