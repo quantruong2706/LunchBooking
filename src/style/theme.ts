@@ -21,24 +21,6 @@ declare module '@mui/material/Typography' {
   }
 }
 
-declare module '@mui/material/styles/createTheme' {
-  interface Theme {
-    palette: CustomPaletteType
-  }
-}
-declare module '@mui/material/styles/createPalette' {
-  type Palette = CustomPaletteType
-
-  interface PaletteOptions extends CustomPaletteType {
-    [name: string]: {
-      // eslint-disable-next-line @typescript-eslint/ban-types
-      [name: string]: string | Object
-    }
-  }
-}
-
-type CustomPaletteType = typeof customPalette
-
 export type CustomThemeType = {
   [Key in keyof typeof theme]: typeof theme[Key]
 }
@@ -150,14 +132,14 @@ const theme = createTheme({
       styleOverrides: {
         option: ({ theme }) => ({
           '&[data-focus="true"]': {
-            backgroundColor: `${theme.palette.colors.neutral[200]}!important` as any,
+            backgroundColor: `${(theme.palette as any).colors.neutral[200]}!important` as any,
             borderColor: 'transparent',
           },
           '&[aria-selected="true"]': {
-            backgroundColor: `${theme.palette.colors.neutral[200]}!important` as any,
+            backgroundColor: `${(theme.palette as any).colors.neutral[200]}!important` as any,
             borderColor: 'transparent',
             '&:hover': {
-              backgroundColor: `${theme.palette.colors.neutral[100]}!important` as any,
+              backgroundColor: `${(theme.palette as any).colors.neutral[100]}!important` as any,
             },
           },
         }),

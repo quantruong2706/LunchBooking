@@ -31,7 +31,7 @@ const LunchDetail = () => {
   const params = useParams<{ id: string }>()
 
   //store
-  const { uid } = useAppSelector(userStore)
+  const { uid } = useAppSelector(userStore)!
   const listEventDetail = useAppSelector(listEventDetailStore)
   const listEvent = useAppSelector(listEventStore)
   const listUser = useAppSelector(listUserStore)
