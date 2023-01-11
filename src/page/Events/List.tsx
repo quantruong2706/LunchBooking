@@ -8,12 +8,17 @@ import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 
 const List = () => {
-  const userData = useAppSelector(userStore)
+  const userData = useAppSelector(userStore)!
   const listEvent = useAppSelector(listEventStore)
   const listEventDetail = useAppSelector(listEventDetailStore)
   const eventOfUser = useMemo(
-    () => listEventDetail.filter((event) => event.uid === userData.uid).map((event) => event.eventId),
-    [listEventDetail, userData.uid]
+    () =>
+      listEventDetail
+        .filter((event) => event.uid === userData.uid)
+        .map((event) => {
+          return event.eventId
+        }),
+    [listEventDetail, userData]
   )
   const listEventUser = useMemo(() => listEvent.filter((event) => eventOfUser.includes(event.id)), [eventOfUser, listEvent])
   return (
