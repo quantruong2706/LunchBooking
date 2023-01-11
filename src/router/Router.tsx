@@ -43,7 +43,7 @@ const PrivateRoute = ({ Comp }: PrivateRouteProps) => {
 export default createBrowserRouter([
   {
     path: '/',
-    // element: <PrivateRoute Comp={Layout} />,
+    element: <PrivateRoute Comp={() => <Outlet />} />,
     children: [
       {
         path: '',
