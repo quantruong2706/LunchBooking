@@ -12,8 +12,8 @@ const List = () => {
   const listEvent = useAppSelector(listEventStore)
   const listEventDetail = useAppSelector(listEventDetailStore)
   const eventOfUser = useMemo(
-    () => listEventDetail.filter((event) => event.uid === userData.uid).map((event) => event.eventId),
-    [listEventDetail, userData.uid]
+    () => listEventDetail.filter((event) => event.uid === userData?.uid).map((event) => event.eventId),
+    [listEventDetail, userData?.uid]
   )
   const listEventUser = useMemo(() => listEvent.filter((event) => eventOfUser.includes(event.id)), [eventOfUser, listEvent])
   return (
@@ -38,8 +38,8 @@ const List = () => {
         </div>
         <ul className="mt-10">
           {listEventUser.map((item, index) => {
-            const isHost = userData.uid === item.userPayId
-            const isPaid = isHost ? item.isAllPaid : !(listEventDetail || []).find((member) => member?.uid === userData.uid && member.isPaid)
+            const isHost = userData?.uid === item.userPayId
+            const isPaid = isHost ? item.isAllPaid : !(listEventDetail || []).find((member) => member?.uid === userData?.uid && member.isPaid)
             return (
               <li className="my-4" key={index}>
                 <Link to={item.id!} className="flex bg-white rounded-3xl p-3">
@@ -67,7 +67,7 @@ const List = () => {
                       <br />
                       <span>
                         Số tiền chưa đòi:
-                        <b>{formatMoney(isHost ? item.billAmount : listEventDetail?.find((member) => member.uid === userData.uid)?.amount)}</b>
+                        <b>{formatMoney(isHost ? item.billAmount : listEventDetail?.find((member) => member.uid === userData?.uid)?.amount)}</b>
                       </span>
                     </div>
                     <span
