@@ -2,7 +2,7 @@ import { INoti } from '@app/server/firebaseType'
 import { NotiColection, NotiDetail } from '@app/server/useDB'
 import { store } from '@app/stores'
 import { addDoc, onSnapshot, query, updateDoc, where } from 'firebase/firestore'
-const uid = store.getState().USER.data.uid as string
+const uid = store.getState().USER.data?.uid as string
 export const createNoti = async (data: Partial<INoti>) => {
   let isSuccess = false
   let notiId = ''

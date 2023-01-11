@@ -1,15 +1,14 @@
-import { IUser } from '@app/libs/types'
+import { createUser, getUserByUid, updateUser, uploadQRImg } from '@app/libs/api/userAPI'
+import { User as UserType } from '@app/server/firebaseType'
 import { RootState } from '@app/stores'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { getUserByUid, createUser, updateUser, uploadQRImg } from '@app/libs/api/userAPI'
-export const namespace = 'USER'
+import { User } from 'firebase/auth'
 import { AnyAction } from 'redux'
 import { ThunkAction } from 'redux-thunk'
-import { User } from 'firebase/auth'
-import { User as UserType } from '@app/server/firebaseType'
 
+export const namespace = 'USER'
 interface userState {
-  data: UserType | null
+  data: UserType
   status: 'idle' | 'loading' | 'succeeded' | 'failed'
 }
 const initialState: userState = {
