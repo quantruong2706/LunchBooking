@@ -33,7 +33,7 @@ const getListEvent = () => {
 export const getListEventDetail = () => {
   const q = query(EventDetailColection)
   onSnapshot(q, (res) => {
-    const ListEventDetail = res.docs.map((item) => item.data())
+    const ListEventDetail = res.docs.map((item) => ({ ...item.data(), id: item.id }))
     getListEvent()
     store.dispatch(setListEventDetail(ListEventDetail))
   })

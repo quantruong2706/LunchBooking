@@ -1,13 +1,14 @@
 // import { ReactComponent as DishImg } from '@app/assets/react.svg'
 import TextNumberInput from '@app/components/Input/NumericInput'
 import PeopleModal from '@app/components/Modal/PeopleModal'
-import { setEvent, setEventDetail, updatePayCount } from '@app/libs/api/EventApi'
+import { setEvent, setEventDetail, updateEvent, updateEventDetail, updatePayCount } from '@app/libs/api/EventApi'
 import { IEvent, IEventDetail, User } from '@app/server/firebaseType'
 import { useAppSelector } from '@app/stores/hook'
 import { listEventStore } from '@app/stores/listEvent'
 import { listEventDetailStore } from '@app/stores/listEventDetail'
 import AddIcon from '@mui/icons-material/Add'
 import DeleteIcon from '@mui/icons-material/Delete'
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline'
 import ReplyIcon from '@mui/icons-material/Reply'
 import { Box, CardContent, FormControl, FormControlLabel, FormLabel, InputAdornment, Modal, Radio, RadioGroup, TextField, Typography } from '@mui/material'
 import Button from '@mui/material/Button'
@@ -18,6 +19,7 @@ import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
 import ListItemIcon from '@mui/material/ListItemIcon'
 import { styled } from '@mui/material/styles'
+import Tooltip from '@mui/material/Tooltip'
 import { DatePicker } from '@mui/x-date-pickers/DatePicker'
 import * as dayjs from 'dayjs'
 import _, { round } from 'lodash'
@@ -102,7 +104,9 @@ function Add() {
       // tempMembers[index].amountToPay = value + bonus / tempMembers.length
     }
     const newTotalAmount = tempMembers.reduce((acc: number, item: IEventDetail) => acc + (item.amount || 0), 0)
-    setSelectedListMember(tempMembers)
+    const bonus = calBonus(newTotalAmount, eventState.tip || 0)
+    const tempMembersAfterCaculate = recalculateMoneyToPay(tempMembers, bonus)
+    setSelectedListMember(tempMembersAfterCaculate)
     setEventState({ ...tempEvenState, billAmount: newTotalAmount })
   }
   const handleSelectedMember = (listSelectingMembers: IEventDetail[]) => {
@@ -125,41 +129,69 @@ function Add() {
 
   const handleChangeBill = (value: number) => {
     const total = eventState.tip ? eventState.tip + value : value
+    const tempMembers = _.cloneDeep(selectedListMember)
+    tempMembers.forEach((item, index, arr) => {
+      arr[index].amountToPay = 0
+      arr[index].amount = 0
+    })
+    setSelectedListMember(tempMembers)
     setEventState({ ...eventState, billAmount: value, totalAmount: total })
   }
-  const calBonus = (value: number) => {
+  const calBonus = (billAmount: number, tipAmount: number) => {
     let bonus = 0
     if (bonusType === bonusTypeEnum.PERCENT) {
-      bonus = eventState.billAmount && value > 0 ? (eventState.billAmount * value) / 100 : 0
+      bonus = billAmount && tipAmount > 0 ? (billAmount * tipAmount) / 100 : 0
     } else {
-      bonus = value
+      bonus = tipAmount
     }
     return Math.round(bonus)
   }
-  const handleChangeTip = (value: number) => {
-    const bonus = calBonus(value)
-    const tempMembers = _.cloneDeep(selectedListMember)
-    tempMembers.forEach((item, index, arr) => {
-      arr[index].amountToPay = Math.round((item.amount || 0) + bonus / tempMembers.length)
+  const recalculateMoneyToPay = (arrListMember: IEventDetail[], bonus: number) => {
+    arrListMember.forEach((item, index, arr) => {
+      arr[index].amountToPay = Math.round((item.amount || 0) + bonus / arrListMember.length)
     })
+    return arrListMember
+  }
+  const handleChangeTip = (value: number) => {
+    const bonus = calBonus(eventState.billAmount || 0, value)
+
+    const tempMembers = _.cloneDeep(selectedListMember)
+    const tempMembersAfterCaculate = recalculateMoneyToPay(tempMembers, bonus)
+    setSelectedListMember(tempMembersAfterCaculate)
     const total = eventState.billAmount ? Number(eventState.billAmount + bonus) : bonus
-    setSelectedListMember(tempMembers)
     setEventState({ ...eventState, tip: value, totalAmount: total })
   }
   const handleCreateEvent = async () => {
     const isAllPaid = selectedListMember.every((item: IEventDetail) => item.isPaid === true)
-    const { isSuccess, eventId } = await setEvent({ ...eventState, isAllPaid })
-    selectedListMember.map(async (member) => {
-      const eventDetail = { ...member, eventId }
-      await setEventDetail(eventDetail)
-    })
+    const eventData = { ...eventState, isAllPaid }
+
+    if (params.id) {
+      const { isSuccess, eventId } = await updateEvent(params.id, eventData)
+      if (isSuccess) {
+        const promises: Promise<any>[] = []
+        selectedListMember.map((member) => {
+          const eventDetail = { ...member, eventId }
+          if (member.id) promises.push(updateEventDetail(member.id, eventDetail))
+        })
+        await Promise.all(promises)
+        setOpenModalSuccess(true)
+      }
+    } else {
+      const { isSuccess, eventId } = await setEvent(eventData)
+      if (isSuccess) {
+        const promises: Promise<any>[] = []
+        selectedListMember.map((member) => {
+          const eventDetail = { ...member, eventId }
+          if (member.id) setEventDetail(eventDetail)
+        })
+        await Promise.all(promises)
+        setOpenModalSuccess(true)
+      }
+    }
 
     if (memberToPayState?.uid) {
       const payCount = (memberToPayState?.count || 0) + 1
       updatePayCount(memberToPayState.uid, payCount)
-    }
-    if (isSuccess) {
-      setOpenModalSuccess(true)
     }
   }
 
@@ -198,28 +230,32 @@ function Add() {
       setEventState({ ...eventState, userPayId: memberToPayNew.uid, userPayName: memberToPayNew.name ? memberToPayNew.name : memberToPayNew.email })
     }
   }
+
   const handleCloseModalSuccess = () => {
     setOpenModalSuccess(false)
     navigate('/')
   }
+
   useEffect(() => {
     setListBillOwner([...selectedListMember])
   }, [selectedListMember])
   useEffect(() => {
-    const bonus = calBonus(eventState.tip || 0)
+    const bonus = calBonus(eventState.billAmount || 0, eventState.tip || 0)
     const total = (eventState.billAmount || 0) + bonus
     setEventState({ ...eventState, totalAmount: total })
   }, [eventState.billAmount])
 
   return (
-    <div className="w-full flex justify-center ">
-      <CardStyled variant="outlined" className="mx-5 md:px-3 md:max-w-xl">
+    <div>
+      <button className="px-4">
+        <Link to="/">
+          <ReplyIcon fontSize={'large'} />
+        </Link>
+      </button>
+      <div className="text-center font-[Bellota] text-[24px]">Tạo mới hoá đơn</div>
+
+      <CardStyled variant="outlined" className="mx-5 md:px-3 md:max-w-xl" sx={{ marginTop: '30px', marginBottom: '15px', overflow: 'scroll' }}>
         <CardContent>
-          <button className="px-4">
-            <Link to="/">
-              <ReplyIcon fontSize={'large'} />
-            </Link>
-          </button>{' '}
           <Box className="mt-6">
             <TextFieldStyled
               fullWidth
@@ -277,7 +313,7 @@ function Add() {
                   </Box>
                   <Box className="ml-5">
                     <Typography className="min-w-[100px]" variant="subtitle2">
-                      Tiền Bill
+                      Bill
                     </Typography>
                   </Box>
                   <Box className="ml-5">
@@ -301,7 +337,11 @@ function Add() {
                         />
                       </ListItemIcon>
                       <Box className="ml-5 min-w-[100px]">
-                        <Typography noWrap>{member.name || member.email}</Typography>
+                        <Typography noWrap>
+                          <Tooltip title={member.name || member.email}>
+                            <span> {member.name || member.email} </span>
+                          </Tooltip>
+                        </Typography>
                       </Box>
                       <Box className="ml-5 min-w-[100px]">
                         <TextNumberInput
@@ -346,10 +386,13 @@ function Add() {
           <Typography variant="subtitle2">Người trả bill</Typography>
           <Box sx={{ flexGrow: 1 }} className="mt-2">
             <Grid container spacing={2}>
-              <Grid item md={4} xs={5}>
+              <Grid item md={4} xs={5} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                 <ButtonStyled variant="contained" onClick={handleGenerate} disabled={!listBillOwner.length}>
                   <Typography>Auto Pick</Typography>
                 </ButtonStyled>
+                <Tooltip title="Chọn thành viên trước khi pick người chủ chi" placement="top-start">
+                  <ErrorOutlineIcon sx={{ marginTop: '-16px', fontSize: '20px', marginLeft: '3px', color: '#9c9c9c' }} />
+                </Tooltip>
               </Grid>
               <Grid item md={8} xs={7}>
                 <TextFieldStyled
@@ -370,7 +413,7 @@ function Add() {
               allowLeadingZeros={false}
               fullWidth
               variant="standard"
-              label="Tổng bill"
+              label="Bill"
               value={eventState?.billAmount}
               onValueChange={(values) => {
                 handleChangeBill(round(_.toNumber(values.value), 3))
@@ -383,7 +426,7 @@ function Add() {
           </Box>
           <Box className="mt-5 flex items-center">
             <FormControl>
-              <FormLabel>Hoa Hồng</FormLabel>
+              <FormLabel>Hoa hồng</FormLabel>
               <RadioGroup
                 row
                 aria-labelledby="demo-form-control-label-placement"
@@ -393,8 +436,8 @@ function Add() {
                   setBonusType(e.target.value as bonusTypeEnum)
                 }}
               >
-                <FormControlLabel value={bonusTypeEnum.MONEY} checked={bonusType === bonusTypeEnum.MONEY} control={<Radio />} label="nhập số" />
-                <FormControlLabel value={bonusTypeEnum.PERCENT} checked={bonusType === bonusTypeEnum.PERCENT} control={<Radio />} label="phần trăm" />
+                <FormControlLabel value={bonusTypeEnum.MONEY} checked={bonusType === bonusTypeEnum.MONEY} control={<Radio />} label="Nhập số" />
+                <FormControlLabel value={bonusTypeEnum.PERCENT} checked={bonusType === bonusTypeEnum.PERCENT} control={<Radio />} label="Phần trăm" />
               </RadioGroup>
             </FormControl>
             <TextNumberInput
