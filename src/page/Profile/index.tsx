@@ -67,7 +67,7 @@ const Profile = () => {
             <LogoutIcon fontSize={'large'} />
           </button>
         </div>
-        <img src="/src/assets/profile-picture.png" alt="" referrerPolicy="no-referrer" className="rounded-full w-28" />
+        <img src="@app/assets/profile-picture.png" alt="" referrerPolicy="no-referrer" className="rounded-full w-28" />
         <span className="py-2 text-xl">{user?.name || ''}</span>
         <span className="text-md">{user?.email || ''}</span>
         <span className="pt-4 text-md">
